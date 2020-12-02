@@ -1,0 +1,70 @@
+/* You can add global styles to this file, and also import other style files */
+
+$primary: #58723C;
+
+@import "../node_modules/map-wald-leaflet/map-wald.scss";
+
+// $fa-font-path: "../node_modules/font-awesome/fonts";
+@import "../node_modules/font-awesome/scss/font-awesome.scss";
+
+/* Importing Bootstrap SCSS file. */
+@import '~bootstrap/scss/bootstrap';
+@import '../node_modules/leaflet/dist/leaflet.css';
+@import '../node_modules/leaflet-draw/dist/leaflet.draw.css';
+
+// $navbar-height: 80px;
+$navbar-height: 0px;
+
+.navbar-inverse{
+  // background-color: rgb(239,56,42);
+  height:$navbar-height;
+}
+
+.leafletHost, .main-map{
+  position:fixed;
+  left:0px;
+  top:$navbar-height;
+  bottom:0;
+  width:100%;
+  height:auto;
+/*  height:400px;
+  position:relative;
+  top:0px;
+*/
+}
+
+.map-controls {
+  // background: white;
+  background: transparent;
+  padding: 10px;
+
+  h5 {
+    color: $primary;
+  }
+}
+
+.citation {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+a.logo:focus {
+  outline: none;
+}
+
+.logo-block {
+  padding-bottom: 15px;
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+.btn-download {
+  margin-top: 20px;
+  margin-right: 20px;
+}
+
+label {
+  font-size: 1rem;
+  font-weight: 100;
+}
+
