@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Terrain",
+    "icon": "fa-area-chart",
+    "urlTemplate": "https://server.arcgisonline.com/ArcGIS/rest/services/World_Shaded_Relief/MapServer/tile/{z}/{y}/{x}",
+    "maxNativeZoom": 13
+  },
+  {
+    "name": "Streets",
+    "icon": "fa-road",
+    "urlTemplate": "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+  },
+  {
+    "name": "Satellite",
+    "icon": "fa-globe",
+    "urlTemplate": "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+  },
+  {
+    "name": "Dark",
+    "icon": "fa-star",
+    "urlTemplate": "https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png"
+  }
+]

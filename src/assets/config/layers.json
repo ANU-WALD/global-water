@@ -1,0 +1,67 @@
+[
+  {
+    "type":"grid",
+    "source":"tds",
+    "label":"Soil Moisture",
+    "filename":"/ub8/global/GRAFS/GRAFS_TopSoilRelativeWetness_{{year}}.nc",
+    "variable":"relative_wetness",
+    "mapParams":{
+      "colorscalerange": "0,1",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_fmc_rdylbu_9",
+      "numcolorbands": 9,
+      "time":"{{year}}-{{month}}-{{day}}T00%3A00%3A00.000Z"
+    },
+    "timePeriod":{
+      "start":2015,
+      "end":0
+    }
+  },
+  {
+    "type":"grid",
+    "source":"tds",
+    "label":"Rainfall",
+    "filename":"/ub8/global/climate/MSWEP_v1.1/daily/{{year}}.nc",
+    "variable":"precipitation",
+    "mapParams":{
+      "colorscalerange": "0,50",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_wald_blues09",
+      "numcolorbands": 9,
+      "time":"{{year}}-{{month}}-{{day}}T00%3A00%3A00.000Z"
+    },
+    "timePeriod":{
+      "start":2000,
+      "end":2014
+    }
+  },
+  {
+    "type":"point",
+    "label":"Water bodies",
+    "filename":"ub8/global/GRALM/Global_Reservoir_Storage_B (1984-current).nc",
+    "meta":[
+
+    ],
+    "variables":[
+      "storage"
+    ],
+    "time":"time",
+    "timeFirst":true
+  },
+  {
+    "type":"point",
+    "label":"Streamflow",
+    "filename":"ub8/global/GRALM/Global_River_Discharge_GSGR (2000-present).nc",
+    "meta":[
+      "Riv_Qmean",
+      "Riv_Qmax"
+    ],
+    "variables":[
+      "river_discharge"
+    ],
+    "time":"Time",
+    "timeFirst":false
+  }
+]

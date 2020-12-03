@@ -1,0 +1,198 @@
+<!--
+<div id="main-map" class="main-map">
+ -->
+<div>
+  <leaflet-map class="main-map"
+               [baseMap]="basemap"
+               [bounds]="bounds"
+               [minZoom]="1"
+               [maxZoom]="16"
+               [zoomControl]="false">
+    <wms-layer [url]="wmsURL" [params]="wmsParams"></wms-layer>
+
+    <draw *ngIf="!showVectors"
+          (featureClosed)="vectorFeatureClicked($event)">
+    </draw>
+
+    <geojson-layer *ngIf="showVectors&&vectorLayer?.source"
+                   [url]="vectorLayer.source"
+                   (featureSelected)="vectorFeatureClicked($event)">
+
+    </geojson-layer>
+
+    <vector-tile-layer *ngIf="showVectors&&vectorLayer?.tiles"
+                       [url]="vectorLayer.tiles"
+                       [styles]="vectorStyles"
+                       [sublayers]="vectorLayer.tileLayers"
+                       (featureSelected)="vectorFeatureClicked($event)"></vector-tile-layer>
+
+
+    <map-control [position]="'TOP_RIGHT'">
+      <app-map-buttons [basemaps]="basemaps"
+                       [minZoom]="5"
+                       [maxZoom]="16"
+                       [vectorLayers]="vectorLayers"
+                       (optionsChanged)="displayOptionsChanged($event)"
+                       [helpModal]="splash">
+
+      </app-map-buttons>
+    </map-control>
+
+    <map-control [position]="'TOP_LEFT'">
+      <div class="map-controls">
+        <div class="logo-block">
+          <span class="header-title">
+            <img class="logo"
+                 alt="Water Monitor"
+                 src="assets/anuwald_round_large_tr.png"
+                 height="50">
+          </span>
+
+          <span class="float-right">
+            <a class="logo" href="http://wald.anu.edu.au/" target="_blank">
+              <img  class="logo"
+                    alt="Centre for Water and Landscape Dynamics"
+                    src="assets/anuwald_round_large_tr.png"
+                    height="50">
+            </a>
+          </span>
+        </div>
+        <ngb-accordion *ngIf="showWindows" #acc="ngbAccordion" activeIds="map-panel">
+          <ngb-panel id="map-panel">
+            <ng-template ngbPanelHeader let-opened="opened">
+              <div class="d-flex align-items-center justify-content-between">
+                <h5 class="m-0">1. Choose map</h5>
+                <button ngbPanelToggle class="btn btn-link-primary btn-link p-0">
+                  <i class="fa" [ngClass]="opened?'fa-minus':'fa-plus'"></i>
+                </button>
+              </div>
+            </ng-template>
+            <ng-template ngbPanelContent>
+              <app-map-controls [layers]="layers"
+                                [orientation]="'vertical'"
+                                (optionsChanged)="mapOptionsChanged($event)">
+              </app-map-controls>
+
+              <div class="row form-group">
+                <div class="col-6">
+                  <label for="basemapSelect">background</label>
+                </div>
+                <div class="col-6">
+                  <select [(ngModel)]="basemap"
+                          id="basemapSelect"
+                          (ngModelChange)="basemapChanged()"
+                          class="form-control form-control-sm">
+                    <option *ngFor="let bl of basemaps" [ngValue]="bl">{{bl.name}}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-6">
+                  <label for="vector-selection">boundaries</label>
+                </div>
+                <div class="col-6">
+                  <app-vector-layer-selection [vectorLayers]="vectorLayers"
+                                              [currentZoom]="zoom"
+                                              [enabled]="showVectors"
+                                              (vectorLayerSelected)="vectorLayerChanged($event)">
+                  </app-vector-layer-selection>
+                </div>
+              </div>
+            </ng-template>
+          </ngb-panel>
+
+          <ngb-panel id="chart-panel">
+            <ng-template ngbPanelHeader let-opened="opened">
+              <div class="d-flex align-items-center justify-content-between">
+                <h5 class="m-0">2. Query data</h5>
+                <button ngbPanelToggle class="btn btn-link-primary btn-link p-0">
+                  <i class="fa" [ngClass]="opened?'fa-minus':'fa-plus'"></i>
+                </button>
+              </div>
+            </ng-template>
+            <ng-template ngbPanelContent>
+              <div class="row">
+                <div class="col-12">
+                  <div class="btn-group btn-group-toggle"
+                       ngbRadioGroup
+                       name="polygonSelection"
+                       [(ngModel)]="polygonMode"
+                       (ngModelChange)="polygonModeChanged()">
+                    <label ngbButtonLabel [ngClass]="(polygonMode==='predefined')?'btn-primary':'btn-secondary'">
+                      <input ngbButton type="radio" value="predefined">Select area
+                    </label>
+                    <label ngbButtonLabel [ngClass]="(polygonMode==='draw')?'btn-primary':'btn-secondary'">
+                      <input ngbButton type="radio" value="draw">Draw polygon
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="chartSeries?.length">
+                <app-chart [series]="chartSeries"
+                           axisLabel="Woody cover (%)">
+
+                </app-chart>
+                <div class="row">
+                  <div class="col-8">
+                    <table>
+                      <thead>
+                        <tr>
+                          <td style="column-span: 2;"><strong>mean values:</strong></td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>woody cover:</td>
+                          <td>{{treeCover[0]}} to {{treeCover[1]}} %</td>
+                        </tr>
+                        <tr>
+                          <td>vegetation height:</td>
+                          <td>{{canopy}} m</td>
+                        </tr>
+                        <tr>
+                          <td>dry biomass:</td>
+                          <td>{{biomass}} t per ha</td>
+                        </tr>
+                        <tr>
+                          <td>area:</td>
+                          <td>{{area}} {{areaUnits}}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="col-4">
+                    <button class="btn btn-primary btn-download" (click)="downloadClick()">Download</button>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </ngb-panel>
+
+        </ngb-accordion>
+      </div>
+
+    </map-control>
+
+    <map-control [position]="'BOTTOM_RIGHT'">
+      <div *ngIf="showWindows&&layer" class="legend">
+        <app-legend [labels]="legendLabels"
+                    [colours]="legendColours"
+                    [title]="layer.label"
+                    [mapUnits]="layer.units"
+                    [helpText]="layer.help"
+                    [tooltipPlacement]="'top'">
+        </app-legend>
+        <span>
+            Data by <a href="http://wald.anu.edu.au/" target="_blank">ANU Centre for Water and Landscape Dynamics</a>
+        </span>
+      </div>
+    </map-control>
+
+  </leaflet-map>
+</div>
+
+<one-time-splash #splash application="tree-change" klass="about" label="">
+  <app-about></app-about>
+</one-time-splash>
