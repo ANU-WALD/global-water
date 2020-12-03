@@ -205,43 +205,40 @@ export class MainMapComponent implements OnInit, OnChanges {
   getLegendData(): void {
     return;
 
-    // const valueOffset = (this.layer.options&&this.layer.options.delta&&this.difference) ?
-    //   (this.layer.options.deltaOffset||DEFAULT_DELTA_OFFSET) :
-    //   0;
-    let url = `${environment.wms}?`;
-    url += `layers=${this.wmsParams.layers}`;
-    url += '&request=GetLegendGraphic&service=WMS&version=1.1.1';
+    // let url = `${environment.wms}?`;
+    // url += `layers=${this.wmsParams.layers}`;
+    // url += '&request=GetLegendGraphic&service=WMS&version=1.1.1';
 
-    this.http.get(url).subscribe((data: LegendResponse)=>{
-      const TARGET_N_COLOURS = 6;
-      let filter = (v:any,i:number)=>true;
-      if(data.palette.length > TARGET_N_COLOURS) {
-        filter = (v:any,i:number)=>{
-          return (i===1) ||
-                 (i===data.palette.length-1)||
-                 (i&&(i%(Math.floor(data.palette.length / (TARGET_N_COLOURS-2)))===0));
-        };
-      }
-      // this.legendLabels = data.values.filter(filter).map(v=>(v+valueOffset).toFixed()).reverse();
-      // if(!this.difference){
-      //   this.legendLabels[0] = this.layer.options.range[1].toFixed();
-      // }
-      this.legendColours = data.palette.filter(filter).map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse();
-    });
+    // this.http.get(url).subscribe((data: LegendResponse)=>{
+    //   const TARGET_N_COLOURS = 6;
+    //   let filter = (v:any,i:number)=>true;
+    //   if(data.palette.length > TARGET_N_COLOURS) {
+    //     filter = (v:any,i:number)=>{
+    //       return (i===1) ||
+    //              (i===data.palette.length-1)||
+    //              (i&&(i%(Math.floor(data.palette.length / (TARGET_N_COLOURS-2)))===0));
+    //     };
+    //   }
+    //   // this.legendLabels = data.values.filter(filter).map(v=>(v+valueOffset).toFixed()).reverse();
+    //   // if(!this.difference){
+    //   //   this.legendLabels[0] = this.layer.options.range[1].toFixed();
+    //   // }
+    //   this.legendColours = data.palette.filter(filter).map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse();
+    // });
   }
 
-  setupChart(chartData: TableRow[]): void{
-    if(!chartData) {
-      this.chartSeries = [];
-      return;
-    }
+  // setupChart(chartData: TableRow[]): void{
+  //   if(!chartData) {
+  //     this.chartSeries = [];
+  //     return;
+  //   }
 
-    this.chartSeries = [
-      {
-        data:chartData
-      }
-    ];
-  }
+  //   this.chartSeries = [
+  //     {
+  //       data:chartData
+  //     }
+  //   ];
+  // }
 
   mapOptionsChanged(event: MapSettings): void {
     this.gaEvent('layer','wms',
@@ -278,65 +275,65 @@ export class MainMapComponent implements OnInit, OnChanges {
     }
   }
 
-  getValues(geoJSON: any, layer: string, callback: ((data: TableRow[])=>void)): void {
-    const currentSelection = this.selectionNum;
+  // getValues(geoJSON: any, layer: string, callback: ((data: TableRow[])=>void)): void {
+  //   const currentSelection = this.selectionNum;
 
-    this.http.post(environment.wps,{
-      layer_name:layer,
-      vector:geoJSON
-    }, {
-      responseType:'text'
-    }).subscribe(res=>{
-      if(this.selectionNum !== currentSelection) {
-        return;
-      }
+  //   this.http.post(environment.wps,{
+  //     layer_name:layer,
+  //     vector:geoJSON
+  //   }, {
+  //     responseType:'text'
+  //   }).subscribe(res=>{
+  //     if(this.selectionNum !== currentSelection) {
+  //       return;
+  //     }
 
-      const data = parseCSV(res,{
-        columns:DATA_COLUMNS
-      });
-      callback(data);
-    });
-  }
+  //     const data = parseCSV(res,{
+  //       columns:DATA_COLUMNS
+  //     });
+  //     callback(data);
+  //   });
+  // }
 
-  vectorFeatureClicked(geoJSON: any): void {
-    this.selectionNum++;
-    const currentSelection = this.selectionNum;
-    this.gaEvent('action','select-polygon',`${this.showVectors?this.vectorLayer.name:'custom-drawn'}`);
-    this.area = area(geoJSON);
-    if(this.area < 10000) {
-      this.areaUnits = 'm'+SUPER2;
-    } else if(this.area < 1000000) {
-      this.area /= 10000;
-      this.areaUnits = 'ha';
-    } else {
-      this.area /= 1000000;
-      this.areaUnits = 'km'+SUPER2;
-    }
+  // vectorFeatureClicked(geoJSON: any): void {
+  //   this.selectionNum++;
+  //   const currentSelection = this.selectionNum;
+  //   this.gaEvent('action','select-polygon',`${this.showVectors?this.vectorLayer.name:'custom-drawn'}`);
+  //   this.area = area(geoJSON);
+  //   if(this.area < 10000) {
+  //     this.areaUnits = 'm'+SUPER2;
+  //   } else if(this.area < 1000000) {
+  //     this.area /= 10000;
+  //     this.areaUnits = 'ha';
+  //   } else {
+  //     this.area /= 1000000;
+  //     this.areaUnits = 'km'+SUPER2;
+  //   }
 
-    this.area = +this.area.toFixed(DECIMAL_PLACES);
+  //   this.area = +this.area.toFixed(DECIMAL_PLACES);
 
-    setTimeout(()=>{
-      if(this.selectionNum!==currentSelection){
-        return;
-      }
+  //   setTimeout(()=>{
+  //     if(this.selectionNum!==currentSelection){
+  //       return;
+  //     }
 
-      this.setupChart(null);
+  //     this.setupChart(null);
 
-      this.getValues(geoJSON,'wcf',data=>{
-        this.setupChart(data);
-        this.treeCover[0] = +Math.min(...data.map(r=>r.value)).toFixed(DECIMAL_PLACES);
-        this.treeCover[1] = +Math.max(...data.map(r=>r.value)).toFixed(DECIMAL_PLACES);
-      });
+  //     this.getValues(geoJSON,'wcf',data=>{
+  //       this.setupChart(data);
+  //       this.treeCover[0] = +Math.min(...data.map(r=>r.value)).toFixed(DECIMAL_PLACES);
+  //       this.treeCover[1] = +Math.max(...data.map(r=>r.value)).toFixed(DECIMAL_PLACES);
+  //     });
 
-      this.getValues(geoJSON,'vegh',data=>{
-        this.canopy = +data[0].value.toFixed(DECIMAL_PLACES);
-      });
+  //     this.getValues(geoJSON,'vegh',data=>{
+  //       this.canopy = +data[0].value.toFixed(DECIMAL_PLACES);
+  //     });
 
-      this.getValues(geoJSON,'wagb',data=>{
-        this.biomass = +data[0].value.toFixed(DECIMAL_PLACES);
-      });
-    });
-  }
+  //     this.getValues(geoJSON,'wagb',data=>{
+  //       this.biomass = +data[0].value.toFixed(DECIMAL_PLACES);
+  //     });
+  //   });
+  // }
 
   resetBounds(): void {
     this.bounds = Object.assign({},FULL_EXTENT);
@@ -374,9 +371,9 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.baseMapURL = this.basemap.urlTemplate;
   }
 
-  polygonModeChanged(): void {
-    this.showVectors = this.polygonMode==='predefined';
-  }
+  // polygonModeChanged(): void {
+  //   this.showVectors = this.polygonMode==='predefined';
+  // }
 
   closeAbout(): void {
     this.splash.close();
@@ -395,49 +392,6 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
-  downloadClick(): void {
-    const submittedPreviously = store.get(EMAIL_KEY,false);
-    if(submittedPreviously){
-      this.doDownload();
-      return;
-    }
-
-    const modalRef = this.modalService.open(DownloadFormComponent);
-    const component: DownloadFormComponent = modalRef.componentInstance;
-    const sub = component.submitted.subscribe(()=>{
-      modalRef.close();
-      sub.unsubscribe();
-    });
-
-    modalRef.result.then(res=>{
-      this.doDownload();
-      store.set(EMAIL_KEY,true);
-    }, rej=>{
-    });
-  }
-
-  makeCSV(): string {
-    const res = ([] as string[]).concat(
-      DATA_COLUMNS.join(','),
-      this.chartSeries[0].data.map(r=>{
-        return DATA_COLUMNS.map(c=>r[c]).join(',');
-      }),
-      ',',
-      `vegetation height,${this.canopy} m`,
-      `dry biomass,${this.biomass} t per ha`,
-      `area,${this.area} ${this.areaUnits}`);
-    return res.join('\n');
-  }
-
-  doDownload(): void {
-    const fileName = 'tree-change.csv';
-
-    const output = new Blob(
-      [this.makeCSV()],
-      {type: 'text/plain;charset=utf-8'});
-    FileSaver.saveAs(output, fileName);
-    this.gaEvent('action','download-csv',`${this.showVectors?this.vectorLayer.name:'custom-drawn'}`);
-  }
 }
 
 // &threshold=50&styles=
