@@ -1,0 +1,40 @@
+sudo: false
+language: node_js
+node_js: 10
+before_install:
+- openssl aes-256-cbc -K $encrypted_927ecb221329_key -iv $encrypted_927ecb221329_iv
+  -in id_rsa_deploy.enc -out id_rsa_deploy -d
+- chmod 600 id_rsa_deploy
+install:
+- npm install '@angular/cli' -g
+- npm install
+- npm list || true
+- gem install compass
+#- cd node_modules/map-wald && npm install && (npm list || true) && cd -
+script:
+- npm config ls -l
+- echo $TRAVIS_BRANCH
+- node --version
+- ng version
+#- cd node_modules/map-wald && npm run build && rm -rf node_modules && cd -
+# - SCRIPTS_FN=src/environments/environment.prod.ts
+# - sed "s/WENFO_GOOGLE_MAPS_API_KEY/$GOOGLE_MAPS_API_KEY/g" < $SCRIPTS_FN > tmp
+# - mv tmp $SCRIPTS_FN
+- env BRANCH=$TRAVIS_BRANCH npm run build
+deploy:
+- skip_cleanup: true
+  provider: script
+  script: cd dist/global-water && scp -o StrictHostKeyChecking=no -i ../id_rsa_deploy -r . $FTP_USER@wenfo.org:/home/$FTP_USER/public_html/global-water/staging
+  on:
+    branch: master
+- skip_cleanup: true
+  provider: script
+  script: cd dist/global-water && scp -o StrictHostKeyChecking=no -i ../id_rsa_deploy -r . $FTP_USER@wenfo.org:/home/$FTP_USER/public_html/global-water
+  on:
+    branch: production
+notifications:
+  email: false
+  slack:
+    rooms:
+      secure: 0J1RBOWZJUnm3KlvEIPyvR/D9RfhKP1+nGTeFKTQ5fFuqnlRBgaiJEZFyVaB6J3zLgzj+KHsqkw/uOVIKIdDOPZqhqZ/E/+yqUNrZnfT9HdDWs7o58vIm9QJLo9tg5+SWrMMGIu7D1e601Ue2Ay9ESwExAoRHxfsg9C2T+O57gilxKK4sPb8yM+L4U0FAyN2hjE8CnVmH0hBKIAjjKmrF1PY4sdy4y/t87uGzoi0ammZ7lsNABNAxRlsqXrXbYpIlyPqnrtZwVXDI4ROUKADyHyAFI4qQUrCn3Y6zqp0vNoizwjj7l36gcQZRLjqxMqa98hhXbPTflmqCajvqdLiozKdpztw/hmr+VOQSRRj8N2kwPwFC32ikSF+J0SyVyX4AP1QMfADVC7aJuRRTaRdvmzKRnklssolUKW3HuArBo1yVJJDi8nAW7ZoX6Vakzo3UeAw786zYpYfy5Iq0dvjeB3636CwZqxEsHoUYFk/4evE6sQGoXgPuzU9Oe+oV6+FETEGl31dLPu64snqx0MK/awjumuit1SdZhbMFm8Yi83+plde7dEwWzVDk6OYaLCeEG4Zun1V/kUQyOtdQTgp1KgspaWaXDgkyw0i3pg7jIYAlwu7MH+wj9W1/u77nR7a3zF6TEecAANEqMDikAstQVSwga4Le6DWhXqUPMclO+0=
+    on_success: always

@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --port 9006 --host 0.0.0.0 --proxy-config proxy.conf.json",
-    "build": "ng build --prod --base-href /global-water/",
+    "build": "if [ $BRANCH = 'production' ]; then export PREFIX='/global-water/'; else export PREFIX='/global-water/staging/'; fi; npm run build-with-prefix",
+    "build-with-prefix": "echo prefix=$PREFIX && ng build --prod --base-href $PREFIX",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
