@@ -9,11 +9,14 @@
 
   <div class="row">
     <div class="col-6">
-      <date-selection [minDate]="settings.layer?.timePeriod?.start"
+      <date-selection [date]="settings.date"
+                      [minDate]="settings.layer?.timePeriod?.start"
                       [maxDate]="settings.layer?.timePeriod?.end"
                       [style]="'popup'"
                       [disabled]="!settings.layer?.timePeriod"
-                      (dateChange)="dateChanged($event)"></date-selection>
+                      (dateChange)="dateChanged($event)"
+                      [step]="true"
+                      [stepDays]="7"></date-selection>
     </div>
     <div class="col-6">
       <span>TODO: Animation controls?</span>

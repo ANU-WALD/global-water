@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges, ViewChild, NgModule
 import * as L from 'leaflet';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { parseCSV, TableRow, Bounds, InterpolationService } from 'map-wald';
+import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate } from 'map-wald';
 import { ChartSeries } from '../chart/chart.component';
 import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings } from '../data';
 import { ConfigService } from '../config.service';
@@ -36,7 +36,7 @@ const DEFAULT_DELTA_OFFSET=-50;
   styleUrls: ['./main-map.component.scss']
 })
 export class MainMapComponent implements OnInit, OnChanges {
-  @Input() date: Date;
+  @Input() date: UTCDate;
   @Input() layer: LayerDescriptor;
   @ViewChild('splash', { static: true }) splash: OneTimeSplashComponent;
 
@@ -96,6 +96,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.layersService.layerConfig$.subscribe(layers=>{
       this.layers = layers;
       this.layer = this.layers[0];
+      this.date = this.layer.timePeriod?.end;
       this.setupMapLayer();
     });
   }
