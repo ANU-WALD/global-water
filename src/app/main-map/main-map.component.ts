@@ -6,13 +6,15 @@ import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate } from 'map-w
 import { ChartSeries } from '../chart/chart.component';
 import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings } from '../data';
 import { ConfigService } from '../config.service';
-import { LeafletService, OneTimeSplashComponent, BasemapDescriptor, VectorLayerDescriptor, makeColour } from 'map-wald-leaflet';
+import { LeafletService, OneTimeSplashComponent, BasemapDescriptor,
+  VectorLayerDescriptor, PointMode } from 'map-wald-leaflet';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { DownloadFormComponent } from '../download-form/download-form.component';
 import * as store from 'store';
 import * as FileSaver from 'file-saver';
 import area from '@turf/area';
 import { LayersService } from '../layers.service';
+import { PointDataService } from '../point-data.service';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -40,6 +42,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   @Input() layer: LayerDescriptor;
   @ViewChild('splash', { static: true }) splash: OneTimeSplashComponent;
 
+  pointMode = PointMode;
   selectionNum = 0;
   zoom: number;
   vectorLayers: VectorLayerDescriptor[];
@@ -47,6 +50,8 @@ export class MainMapComponent implements OnInit, OnChanges {
   showWindows = true;
   basemap: BasemapDescriptor;
   transparency = 0;
+
+  pointLayerFeatures: any;
 
   get opacity(): number {
     return 1-0.01*this.transparency;
@@ -78,7 +83,8 @@ export class MainMapComponent implements OnInit, OnChanges {
               private appConfig: ConfigService,
               private _map: LeafletService,
               private modalService: NgbModal,
-              private layersService: LayersService) {
+              private layersService: LayersService,
+              private pointData: PointDataService ) {
     console.log('MainMapComponent');
     this.resetBounds();
 
@@ -171,6 +177,23 @@ export class MainMapComponent implements OnInit, OnChanges {
       return;
     }
 
+    this.wmsParams = null;
+    this.pointLayerFeatures = null;
+
+    if(this.layer.type==='grid'){
+      this.setupWMSLayer();
+    } else {
+      this.setupPointLayer();
+    }
+  }
+
+  private setupPointLayer(): void {
+    this.pointData.getSites(this.layer.label).subscribe(features => {
+      this.pointLayerFeatures = features;
+    });
+  }
+
+  private setupWMSLayer(): void {
     this.wmsURL = this.mapUrl();
 
     const options: any =  {
@@ -273,6 +296,10 @@ export class MainMapComponent implements OnInit, OnChanges {
         this.configureVectorLayer(event.vectorLayer);
       });
     }
+  }
+
+  pointClicked(geoJSON: any): void {
+    console.log(geoJSON);
   }
 
   // getValues(geoJSON: any, layer: string, callback: ((data: TableRow[])=>void)): void {

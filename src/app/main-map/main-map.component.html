@@ -14,6 +14,13 @@
           (featureClosed)="vectorFeatureClicked($event)">
     </draw>
 
+    <geojson-layer *ngIf="pointLayerFeatures"
+    [features]="pointLayerFeatures"
+    [pointMode]="pointMode.circle"
+    (featureSelected)="pointClicked($event)">
+
+    </geojson-layer>
+
     <geojson-layer *ngIf="showVectors&&vectorLayer?.source"
                    [url]="vectorLayer.source"
                    (featureSelected)="vectorFeatureClicked($event)">

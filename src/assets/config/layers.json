@@ -40,7 +40,8 @@
   {
     "type":"point",
     "label":"Water bodies",
-    "filename":"ub8/global/GRALM/Global_Reservoir_Storage_B (1984-current).nc",
+    "filename":"ub8/global/GRALM/Global_Lake_Storage (2015-present).nc",
+    "filenameX":"ub8/global/GRALM/Global_Reservoir_Storage_B (1984-current).nc",
     "meta":[
 
     ],

@@ -165,9 +165,11 @@ export class FeatureDataService {
   }
 
   private _retrieveLayer(lyr: FeatureDataConfig): Observable<FeatureCollection> {
-    const variables = lyr.meta || [];
+    let variables = lyr.meta || [];
     const url = `${environment.tds}/dodsC/${lyr.filename}`;
     const idCol = lyr.id||DEFAULT_ID_COLUMN;
+    variables = variables.concat([idCol,'latitude','longitude']);
+
     return forkJoin([this.metadata.dasForUrl(url),this.metadata.ddxForUrl(url)]).pipe(
       map(([das,ddx]) => {
         const size = +ddx.variables[idCol].dimensions[0].size;
