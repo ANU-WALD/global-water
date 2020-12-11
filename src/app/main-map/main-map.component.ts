@@ -2,7 +2,7 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges, ViewChild, NgModule
 import * as L from 'leaflet';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
-import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate } from 'map-wald';
+import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate, RangeStyle, PaletteService } from 'map-wald';
 import { ChartSeries } from '../chart/chart.component';
 import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings } from '../data';
 import { ConfigService } from '../config.service';
@@ -15,6 +15,7 @@ import * as FileSaver from 'file-saver';
 import area from '@turf/area';
 import { LayersService } from '../layers.service';
 import { PointDataService } from '../point-data.service';
+import { forkJoin } from 'rxjs';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -78,13 +79,16 @@ export class MainMapComponent implements OnInit, OnChanges {
   biomass: number;
   area: number;
   areaUnits = 'km'+SUPER2;
+  siteFill: RangeStyle<string>;
+  siteSize: RangeStyle<number>;
 
   constructor(private http: HttpClient,
               private appConfig: ConfigService,
               private _map: LeafletService,
               private modalService: NgbModal,
               private layersService: LayersService,
-              private pointData: PointDataService ) {
+              private pointData: PointDataService,
+              private palettes: PaletteService ) {
     console.log('MainMapComponent');
     this.resetBounds();
 
@@ -188,8 +192,16 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   private setupPointLayer(): void {
-    this.pointData.getSites(this.layer.label).subscribe(features => {
+    forkJoin([
+      this.pointData.getValues(this.layer.label,{},this.date),
+      this.palettes.getPalette('PuBu',false,5)
+    ]).subscribe(([features,palette]) => {
       this.pointLayerFeatures = features;
+      const max = Math.max(...(features.features).map(f=>f.properties.value));
+      const breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
+      this.siteFill = new RangeStyle('value',palette,breaks);
+      this.siteSize = new RangeStyle('value',[2,3,5,8,13],breaks);
+
     });
   }
 

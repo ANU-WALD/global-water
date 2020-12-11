@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { shareReplay, map, switchAll, tap } from 'rxjs/operators';
 import { Observable, forkJoin, of, config } from 'rxjs';
-import { MetadataService, OpendapService, TimeSeries } from 'map-wald';
+import { MetadataService, OpendapService, TimeSeries, UTCDate } from 'map-wald';
 import { FeatureCollection, Feature, GeoJsonProperties } from 'geojson';
 import { Point } from 'leaflet';
 import { FeatureDataService, FeatureDataConfig } from './feature-data.service';
@@ -50,13 +50,13 @@ export class PointDataService {
       switchAll());
   }
 
-  getTimes(layer: string): Observable<Date[]> {
+  getTimes(layer: string): Observable<UTCDate[]> {
     return this._layerConfig(layer).pipe(
       map(lyr=>this.featureData.getTimes(lyr)),
       switchAll());
   }
 
-  getValues(layer:string, filter:{[key:string]:any}, timestep: Date, variable?: string): Observable<FeatureCollection>{
+  getValues(layer:string, filter:{[key:string]:any}, timestep: UTCDate, variable?: string): Observable<FeatureCollection>{
     return this._layerConfig(layer).pipe(
       map(lyr=>this.featureData.getValues(lyr,filter,timestep,variable)),
       switchAll());

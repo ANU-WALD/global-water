@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Feature, FeatureCollection } from 'geojson';
 import { Observable, forkJoin, of } from 'rxjs';
-import { TimeSeries, MetadataService, OpendapService } from 'map-wald';
+import { TimeSeries, MetadataService, OpendapService, UTCDate } from 'map-wald';
 import { map, switchAll } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LayerDescriptor } from './data';
@@ -51,7 +51,7 @@ export class FeatureDataService {
       }));
   }
 
-  getTimes(layer: FeatureDataConfig): Observable<Date[]> {
+  getTimes(layer: FeatureDataConfig): Observable<UTCDate[]> {
     return of(layer).pipe(
       map(cfg=>{
         const url = `${environment.tds}/dodsC/${cfg.filename}`;
@@ -61,7 +61,14 @@ export class FeatureDataService {
     );
   }
 
-  getValues(layer:FeatureDataConfig, filter:{[key:string]:any}, timestep: Date, variable?: string): Observable<FeatureCollection>{
+  private _closestTimeIndex(date:UTCDate, dates:UTCDate[]):number {
+    const dateT = date.getTime();
+    const deltas = dates.map(t => Math.abs(t.getTime() - dateT));
+    const closest = deltas.indexOf(Math.min(...deltas));
+    return closest;
+  }
+
+  getValues(layer:FeatureDataConfig, filter:{[key:string]:any}, timestep: UTCDate, variable?: string): Observable<FeatureCollection>{
     return this.getFeatures(layer).pipe(
       map((f)=>{
         const features:FeatureCollection = f;
@@ -85,7 +92,7 @@ export class FeatureDataService {
       switchAll(),
       map(([das,timeDim,query])=>{
         const featureRange = this.dap.dapRangeQuery(0,query.features.features.length-1);
-        const timeStepIdx = timeDim.indexOf(timestep);
+        const timeStepIdx = this._closestTimeIndex(timestep,timeDim);
         if(timeStepIdx<0){
           // Error
         }
@@ -112,7 +119,7 @@ export class FeatureDataService {
           const idx = (data[idCol] as number[]).indexOf(newF.properties[idCol]);
           newF.properties.value = data[query.variable][idx];
           return newF;
-        })
+        }).filter(f=>f.properties.value!==null)
         return result;
       }));
   }
@@ -151,7 +158,7 @@ export class FeatureDataService {
       map(([data,query])=>{
         const vals = data[query.variable] as number[];
         return {
-          dates:data[query.config.time] as Date[],
+          dates:data[query.config.time] as UTCDate[],
           values:vals
         };
       }),
