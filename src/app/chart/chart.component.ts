@@ -16,7 +16,8 @@ export class ChartComponent implements OnInit, OnChanges {
   @Input() title: string;
   @Input() axisLabel: string;
   @Input() series: ChartSeries[];
-
+  @Input() x = 'year';
+  @Input() y = 'value';
   constructor() { }
 
   ngOnInit(): void {
@@ -37,8 +38,8 @@ export class ChartComponent implements OnInit, OnChanges {
 
     const series = [
       {
-        x: chartData.map(r=>r.year),
-        y: chartData.map(r=>r.value),
+        x: chartData.map(r=>r[this.x]),
+        y: chartData.map(r=>r[this.y]),
         name: 'Woody cover',
         mode: 'lines+markers',
         connectgaps: true,
@@ -50,8 +51,8 @@ export class ChartComponent implements OnInit, OnChanges {
         }
       },
       {
-        x: chartData.slice(chartData.length-2).map(r=>r.year),
-        y: chartData.slice(chartData.length-2).map(r=>r.value),
+        x: chartData.slice(chartData.length-2).map(r=>r[this.x]),
+        y: chartData.slice(chartData.length-2).map(r=>r[this.y]),
         name: '',
         mode: 'lines',
         connectgaps: true,

@@ -312,6 +312,19 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   pointClicked(geoJSON: any): void {
     console.log(geoJSON);
+    this.pointData.getTimeSeries(this.layer.label,geoJSON).subscribe(timeseries=>{
+      const chartData = timeseries.dates.map((d,i)=>{
+        return {
+          date:d,
+          value:timeseries.values[i]
+        };
+      }).filter(row=>(row.value!==null)&&!isNaN(row.value));
+      this.chartSeries = [
+        {
+          data:chartData
+        }
+      ];
+    });
   }
 
   // getValues(geoJSON: any, layer: string, callback: ((data: TableRow[])=>void)): void {
