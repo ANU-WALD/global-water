@@ -86,10 +86,10 @@ export class ChartComponent implements OnInit, OnChanges {
     },
     {
       displaylogo: false,
-      displayModeBar: false,
+      displayModeBar: true,
       modeBarButtonsToRemove: ['hoverCompareCartesian', 'hoverClosestCartesian',
         'lasso2d', 'select2d', 'toggleSpikelines', 'resetViews', 'sendDataToCloud',
-        'zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d', 'resetScale2d']
+        'zoom2d', 'pan2d', 'zoomIn2d', 'zoomOut2d', 'autoScale2d'/*, 'resetScale2d'*/]
     });
   }
 }
