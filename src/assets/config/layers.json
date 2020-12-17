@@ -20,21 +20,24 @@
   },
   {
     "type":"grid",
-    "source":"tds",
+    "source":"custom",
     "label":"Rainfall",
-    "filename":"/ub8/global/climate/MSWEP_v1.1/daily/{{year}}.nc",
-    "variable":"precipitation",
-    "mapParams":{
+    "url":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswep/wms",
+    "filenameX":"/ub8/global/climate/MSWEP_v1.1/daily/{{year}}.nc",
+    "variable":"mswep",
+    "mapParamsX":{
       "colorscalerange": "0,50",
       "belowmincolor": "transparent",
       "abovemaxcolor":"transparent",
       "styles": "boxfill/anu_wald_blues09",
-      "numcolorbands": 9,
-      "time":"{{year}}-{{month}}-{{day}}T00%3A00%3A00.000Z"
+      "numcolorbands": 9
+    },
+    "mapParams":{
+      "time":"{{year}}-{{month}}-{{day}}T00:00:00.000Z"
     },
     "timePeriod":{
-      "start":2000,
-      "end":2014
+      "start":1978,
+      "end":2018
     }
   },
   {

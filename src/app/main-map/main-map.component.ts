@@ -132,8 +132,8 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     if(this.date){
       subs.year = this.date.getUTCFullYear();
-      subs.month = this.date.getUTCMonth() + 1;
-      subs.day = this.date.getUTCDate();
+      subs.month = pad(this.date.getUTCMonth() + 1);
+      subs.day = pad(this.date.getUTCDate());
     }
     return subs;
   }
@@ -158,7 +158,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       return `${environment.tds}/wms/${this.mapFilename()}`;
     }
 
-    return environment.wms;
+    return this.layer.url || environment.wms;
   }
 
   substituteParameters(params: any): any{
@@ -444,6 +444,16 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
+}
+
+function pad(n: number,digits?: number): string{
+  digits = digits || 2;
+
+  let result = n.toString();
+  while (result.length<digits){
+    result = '0' + result;
+  }
+  return result;
 }
 
 // &threshold=50&styles=

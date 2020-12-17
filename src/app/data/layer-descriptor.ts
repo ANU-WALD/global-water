@@ -4,7 +4,8 @@ export interface LayerDescriptor {
   type:string;
   source:string;
   label:string;
-  filename:string;
+  url?: string;
+  filename?:string;
   meta:string[];
   variables?:string[];
   variable?:string;
