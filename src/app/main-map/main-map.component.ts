@@ -158,7 +158,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       return `${environment.tds}/wms/${this.mapFilename()}`;
     }
 
-    return this.layer.url || environment.wms;
+    return this.layer.url;
   }
 
   substituteParameters(params: any): any{

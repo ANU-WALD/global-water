@@ -13,7 +13,7 @@ export class ConfigService {
   basemaps$: Observable<BasemapDescriptor[]>;
 
   constructor(private http: HttpClient) {
-    this.vectorLayers$ = this.http.get('assets/foci.json').pipe(
+    this.vectorLayers$ = this.http.get(environment.vectorConfig).pipe(
       map((layers: VectorLayerDescriptor[])=>{
         return layers.map(l=>{
           if(l.source){
