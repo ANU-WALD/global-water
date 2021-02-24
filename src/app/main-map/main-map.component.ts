@@ -16,6 +16,7 @@ import area from '@turf/area';
 import { LayersService } from '../layers.service';
 import { PointDataService } from '../point-data.service';
 import { forkJoin } from 'rxjs';
+import {groupBy} from 'ramda';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -32,6 +33,9 @@ const FULL_EXTENT: Bounds = {
 };
 const DATA_COLUMNS=['date','value'];
 const DEFAULT_DELTA_OFFSET=-50;
+const CM_NORMAL='Normal';
+const CM_DEVIATION='Deviation from monthly mean';
+const CM_YR_ON_YR='Year on year';
 
 @Component({
   selector: 'app-main-map',
@@ -53,6 +57,8 @@ export class MainMapComponent implements OnInit, OnChanges {
   transparency = 0;
 
   pointLayerFeatures: any;
+  chartModes = [CM_NORMAL,CM_DEVIATION,CM_YR_ON_YR];
+  chartMode = CM_NORMAL;
 
   get opacity(): number {
     return 1-0.01*this.transparency;
@@ -68,6 +74,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   wmsURL:string;
   wmsParams: any = {};
   vectorStyles: any = {};
+  rawChartData: ChartSeries;
   chartSeries: ChartSeries[] = [];
   legendColours: string[] = [];
   legendLabels: string[] = [];
@@ -259,22 +266,80 @@ export class MainMapComponent implements OnInit, OnChanges {
     // });
   }
 
-  setupChart(chartData: TableRow[]): void{
+  setupChart(title: string, chartData: TableRow[]): void{
     if(!chartData) {
       this.chartSeries = [];
+      this.rawChartData = null;
       return;
     }
 
-    this.chartSeries = [
-      {
-        data:chartData
-      }
-    ];
+    this.rawChartData = {
+      title,
+      data:chartData
+    };
+
+    this.configureChartMode();
+  }
+
+  configureChartMode(): void {
+    switch(this.chartMode){
+      case CM_NORMAL:
+        this.chartSeries = [
+          this.rawChartData
+        ];
+        break;
+      case CM_DEVIATION:
+        this.chartSeries = [
+          {
+            title: this.rawChartData.title,
+            data: this.convertToMonthlyVariance(this.rawChartData.data)
+          }
+        ];
+        break;
+      case CM_YR_ON_YR:
+        const orig = this.rawChartData.data;
+        // const years = orig.map(r=>(r.date as UTCDate).getUTCFullYear());
+        const groups = groupBy(r=>(r.date as UTCDate).getUTCFullYear().toString(),orig);
+        const years = Object.keys(groups).map(yr=>+yr).sort().reverse();
+        const maxYear = years[0];
+        console.log(maxYear,years,groups);
+        this.chartSeries = years.map(yr=>{
+          return {
+            title: `${this.rawChartData.title}: ${yr}`,
+            data: groups[yr.toString()].map(r=>{
+              const d = r.date as Date;
+              d.setUTCFullYear(maxYear);
+              return {
+                date:d,
+                value:r.value
+              };
+            })
+          };
+        });
+        break;
+    }
+  }
+
+  convertToMonthlyVariance(chartData: TableRow[]): TableRow[] {
+    const monthlyTotals = new Array<number>(12).fill(0);
+    const monthlyCounts = new Array<number>(12).fill(0);
+    chartData.forEach(row=>{
+      const month = (row.date as UTCDate).getUTCMonth();
+      monthlyTotals[month] += row.value;
+      monthlyCounts[month]++;
+    });
+    const monthlyMeans = monthlyCounts.map((c,i)=>(c?(monthlyTotals[i]/c):NaN));
+    return chartData.map(row=>{
+      return {
+        date:row.date,
+        value:row.value - monthlyMeans[(row.date as UTCDate).getUTCMonth()]
+      };
+    });
   }
 
   mapOptionsChanged(event: MapSettings): void {
     this.gaEvent('layer','wms',
-      `${event.layer.label}:${event.date.toUTCString()}:${event.relative?event.relativeVariable:'-'}`);
+      `${event.layer.label}:${(event.date as Date).toUTCString()}:${event.relative?event.relativeVariable:'-'}`);
     this.layer = event.layer;
     this.date = this.layersService.constrainDate(event.date,this.layer);
     this.transparency = event.transparency;
@@ -309,18 +374,15 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   pointClicked(geoJSON: any): void {
     console.log(geoJSON);
-    this.pointData.getTimeSeries(this.layer.label,geoJSON).subscribe(timeseries=>{
+    const layer = this.layer;
+    this.pointData.getTimeSeries(layer.label,geoJSON).subscribe(timeseries=>{
       const chartData = timeseries.dates.map((d,i)=>{
         return {
           date:d,
           value:timeseries.values[i]
         };
       }).filter(row=>(row.value!==null)&&!isNaN(row.value));
-      this.chartSeries = [
-        {
-          data:chartData
-        }
-      ];
+      this.setupChart(layer.label,chartData);
     });
   }
 
@@ -370,9 +432,9 @@ export class MainMapComponent implements OnInit, OnChanges {
         return;
       }
 
-      this.setupChart(null);
-
-      if(this.layer.polygonDrill){
+      this.setupChart(null,null);
+      const layer = this.layer;
+      if(layer.polygonDrill){
         this.getValues(geoJSON,data=>{
           data = data.filter(rec=>rec.value!==-9999).map(rec=>{
             const dString = ''+rec.date;
@@ -382,7 +444,7 @@ export class MainMapComponent implements OnInit, OnChanges {
             };
           });
           data = data.reverse();
-          this.setupChart(data);
+          this.setupChart(layer.label,data);
         });
       }
     });
@@ -444,7 +506,6 @@ export class MainMapComponent implements OnInit, OnChanges {
       event_label: context
     });
   }
-
 }
 
 function pad(n: number,digits?: number): string{

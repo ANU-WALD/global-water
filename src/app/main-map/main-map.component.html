@@ -10,7 +10,7 @@
                [zoomControl]="false">
     <wms-layer [url]="wmsURL" [params]="wmsParams"></wms-layer>
 
-    <draw *ngIf="!showVectors"
+    <draw *ngIf="layer&&layer.polygonDrill&&!showVectors"
           (featureClosed)="vectorFeatureClicked($event)">
     </draw>
 
@@ -123,6 +123,7 @@
               <div class="row">
                 <div class="col-12">
                   <div class="btn-group btn-group-toggle"
+                       *ngIf="layer&&layer.polygonDrill"
                        ngbRadioGroup
                        name="polygonSelection"
                        [(ngModel)]="polygonMode"
@@ -138,6 +139,13 @@
               </div>
 
               <div *ngIf="chartSeries?.length">
+                <select [(ngModel)]="chartMode"
+                        id="chartModeSelect"
+                        (ngModelChange)="configureChartMode()"
+                        class="form-control form-control-sm">
+                  <option *ngFor="let cm of chartModes" [ngValue]="cm">{{cm}}</option>
+
+                </select>
                 <app-chart [series]="chartSeries"
                            axisLabel=""
                            x="date"
@@ -145,36 +153,8 @@
 
                 </app-chart>
                 <div class="row">
-                  <div class="col-8">
-                    <table>
-                      <thead>
-                        <tr>
-                          <td style="column-span: 2;"><strong>mean values:</strong></td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>woody cover:</td>
-                          <td>{{treeCover[0]}} to {{treeCover[1]}} %</td>
-                        </tr>
-                        <tr>
-                          <td>vegetation height:</td>
-                          <td>{{canopy}} m</td>
-                        </tr>
-                        <tr>
-                          <td>dry biomass:</td>
-                          <td>{{biomass}} t per ha</td>
-                        </tr>
-                        <tr>
-                          <td>area:</td>
-                          <td>{{area}} {{areaUnits}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-
                   <div class="col-4">
-                    <button class="btn btn-primary btn-download" (click)="downloadClick()">Download</button>
+                    <button disabled class="btn btn-primary btn-download" (click)="downloadClick()">Download</button>
                   </div>
                 </div>
               </div>

@@ -3,8 +3,12 @@ import { TableRow } from 'map-wald';
 import * as Plotly from 'plotly.js/dist/plotly-basic';
 
 export interface ChartSeries {
+  title: string;
   data: TableRow[];
 }
+
+const MAIN_COLOUR='#3c4172';
+const SAT_COLOUR='#dee1ff';
 
 @Component({
   selector: 'app-chart',
@@ -33,39 +37,25 @@ export class ChartComponent implements OnInit, OnChanges {
     }
 
     const node = document.getElementById('chart-div');
-    const chartData = this.series[0].data;
+    // const chartData = this.series[0].data;
     Plotly.purge(node);
 
-    const series = [
-      {
-        x: chartData.map(r=>r[this.x]),
-        y: chartData.map(r=>r[this.y]),
-        name: 'Woody cover',
+    const series = this.series.map((chartData,ix)=>{
+      return {
+        x: chartData.data.map(r=>r[this.x]),
+        y: chartData.data.map(r=>r[this.y]),
+        name: chartData.title,
         mode: 'lines+markers',
         connectgaps: true,
         marker: {
-          size: 6
+          size: ix ? 2 : 6
         },
         line: {
-          color: '#58723C'
+          color: ix ? SAT_COLOUR : MAIN_COLOUR
         }
-      },
-      {
-        x: chartData.slice(chartData.length-2).map(r=>r[this.x]),
-        y: chartData.slice(chartData.length-2).map(r=>r[this.y]),
-        name: '',
-        mode: 'lines',
-        connectgaps: true,
-        // marker: {
-        //   size: 6
-        // },
-        line: {
-          dash: 'dash',
-          color: '#C8D5C1'
-        },
-        hoverinfo:'skip'
-      }
-    ];
+      };
+    }).reverse();
+
     Plotly.plot(node, series, {
       margin: {
         t: 30,
