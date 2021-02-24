@@ -1,7 +1,7 @@
 <div>
   <div class="row">
     <div [ngClass]="(orientation==='vertical')?'col-6':'col-2'">
-      <select class="form-control form-control-sm" [(ngModel)]="settings.layer" (ngModelChange)="formControlChanged()">
+      <select class="form-control form-control-sm" [(ngModel)]="settings.layer" (ngModelChange)="layerChanged()">
         <option *ngFor="let lyr of layers" [ngValue]="lyr">{{lyr.label}}</option>
       </select>
     </div>
@@ -16,7 +16,7 @@
                       [disabled]="!settings.layer?.timePeriod"
                       (dateChange)="dateChanged($event)"
                       [step]="true"
-                      [stepDays]="7"></date-selection>
+                      [stepDays]="settings.dateStep"></date-selection>
     </div>
     <div class="col-6">
       <span>TODO: Animation controls?</span>

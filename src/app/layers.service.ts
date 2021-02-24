@@ -4,7 +4,7 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { map, publishReplay, refCount, switchAll } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LayerDescriptor } from './data';
-import { DateRange } from 'map-wald';
+import { DateRange, UTCDate } from 'map-wald';
 import { FeatureDataService } from './feature-data.service';
 
 @Injectable({
@@ -58,5 +58,18 @@ export class LayersService {
         });
       })
     );
+  }
+
+  constrainDate(d: UTCDate, lyr: LayerDescriptor): UTCDate {
+    if(!lyr.timePeriod){
+      return d;
+    }
+    if(lyr.timePeriod.contains(d)){
+      return d;
+    }
+    if(d.getTime()<lyr.timePeriod.start.getTime()){
+      return lyr.timePeriod.start;
+    }
+    return lyr.timePeriod.end;
   }
 }

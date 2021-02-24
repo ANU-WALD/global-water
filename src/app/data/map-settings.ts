@@ -1,7 +1,8 @@
+import { UTCDate } from 'map-wald';
 import { LayerDescriptor } from './layer-descriptor';
 
 export interface MapSettings {
-  date: Date;
+  date: UTCDate;
   // binary: boolean;
   // difference: boolean;
   // referenceYear: number;
@@ -10,5 +11,6 @@ export interface MapSettings {
   transparency: number;
   relative: boolean;
   relativeVariable: string;
+  dateStep: number;
 }
 

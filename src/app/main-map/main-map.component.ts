@@ -276,7 +276,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.gaEvent('layer','wms',
       `${event.layer.label}:${event.date.toUTCString()}:${event.relative?event.relativeVariable:'-'}`);
     this.layer = event.layer;
-    this.date = event.date;
+    this.date = this.layersService.constrainDate(event.date,this.layer);
     this.transparency = event.transparency;
     this.setupMapLayer();
   }
