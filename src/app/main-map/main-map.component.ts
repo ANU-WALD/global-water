@@ -30,7 +30,7 @@ const FULL_EXTENT: Bounds = {
   south: 40,
   west: 180
 };
-const DATA_COLUMNS=['year','value'];
+const DATA_COLUMNS=['date','value'];
 const DEFAULT_DELTA_OFFSET=-50;
 
 @Component({
@@ -74,9 +74,6 @@ export class MainMapComponent implements OnInit, OnChanges {
   polygonMode: 'predefined' | 'draw' = 'predefined';
   showVectors = true;
 
-  treeCover: number[] = [0,0];
-  canopy: number;
-  biomass: number;
   area: number;
   areaUnits = 'km'+SUPER2;
   siteFill: RangeStyle<string>;
@@ -262,18 +259,18 @@ export class MainMapComponent implements OnInit, OnChanges {
     // });
   }
 
-  // setupChart(chartData: TableRow[]): void{
-  //   if(!chartData) {
-  //     this.chartSeries = [];
-  //     return;
-  //   }
+  setupChart(chartData: TableRow[]): void{
+    if(!chartData) {
+      this.chartSeries = [];
+      return;
+    }
 
-  //   this.chartSeries = [
-  //     {
-  //       data:chartData
-  //     }
-  //   ];
-  // }
+    this.chartSeries = [
+      {
+        data:chartData
+      }
+    ];
+  }
 
   mapOptionsChanged(event: MapSettings): void {
     this.gaEvent('layer','wms',
@@ -327,65 +324,69 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
-  // getValues(geoJSON: any, layer: string, callback: ((data: TableRow[])=>void)): void {
-  //   const currentSelection = this.selectionNum;
+  getValues(geoJSON: any, callback: ((data: TableRow[])=>void)): void {
+    if(!this.layer.polygonDrill){
+      return;
+    }
 
-  //   this.http.post(environment.wps,{
-  //     layer_name:layer,
-  //     vector:geoJSON
-  //   }, {
-  //     responseType:'text'
-  //   }).subscribe(res=>{
-  //     if(this.selectionNum !== currentSelection) {
-  //       return;
-  //     }
+    const currentSelection = this.selectionNum;
 
-  //     const data = parseCSV(res,{
-  //       columns:DATA_COLUMNS
-  //     });
-  //     callback(data);
-  //   });
-  // }
+    this.http.post(this.layer.polygonDrill,{
+      layer_name:this.layer.variable,
+      vector:geoJSON
+    }, {
+      responseType:'text'
+    }).subscribe(res=>{
+      if(this.selectionNum !== currentSelection) {
+        return;
+      }
 
-  // vectorFeatureClicked(geoJSON: any): void {
-  //   this.selectionNum++;
-  //   const currentSelection = this.selectionNum;
-  //   this.gaEvent('action','select-polygon',`${this.showVectors?this.vectorLayer.name:'custom-drawn'}`);
-  //   this.area = area(geoJSON);
-  //   if(this.area < 10000) {
-  //     this.areaUnits = 'm'+SUPER2;
-  //   } else if(this.area < 1000000) {
-  //     this.area /= 10000;
-  //     this.areaUnits = 'ha';
-  //   } else {
-  //     this.area /= 1000000;
-  //     this.areaUnits = 'km'+SUPER2;
-  //   }
+      const data = parseCSV(res,{
+        columns:DATA_COLUMNS
+      });
+      callback(data);
+    });
+  }
 
-  //   this.area = +this.area.toFixed(DECIMAL_PLACES);
+  vectorFeatureClicked(geoJSON: any): void {
+    this.selectionNum++;
+    const currentSelection = this.selectionNum;
+    this.gaEvent('action','select-polygon',`${this.showVectors?this.vectorLayer.name:'custom-drawn'}`);
+    this.area = area(geoJSON);
+    if(this.area < 10000) {
+      this.areaUnits = 'm'+SUPER2;
+    } else if(this.area < 1000000) {
+      this.area /= 10000;
+      this.areaUnits = 'ha';
+    } else {
+      this.area /= 1000000;
+      this.areaUnits = 'km'+SUPER2;
+    }
 
-  //   setTimeout(()=>{
-  //     if(this.selectionNum!==currentSelection){
-  //       return;
-  //     }
+    this.area = +this.area.toFixed(DECIMAL_PLACES);
 
-  //     this.setupChart(null);
+    setTimeout(()=>{
+      if(this.selectionNum!==currentSelection){
+        return;
+      }
 
-  //     this.getValues(geoJSON,'wcf',data=>{
-  //       this.setupChart(data);
-  //       this.treeCover[0] = +Math.min(...data.map(r=>r.value)).toFixed(DECIMAL_PLACES);
-  //       this.treeCover[1] = +Math.max(...data.map(r=>r.value)).toFixed(DECIMAL_PLACES);
-  //     });
+      this.setupChart(null);
 
-  //     this.getValues(geoJSON,'vegh',data=>{
-  //       this.canopy = +data[0].value.toFixed(DECIMAL_PLACES);
-  //     });
-
-  //     this.getValues(geoJSON,'wagb',data=>{
-  //       this.biomass = +data[0].value.toFixed(DECIMAL_PLACES);
-  //     });
-  //   });
-  // }
+      if(this.layer.polygonDrill){
+        this.getValues(geoJSON,data=>{
+          data = data.filter(rec=>rec.value!==-9999).map(rec=>{
+            const dString = ''+rec.date;
+            return {
+              date: new Date(+dString.slice(0,4),+dString.slice(4,6)-1,+dString.slice(6,8)),
+              value:rec.value
+            };
+          });
+          data = data.reverse();
+          this.setupChart(data);
+        });
+      }
+    });
+  }
 
   resetBounds(): void {
     this.bounds = Object.assign({},FULL_EXTENT);
@@ -423,9 +424,9 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.baseMapURL = this.basemap.urlTemplate;
   }
 
-  // polygonModeChanged(): void {
-  //   this.showVectors = this.polygonMode==='predefined';
-  // }
+  polygonModeChanged(): void {
+    this.showVectors = this.polygonMode==='predefined';
+  }
 
   closeAbout(): void {
     this.splash.close();

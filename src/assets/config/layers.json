@@ -37,7 +37,30 @@
     },
     "timePeriod":{
       "start":1978,
-      "end":2018
+      "end":2017
+    }
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Temperature",
+    "url":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx/wms",
+    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx_drill",
+    "filenameX":"/ub8/global/climate/MSWEP_v1.1/daily/{{year}}.nc",
+    "variable":"temp",
+    "mapParamsX":{
+      "colorscalerange": "0,50",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_wald_blues09",
+      "numcolorbands": 9
+    },
+    "mapParams":{
+      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
+    },
+    "timePeriod":{
+      "start":1978,
+      "end":2020
     }
   },
   {

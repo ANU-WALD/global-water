@@ -5,6 +5,7 @@ export interface LayerDescriptor {
   source:string;
   label:string;
   url?: string;
+  polygonDrill?: string;
   filename?:string;
   meta:string[];
   variables?:string[];
