@@ -9,9 +9,9 @@ import { ConfigService } from '../config.service';
 import { LeafletService, OneTimeSplashComponent, BasemapDescriptor,
   VectorLayerDescriptor, PointMode } from 'map-wald-leaflet';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { DownloadFormComponent } from '../download-form/download-form.component';
-import * as store from 'store';
-import * as FileSaver from 'file-saver';
+// import { DownloadFormComponent } from '../download-form/download-form.component';
+// import * as store from 'store';
+// import * as FileSaver from 'file-saver';
 import area from '@turf/area';
 import { LayersService } from '../layers.service';
 import { PointDataService } from '../point-data.service';

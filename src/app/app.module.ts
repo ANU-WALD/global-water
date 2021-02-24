@@ -12,7 +12,7 @@ import { MapButtonsComponent } from './map-buttons/map-buttons.component';
 import { ChartComponent } from './chart/chart.component';
 import { VectorLayerSelectionComponent } from './vector-layer-selection/vector-layer-selection.component';
 import { AboutComponent } from './about/about.component';
-import { DownloadFormComponent } from './download-form/download-form.component';
+// import { DownloadFormComponent } from './download-form/download-form.component';
 import { FeatureDataService } from './feature-data.service';
 import { PointDataService } from './point-data.service';
 import { LayersService } from './layers.service';
@@ -26,7 +26,7 @@ import { LayersService } from './layers.service';
     ChartComponent,
     VectorLayerSelectionComponent,
     AboutComponent,
-    DownloadFormComponent
+    // DownloadFormComponent
   ],
   imports: [
     HttpClientModule,
