@@ -3,7 +3,7 @@
     "type":"grid",
     "source":"tds",
     "label":"Soil Moisture",
-    "filename":"/ub8/global/GRAFS/GRAFS_TopSoilRelativeWetness_{{year}}.nc",
+    "filename":"/ub8/global/GRAFS/GRAFS_v2/GRAFS_TopSoilRelativeWetness_{{year}}.nc",
     "variable":"relative_wetness",
     "mapParams":{
       "colorscalerange": "0,1",
@@ -66,7 +66,7 @@
   {
     "type":"point",
     "label":"Water bodies",
-    "filename":"ub8/global/GRALM/Global_Lake_Storage (2015-present).nc",
+    "filename":"ub8/global/GRALM/Global_Lake_NRT_Storage (1984-present).nc",
     "filenameX":"ub8/global/GRALM/Global_Reservoir_Storage_B (1984-current).nc",
     "meta":[
 
