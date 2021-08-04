@@ -307,7 +307,7 @@ export class MainMapComponent implements OnInit, OnChanges {
           return {
             title: `${this.rawChartData.title}: ${yr}`,
             data: groups[yr.toString()].map(r=>{
-              const d = r.date as Date;
+              const d = new Date(r.date);
               d.setUTCFullYear(maxYear);
               return {
                 date:d,
