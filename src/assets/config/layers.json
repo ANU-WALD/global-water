@@ -1,53 +1,10 @@
 [
   {
     "type":"grid",
-    "source":"tds",
-    "label":"Soil Moisture",
-    "filename":"/ub8/global/GRAFS/GRAFS_v2/GRAFS_TopSoilRelativeWetness_{{year}}.nc",
-    "variable":"relative_wetness",
-    "mapParams":{
-      "colorscalerange": "0,1",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_fmc_rdylbu_9",
-      "numcolorbands": 9,
-      "time":"{{year}}-{{month}}-{{day}}T00%3A00%3A00.000Z"
-    },
-    "timePeriod":{
-      "start":2015,
-      "end":-5
-    }
-  },
-  {
-    "type":"grid",
     "source":"custom",
-    "label":"Rainfall",
-    "url":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswep/wms",
-    "filenameX":"/ub8/global/climate/MSWEP_v1.1/daily/{{year}}.nc",
-    "variable":"mswep",
-    "mapParamsX":{
-      "colorscalerange": "0,50",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_wald_blues09",
-      "numcolorbands": 9
-    },
-    "mapParams":{
-      "time":"{{year}}-{{month}}-{{day}}T00:00:00.000Z"
-    },
-    "timePeriod":{
-      "start":1978,
-      "end":2017
-    }
-  },
-  {
-    "type":"grid",
-    "source":"custom",
-    "label":"Temperature",
-    "url":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx/wms",
-    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx_drill",
-    "filenameX":"/ub8/global/climate/MSWEP_v1.1/daily/{{year}}.nc",
-    "variable":"temp",
+    "label":"Precipitation",
+    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "variable":"MSWX_precipitation",
     "mapParamsX":{
       "colorscalerange": "0,50",
       "belowmincolor": "transparent",
@@ -59,7 +16,112 @@
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
     "timePeriod":{
-      "start":1978,
+      "start":1979,
+      "end":2020
+    }
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Air Temperature (average?)",
+    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "variable":"MSWX_air_temperature",
+    "mapParamsX":{
+      "colorscalerange": "0,50",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_wald_blues09",
+      "numcolorbands": 9
+    },
+    "mapParams":{
+      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
+    },
+    "timePeriod":{
+      "start":1979,
+      "end":2020
+    }
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Air temperature (minimum)",
+    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "variable":"MSWX_tmin_air_temperature",
+    "mapParamsX":{
+      "colorscalerange": "0,50",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_wald_blues09",
+      "numcolorbands": 9
+    },
+    "mapParams":{
+      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
+    },
+    "timePeriod":{
+      "start":1979,
+      "end":2020
+    }
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Air temperature (maximum)",
+    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "variable":"MSWX_tmax_air_temperature",
+    "mapParamsX":{
+      "colorscalerange": "0,50",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_wald_blues09",
+      "numcolorbands": 9
+    },
+    "mapParams":{
+      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
+    },
+    "timePeriod":{
+      "start":1979,
+      "end":2020
+    }
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Relative Humidity",
+    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "variable":"MSWX_relative_humidity",
+    "mapParamsX":{
+      "colorscalerange": "0,50",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_wald_blues09",
+      "numcolorbands": 9
+    },
+    "mapParams":{
+      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
+    },
+    "timePeriod":{
+      "start":1979,
+      "end":2020
+    }
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Surface Pressure",
+    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "variable":"MSWX_surface_pressure",
+    "mapParamsX":{
+      "colorscalerange": "0,50",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_wald_blues09",
+      "numcolorbands": 9
+    },
+    "mapParams":{
+      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
+    },
+    "timePeriod":{
+      "start":1979,
       "end":2020
     }
   },
@@ -90,5 +152,24 @@
     ],
     "time":"Time",
     "timeFirst":false
+  },
+  {
+    "type":"grid",
+    "source":"tds",
+    "label":"Soil Moisture",
+    "filename":"/ub8/global/GRAFS/GRAFS_v2/GRAFS_TopSoilRelativeWetness_{{year}}.nc",
+    "variable":"relative_wetness",
+    "mapParams":{
+      "colorscalerange": "0,1",
+      "belowmincolor": "transparent",
+      "abovemaxcolor":"transparent",
+      "styles": "boxfill/anu_fmc_rdylbu_9",
+      "numcolorbands": 9,
+      "time":"{{year}}-{{month}}-{{day}}T00%3A00%3A00.000Z"
+    },
+    "timePeriod":{
+      "start":2015,
+      "end":-5
+    }
   }
 ]
