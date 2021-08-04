@@ -395,7 +395,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     this.http.post(this.layer.polygonDrill,{
       layer_name:this.layer.variable,
-      vector:geoJSON
+      feature:geoJSON
     }, {
       responseType:'text'
     }).subscribe(res=>{
