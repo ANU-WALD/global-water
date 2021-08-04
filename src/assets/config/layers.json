@@ -108,7 +108,7 @@
     "variables":[
       "river_discharge"
     ],
-    "time":"Time",
+    "time":"time",
     "timeFirst":false
   },
   {
