@@ -5,13 +5,6 @@
     "label":"Precipitation",
     "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_precipitation",
-    "mapParamsX":{
-      "colorscalerange": "0,50",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_wald_blues09",
-      "numcolorbands": 9
-    },
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -26,13 +19,6 @@
     "label":"Air Temperature (average?)",
     "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_air_temperature",
-    "mapParamsX":{
-      "colorscalerange": "0,50",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_wald_blues09",
-      "numcolorbands": 9
-    },
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -47,13 +33,6 @@
     "label":"Air temperature (minimum)",
     "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_tmin_air_temperature",
-    "mapParamsX":{
-      "colorscalerange": "0,50",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_wald_blues09",
-      "numcolorbands": 9
-    },
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -68,13 +47,6 @@
     "label":"Air temperature (maximum)",
     "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_tmax_air_temperature",
-    "mapParamsX":{
-      "colorscalerange": "0,50",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_wald_blues09",
-      "numcolorbands": 9
-    },
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -89,13 +61,6 @@
     "label":"Relative Humidity",
     "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_relative_humidity",
-    "mapParamsX":{
-      "colorscalerange": "0,50",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_wald_blues09",
-      "numcolorbands": 9
-    },
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -110,13 +75,6 @@
     "label":"Surface Pressure",
     "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_surface_pressure",
-    "mapParamsX":{
-      "colorscalerange": "0,50",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_wald_blues09",
-      "numcolorbands": 9
-    },
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
