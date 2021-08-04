@@ -97,8 +97,11 @@ export class FeatureDataService {
           // Error
         }
         const timeQuery =  this.dap.dapRangeQuery(timeStepIdx)
+        const constraint = query.config.timeFirst ?
+         `${timeQuery}${featureRange}`:
+         `${featureRange}${timeQuery}`;
         return forkJoin([
-          this.dap.getData(`${query.url}.ascii?${query.variable}${featureRange}${timeQuery}`,das),
+          this.dap.getData(`${query.url}.ascii?${query.variable}${constraint}`,das),
           of(query)
         ]);
       }),
