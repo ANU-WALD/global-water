@@ -23,7 +23,6 @@ declare var gtag: (a: string,b: string,c?: any) => void;
 // const VECTOR_TILE_URL = 'https://storage.googleapis.com/wald-vector/tileserver/{z}/{x}/{y}.pbf';
 // const FEATURE_ID_COL='PR_PY_PID';
 const SUPER2='²';
-const EMAIL_KEY='tree-change-email-submitted';
 const DECIMAL_PLACES=1;
 const FULL_EXTENT: Bounds = {
   east: -180,
