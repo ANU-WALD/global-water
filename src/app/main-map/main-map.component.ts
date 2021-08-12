@@ -7,7 +7,7 @@ import { ChartSeries } from '../chart/chart.component';
 import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings } from '../data';
 import { ConfigService } from '../config.service';
 import { LeafletService, OneTimeSplashComponent, BasemapDescriptor,
-  VectorLayerDescriptor, PointMode } from 'map-wald-leaflet';
+  VectorLayerDescriptor, PointMode, makeColour } from 'map-wald-leaflet';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 // import { DownloadFormComponent } from '../download-form/download-form.component';
 // import * as store from 'store';
@@ -242,28 +242,22 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   getLegendData(): void {
-    return;
+    const url =
+      `${this.wmsURL}?layers=${this.wmsParams.layers}&request=GetLegendGraphic&service=WMS&version=1.1.1`;
 
-    // let url = `${environment.wms}?`;
-    // url += `layers=${this.wmsParams.layers}`;
-    // url += '&request=GetLegendGraphic&service=WMS&version=1.1.1';
-
-    // this.http.get(url).subscribe((data: LegendResponse)=>{
-    //   const TARGET_N_COLOURS = 6;
-    //   let filter = (v:any,i:number)=>true;
-    //   if(data.palette.length > TARGET_N_COLOURS) {
-    //     filter = (v:any,i:number)=>{
-    //       return (i===1) ||
-    //              (i===data.palette.length-1)||
-    //              (i&&(i%(Math.floor(data.palette.length / (TARGET_N_COLOURS-2)))===0));
-    //     };
-    //   }
-    //   // this.legendLabels = data.values.filter(filter).map(v=>(v+valueOffset).toFixed()).reverse();
-    //   // if(!this.difference){
-    //   //   this.legendLabels[0] = this.layer.options.range[1].toFixed();
-    //   // }
-    //   this.legendColours = data.palette.filter(filter).map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse();
-    // });
+    this.http.get(url).subscribe((data: LegendResponse)=>{
+      const TARGET_N_COLOURS = 6;
+      let filter = (v:any,i:number)=>true;
+      if(data.palette.length > TARGET_N_COLOURS) {
+        filter = (v:any,i:number)=>{
+          return (i===1) ||
+                 (i===data.palette.length-1)||
+                 (i&&(i%(Math.floor(data.palette.length / (TARGET_N_COLOURS-2)))===0));
+        };
+      }
+      this.legendLabels = data.values.filter(filter).map(v=>v.toFixed()).reverse();
+      this.legendColours = data.palette.filter(filter).map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse();
+    });
   }
 
   setupChart(title: string, chartData: TableRow[]): void{
