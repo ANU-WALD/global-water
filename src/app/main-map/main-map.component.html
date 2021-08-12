@@ -100,11 +100,11 @@
                   <label for="vector-selection">boundaries</label>
                 </div>
                 <div class="col-6">
-                  <app-vector-layer-selection [vectorLayers]="vectorLayers"
+                  <vector-layer-selection [vectorLayers]="vectorLayers"
                                               [currentZoom]="zoom"
                                               [enabled]="showVectors"
                                               (vectorLayerSelected)="vectorLayerChanged($event)">
-                  </app-vector-layer-selection>
+                  </vector-layer-selection>
                 </div>
               </div>
             </ng-template>
@@ -168,13 +168,13 @@
 
     <map-control [position]="'BOTTOM_RIGHT'">
       <div *ngIf="showWindows&&layer" class="legend">
-        <app-legend [labels]="legendLabels"
-                    [colours]="legendColours"
-                    [title]="layer.label"
-                    [mapUnits]="layer.units"
-                    [helpText]="layer.help"
-                    [tooltipPlacement]="'top'">
-        </app-legend>
+        <legend [labels]="legendLabels"
+                [colours]="legendColours"
+                [title]="layer.label"
+                [mapUnits]="layer.units"
+                [helpText]="layer.help"
+                [tooltipPlacement]="'top'">
+        </legend>
         <span>
             Data by <a href="http://wald.anu.edu.au/" target="_blank">ANU Centre for Water and Landscape Dynamics</a>
         </span>
