@@ -110,7 +110,7 @@
             </ng-template>
           </ngb-panel>
 
-          <ngb-panel id="chart-panel">
+          <ngb-panel id="chart-panel" (hidden)="showVectors=true" (shown)="polygonModeChanged()">
             <ng-template ngbPanelHeader let-opened="opened">
               <div class="d-flex align-items-center justify-content-between">
                 <h5 class="m-0">2. Query data</h5>
