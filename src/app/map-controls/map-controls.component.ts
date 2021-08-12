@@ -50,6 +50,21 @@ export class MapControlsComponent implements OnInit, OnChanges {
     this.formControlChanged();
   }
 
+  relativeSwitchChanged(): void {
+    if(this.settings.relative){
+      const options = Object.keys(this.settings.layer.relativeOptions||{});
+      if(!this.settings.relativeVariable||!options.includes(this.settings.relativeVariable)){
+        this.settings.relativeVariable = options[0];
+      }
+    }
+    this.formControlChanged();
+  }
+
+  relativeModeChanged(): void {
+    this.settings.relative = true;
+    this.formControlChanged();
+  }
+
   constrainDate(): void {
     this.settings.date = this.layersService.constrainDate(this.settings.date,this.settings.layer);
   }

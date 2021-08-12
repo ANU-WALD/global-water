@@ -56,10 +56,45 @@ export class PointDataService {
       switchAll());
   }
 
-  getValues(layer:string, filter:{[key:string]:any}, timestep: UTCDate, variable?: string): Observable<FeatureCollection>{
+  _computeRelative(val:number,properties:{[key:string]:any},mode:string):number{
+    let prop: string;
+    if(mode.includes('[')){
+      prop = mode.split('[')[0];
+    } else {
+      prop = mode;
+    }
+
+    let comp = properties[prop];   
+    if(mode.includes('[')){
+      const idx = +(mode.split('[')[1].split(']')[0]);
+      comp = comp[idx];
+    }
+    return val - comp;
+  }
+
+  getValues(layer:string, 
+            filter:{[key:string]:any},
+            timestep: UTCDate,
+            variable?: string,
+            relativeMode?: string): Observable<FeatureCollection>{
     return this._layerConfig(layer).pipe(
-      map(lyr=>this.featureData.getValues(lyr,filter,timestep,variable)),
-      switchAll());
+      map(lyr=>forkJoin([of(lyr),this.featureData.getValues(lyr,filter,timestep,variable)])),
+      switchAll(),
+      map(([layer,coverage])=>{
+        return {
+          layer,
+          coverage
+        };
+      }),
+      tap(data=>{
+        if(!relativeMode||!data.coverage){
+          return;
+        }
+        data.coverage.features.forEach(f=>{
+          f.properties.value = this._computeRelative(f.properties.value,f.properties,data.layer.relativeOptions[relativeMode]);
+        })
+      }),
+      map(data=>data.coverage));
   }
 
   getTimeSeries(layer:string,feature:Feature,variable?:string):Observable<TimeSeries>{

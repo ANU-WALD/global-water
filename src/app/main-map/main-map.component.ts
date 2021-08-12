@@ -54,6 +54,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   showWindows = true;
   basemap: BasemapDescriptor;
   transparency = 0;
+  mapRelativeMode: string;
 
   pointLayerFeatures: any;
   chartModes = [CM_NORMAL,CM_DEVIATION,CM_YR_ON_YR];
@@ -196,7 +197,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   private setupPointLayer(): void {
     forkJoin([
-      this.pointData.getValues(this.layer.label,{},this.date),
+      this.pointData.getValues(this.layer.label,{},this.date,null,this.mapRelativeMode),
       this.palettes.getPalette('PuBu',false,5)
     ]).subscribe(([features,palette]) => {
       this.pointLayerFeatures = features;
@@ -336,6 +337,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.layer = event.layer;
     this.date = this.layersService.constrainDate(event.date,this.layer);
     this.transparency = event.transparency;
+    this.mapRelativeMode = event.relative?event.relativeVariable:null;
     this.setupMapLayer();
   }
 

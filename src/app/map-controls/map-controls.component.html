@@ -23,14 +23,14 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" *ngIf="settings.layer?.relativeOptions">
     <div class="col-6">
       <div class="custom-control custom-switch custom-switch-md">
         <input type="checkbox"
                class="custom-control-input"
                id="relativeSwitch"
                [(ngModel)]="settings.relative"
-               (ngModelChange)="formControlChanged()">
+               (ngModelChange)="relativeSwitchChanged()">
         <label class="custom-control-label" for="relativeSwitch">relative to</label>
       </div>
     </div>
@@ -38,9 +38,10 @@
     <div class="col-6">
       <select class="form-control form-control-sm"
               [(ngModel)]="settings.relativeVariable"
-              (ngModelChange)="formControlChanged()">
-        <option>Long term average</option>
-        <option>Monthly median</option>
+              (ngModelChange)="relativeModeChanged()">
+        <option *ngFor="let item of settings.layer.relativeOptions | keyvalue">
+          {{item.key}}
+        </option>
       </select>
     </div>
   </div>

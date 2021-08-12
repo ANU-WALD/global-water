@@ -94,19 +94,37 @@
     "label":"Water bodies",
     "filename":"ub8/global/GRALM/Global_Lake_NRT_Storage (1984-present).nc",
     "filenameX":"ub8/global/GRALM/Global_Reservoir_Storage_B (1984-current).nc",
+    "relatedFiles":[
+      {
+        "filename": "ub8/global/GRALM/NRT_Storage_Decile.nc",
+        "meta":[
+          "decile"
+        ]
+      }
+    ],
     "meta":[
-
     ],
     "variables":[
       "storage"
     ],
     "time":"time",
-    "timeFirst":true
+    "timeFirst":true,
+    "relativeOptions":{
+      "Median":"decile[5]"
+    }
   },
   {
     "type":"point",
     "label":"Streamflow",
     "filename":"ub8/global/GRALM/Global_River_Discharge_GSGR (2000-present).nc",
+    "relatedFiles":[
+      {
+        "filename": "ub8/global/GRALM/Discharge_Decile_GSGR.nc",
+        "meta":[
+          "decile"
+        ]
+      }
+    ],
     "meta":[
       "Riv_Qmean",
       "Riv_Qmax"
@@ -115,7 +133,12 @@
       "river_discharge"
     ],
     "time":"time",
-    "timeFirst":false
+    "timeFirst":false,
+    "relativeOptions":{
+      "Median":"decile[5]",
+      "Mean":"Riv_Qmean",
+      "Max":"Riv_Qmax"
+    }
   },
   {
     "type":"grid",

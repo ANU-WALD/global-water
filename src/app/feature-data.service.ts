@@ -4,7 +4,7 @@ import { Observable, forkJoin, of } from 'rxjs';
 import { TimeSeries, MetadataService, OpendapService, UTCDate } from 'map-wald';
 import { map, switchAll } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { LayerDescriptor } from './data';
+import { LayerDescriptor, MetadataConfig } from './data';
 
 const DEFAULT_ID_COLUMN = 'ID';
 
@@ -19,9 +19,8 @@ export interface FeatureDataConfig extends LayerDescriptor {
 export class FeatureDataService {
   private layerCache: { [key: string]: Observable<FeatureCollection> } = {};
 
-  constructor(    private metadata: MetadataService,    private dap: OpendapService) {
- }
-
+  constructor(private metadata: MetadataService, private dap: OpendapService) {
+  }
 
   getFeatures(layer: FeatureDataConfig,filter?:{[key:string]:any}): Observable<FeatureCollection> {
     const res$ = of(layer).pipe(
@@ -174,13 +173,11 @@ export class FeatureDataService {
     return res$;
   }
 
-  private _retrieveLayer(lyr: FeatureDataConfig): Observable<FeatureCollection> {
-    let variables = lyr.meta || [];
-    const url = `${environment.tds}/dodsC/${lyr.filename}`;
-    const idCol = lyr.id||DEFAULT_ID_COLUMN;
-    variables = variables.concat([idCol,'latitude','longitude']);
+  private _metaFromFiles(metaConfig: MetadataConfig,idCol:string):Observable<{[key:string]:number[]}>{
+    let variables = metaConfig.meta || [];
+    const url = `${environment.tds}/dodsC/${metaConfig.filename}`;
 
-    return forkJoin([this.metadata.dasForUrl(url),this.metadata.ddxForUrl(url)]).pipe(
+    let res$ = forkJoin([this.metadata.dasForUrl(url),this.metadata.ddxForUrl(url)]).pipe(
       map(([das,ddx]) => {
         const size = +ddx.variables[idCol].dimensions[0].size;
         const rangeQuery = this.dap.dapRangeQuery(0,size-1);
@@ -195,7 +192,24 @@ export class FeatureDataService {
           result[variables[i]] = d[variables[i]] as number[];
         })
         return result;
-      }),
+      }));
+    return res$;
+  }
+
+  private _retrieveLayer(lyr: FeatureDataConfig): Observable<FeatureCollection> {
+    const idCol = lyr.id||DEFAULT_ID_COLUMN;
+    const coreMeta:MetadataConfig = {
+      filename: lyr.filename,
+      meta: ([] as string[]).concat(lyr.meta||[],[idCol,'latitude','longitude'])
+    }
+
+    let allMeta = [coreMeta];
+    allMeta = allMeta.concat(lyr.relatedFiles||[]);
+
+    let res$ = forkJoin(allMeta.map(m=>this._metaFromFiles(m,idCol)));
+
+    return res$.pipe(
+      map(allMeta=>Object.assign({},...allMeta)),
       map(data => {
         const result: FeatureCollection = {
           type: 'FeatureCollection',
@@ -215,7 +229,7 @@ export class FeatureDataService {
             };
           }
 
-          variables.filter(v=>(v!=='latitude')&&(v!=='longitude')).forEach(v=>{
+          Object.keys(data).filter(v=>(v!=='latitude')&&(v!=='longitude')).forEach(v=>{
             f.properties[v] = data[v][i];
           });
           return f;

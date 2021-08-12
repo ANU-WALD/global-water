@@ -1,19 +1,24 @@
 import { DateRange } from 'map-wald';
 
-export interface LayerDescriptor {
+export interface MetadataConfig {
+  filename?:string;
+  meta:string[];
+  variables?:string[];
+  variable?:string;
+}
+
+export interface LayerDescriptor extends MetadataConfig {
   type:string;
   source:string;
   label:string;
   url?: string;
   polygonDrill?: string;
-  filename?:string;
-  meta:string[];
-  variables?:string[];
-  variable?:string;
   time:string;
   timeFirst:boolean;
   mapParams?:any;
-  timePeriod?:DateRange
+  timePeriod?:DateRange;
+  relatedFiles?:MetadataConfig[];
+  relativeOptions?:{[key:string]:string};
 }
 
 // export interface LayerDescriptor {
