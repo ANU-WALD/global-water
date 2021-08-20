@@ -109,8 +109,20 @@
     ],
     "time":"time",
     "timeFirst":true,
+    "palette": {
+      "name": "PuBu",
+      "count": 6,
+      "reverse": false
+    },
     "relativeOptions":{
-      "Median":"decile[5]"
+      "Median":{
+        "variable":"decile[5]",
+        "palette": {
+          "name": "RdBu",
+          "count": 6,
+          "reverse": false
+        }
+      }
     }
   },
   {
@@ -134,10 +146,36 @@
     ],
     "time":"time",
     "timeFirst":false,
+    "palette": {
+      "name": "PuBu",
+      "count": 6,
+      "reverse": false
+    },
     "relativeOptions":{
-      "Median":"decile[5]",
-      "Mean":"Riv_Qmean",
-      "Max":"Riv_Qmax"
+      "Median":{
+        "variable":"decile[5]",
+        "palette": {
+          "name": "RdBu",
+          "count": 6,
+          "reverse": false
+        }
+      },
+      "Mean":{
+        "variable":"Riv_Qmean",
+        "palette": {
+          "name": "PuBu",
+          "count": 6,
+          "reverse": false
+        }
+      },
+      "Max":{
+        "variable":"Riv_Qmax",
+        "palette": {
+          "name": "PuBu",
+          "count": 6,
+          "reverse": false
+        }
+      }
     }
   },
   {

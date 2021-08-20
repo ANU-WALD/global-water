@@ -4,7 +4,7 @@ import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate, RangeStyle, PaletteService } from 'map-wald';
 import { ChartSeries } from '../chart/chart.component';
-import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings } from '../data';
+import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings, PaletteDescriptor } from '../data';
 import { ConfigService } from '../config.service';
 import { LeafletService, OneTimeSplashComponent, BasemapDescriptor,
   VectorLayerDescriptor, PointMode, makeColour } from 'map-wald-leaflet';
@@ -36,6 +36,11 @@ const CM_NORMAL='Normal';
 const CM_DEVIATION='Deviation from monthly mean';
 const CM_YR_ON_YR='Year on year';
 const INITIAL_TRANSPARENCY=25;//%
+const DEFAULT_PALETTE:PaletteDescriptor = {
+  name:'YlOrBr',
+  count:6,
+  reverse:false
+};
 
 const INITIAL_MAP_SETTINGS:MapSettings = {
   date: new Date(),
@@ -207,16 +212,33 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   private setupPointLayer(): void {
+    let palette = this.layer.palette || DEFAULT_PALETTE;
+    if(this.mapRelativeMode){
+      palette = this.layer.relativeOptions[this.mapRelativeMode]?.palette || palette;
+    }
+
     forkJoin([
       this.pointData.getValues(this.layer.label,{},this.date,null,this.mapRelativeMode),
-      this.palettes.getPalette('PuBu',false,6)
+      this.palettes.getPalette(palette.name,palette.reverse,palette.count)
     ]).subscribe(([features,palette]) => {
       this.pointLayerFeatures = features;
       const max = Math.max(...(features.features).map(f=>f.properties.value));
       const breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
       this.siteFill = new RangeStyle('value',palette,breaks);
       this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
+      this.legendColours = palette;
+      this.legendLabels = this.getLabels(this.siteFill);
     });
+  }
+
+  getLabels(range:RangeStyle<any>,digits?:number):string[] {
+    const fmt = (v:number) => v.toFixed(digits||0);
+    return range.breakpoints.map((b,i)=>{
+      if(i<(range.breakpoints.length-1)){
+        return `${fmt(b)}-${fmt(range.breakpoints[i+1])}`;
+      }
+      return `> ${fmt(b)}`;
+    })
   }
 
   private setupWMSLayer(): void {

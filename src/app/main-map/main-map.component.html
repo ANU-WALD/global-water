@@ -17,7 +17,7 @@
     <geojson-layer *ngIf="pointLayerFeatures"
                    [features]="pointLayerFeatures"
                    [pointMode]="pointMode.circle"
-                   [style]="{weight:1,radius:siteSize,fillOpacity:1,fillColor:siteFill}"
+                   [style]="{weight:1,radius:siteSize,fillOpacity:1,fillColor:siteFill,color:siteFill}"
                    (featureSelected)="pointClicked($event)">
 
     </geojson-layer>

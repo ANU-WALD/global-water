@@ -91,7 +91,7 @@ export class PointDataService {
           return;
         }
         data.coverage.features.forEach(f=>{
-          f.properties.value = this._computeRelative(f.properties.value,f.properties,data.layer.relativeOptions[relativeMode]);
+          f.properties.value = this._computeRelative(f.properties.value,f.properties,data.layer.relativeOptions[relativeMode].variable);
         })
       }),
       map(data=>data.coverage));

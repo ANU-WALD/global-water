@@ -7,6 +7,17 @@ export interface MetadataConfig {
   variable?:string;
 }
 
+export interface PaletteDescriptor {
+  name:string;
+  count:number;
+  reverse?:boolean;
+}
+
+export interface RelativeOption {
+  variable:string;
+  palette?: PaletteDescriptor;
+}
+
 export interface LayerDescriptor extends MetadataConfig {
   type:string;
   source:string;
@@ -18,7 +29,8 @@ export interface LayerDescriptor extends MetadataConfig {
   mapParams?:any;
   timePeriod?:DateRange;
   relatedFiles?:MetadataConfig[];
-  relativeOptions?:{[key:string]:string};
+  relativeOptions?:{[key:string]:RelativeOption};
+  palette?:PaletteDescriptor
 }
 
 // export interface LayerDescriptor {
