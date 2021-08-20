@@ -204,7 +204,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       const max = Math.max(...(features.features).map(f=>f.properties.value));
       const breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
       this.siteFill = new RangeStyle('value',palette,breaks);
-      this.siteSize = new RangeStyle('value',[2,3,5,8,13,21],breaks);
+      this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
     });
   }
 
