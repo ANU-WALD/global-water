@@ -35,6 +35,16 @@ const DEFAULT_DELTA_OFFSET=-50;
 const CM_NORMAL='Normal';
 const CM_DEVIATION='Deviation from monthly mean';
 const CM_YR_ON_YR='Year on year';
+const INITIAL_TRANSPARENCY=25;//%
+
+const INITIAL_MAP_SETTINGS:MapSettings = {
+  date: new Date(),
+  layer: null as LayerDescriptor,
+  transparency: INITIAL_TRANSPARENCY,
+  relative: false,
+  relativeVariable: '',
+  dateStep: 7
+};
 
 @Component({
   selector: 'app-main-map',
@@ -46,6 +56,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   @Input() layer: LayerDescriptor;
   @ViewChild('splash', { static: true }) splash: OneTimeSplashComponent;
 
+  mapSettings: MapSettings = Object.assign({},INITIAL_MAP_SETTINGS);
   pointMode = PointMode;
   selectionNum = 0;
   zoom: number;
@@ -109,15 +120,15 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     this.layersService.layerConfig$.subscribe(layers=>{
       this.layers = layers;
-      this.layer = this.layers[0];
-      this.date = this.layer.timePeriod?.end;
-      this.setupMapLayer();
+      this.mapSettings.layer = this.layers[0];
+      this.date = this.mapSettings.layer.timePeriod?.end;
+      this.applySettings();
     });
   }
 
   ngOnInit(): void {
     gtag('send', 'pageview');
-    this.setupMapLayer();
+    this.applySettings();
 
     this._map.withMap(m=>{
       this.zoom = m.getZoom();
@@ -128,7 +139,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.setupMapLayer();
+    this.applySettings();
   }
 
   interpolationSubstitutions(): any {
@@ -333,10 +344,18 @@ export class MainMapComponent implements OnInit, OnChanges {
   mapOptionsChanged(event: MapSettings): void {
     this.gaEvent('layer','wms',
       `${event.layer.label}:${(event.date as Date).toUTCString()}:${event.relative?event.relativeVariable:'-'}`);
-    this.layer = event.layer;
-    this.date = this.layersService.constrainDate(event.date,this.layer);
-    this.transparency = event.transparency;
-    this.mapRelativeMode = event.relative?event.relativeVariable:null;
+
+      this.mapSettings = event;
+    this.applySettings();
+  }
+
+  applySettings() {
+    this.layer = this.mapSettings.layer;
+    if(this.layer){
+      this.date = this.layersService.constrainDate(this.mapSettings.date,this.layer);
+    }
+    this.transparency = this.mapSettings.transparency;
+    this.mapRelativeMode = this.mapSettings.relative?this.mapSettings.relativeVariable:null;
     this.setupMapLayer();
   }
 

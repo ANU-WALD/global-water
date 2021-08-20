@@ -12,15 +12,7 @@ const MIN_YEAR=1990;
 export class MapControlsComponent implements OnInit, OnChanges {
   @Input() orientation: 'vertical' | 'horizontal' = 'horizontal';
   @Input() layers: LayerDescriptor[];
-
-  settings: MapSettings = {
-    date: new Date(),
-    layer: null as LayerDescriptor,
-    transparency: 0,
-    relative: false,
-    relativeVariable: '',
-    dateStep: 7
-  };
+  @Input() settings: MapSettings;
 
   @Output() optionsChanged = new EventEmitter<MapSettings>();
 
