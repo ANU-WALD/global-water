@@ -25,10 +25,10 @@ declare var gtag: (a: string,b: string,c?: any) => void;
 const SUPER2='²';
 const DECIMAL_PLACES=1;
 const FULL_EXTENT: Bounds = {
-  east: -180,
+  west: -165,
   north: 40,
-  south: 40,
-  west: 180
+  south: -40,
+  east: 165
 };
 const DATA_COLUMNS=['date','value'];
 const DEFAULT_DELTA_OFFSET=-50;
