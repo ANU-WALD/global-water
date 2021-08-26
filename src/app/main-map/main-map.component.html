@@ -177,7 +177,7 @@
                 [tooltipPlacement]="'top'">
         </legend>
         <span>
-            Data by <a href="http://wald.anu.edu.au/" target="_blank">ANU Centre for Water and Landscape Dynamics</a>
+            Data by <a [href]="layer.attributionURL" target="_blank">{{layer.attribution}}</a>
         </span>
       </div>
     </map-control>

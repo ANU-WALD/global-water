@@ -22,6 +22,8 @@ export interface LayerDescriptor extends MetadataConfig {
   type:string;
   source:string;
   label:string;
+  attribution?:string;
+  attributionURL?:string;
   url?: string;
   polygonDrill?: string;
   time:string;

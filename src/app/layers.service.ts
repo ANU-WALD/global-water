@@ -7,6 +7,13 @@ import { LayerDescriptor } from './data';
 import { DateRange, UTCDate } from 'map-wald';
 import { FeatureDataService } from './feature-data.service';
 
+const DEFAULT_ATTRIBUTION_TEXT='ANU Centre for Water and Landscape Dynamics';
+const DEFAULT_ATTRIBUTION_URL='http://wald.anu.edu.au/';
+const DEFAULT_LAYER_SETTINGS={
+  attribution:DEFAULT_ATTRIBUTION_TEXT,
+  attributionURL:DEFAULT_ATTRIBUTION_URL
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -17,6 +24,11 @@ export class LayersService {
               private featureData: FeatureDataService) {
     const url = `${environment.layerConfig}?_=${(new Date()).getTime()}`;
     this.layerConfig$ = this.http.get(url).pipe(
+      map((origLayers:LayerDescriptor[])=>{
+        return origLayers.map(l=>{
+          return Object.assign({},DEFAULT_LAYER_SETTINGS,l)
+        });
+      }),
       map((rawLayers:LayerDescriptor[])=>{
         return forkJoin(rawLayers.map(l=>{
           if(l.timePeriod){
