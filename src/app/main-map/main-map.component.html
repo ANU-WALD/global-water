@@ -171,6 +171,7 @@
       <div *ngIf="showWindows&&layer" class="legend">
         <legend [labels]="legendLabels"
                 [colours]="legendColours"
+                [markerClasses]="legendShape"
                 [title]="layer.label"
                 [mapUnits]="layer.units"
                 [helpText]="layer.help"

@@ -94,6 +94,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   chartSeries: ChartSeries[] = [];
   legendColours: string[] = [];
   legendLabels: string[] = [];
+  legendShape: string[] = [''];
   polygonMode: 'predefined' | 'draw' = 'predefined';
   showVectors = true;
 
@@ -228,6 +229,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
       this.legendColours = palette;
       this.legendLabels = this.getLabels(this.siteFill);
+      this.legendShape[0] = 'circle';
     });
   }
 
@@ -289,6 +291,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       }
       this.legendLabels = data.values.filter(filter).map(v=>v.toFixed()).reverse();
       this.legendColours = data.palette.filter(filter).map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse();
+      this.legendShape[0] = '';
     });
   }
 
