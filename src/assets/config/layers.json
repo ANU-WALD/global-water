@@ -3,9 +3,9 @@
     "type":"grid",
     "source":"custom",
     "label":"Precipitation",
-    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_precipitation",
-    "polygonDrill":"https://mswx-mtmenipwta-ts.a.run.app/wps",
+    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -18,9 +18,9 @@
     "type":"grid",
     "source":"custom",
     "label":"Air Temperature (average?)",
-    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_air_temperature",
-    "polygonDrill":"https://mswx-mtmenipwta-ts.a.run.app/wps",
+    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -33,9 +33,9 @@
     "type":"grid",
     "source":"custom",
     "label":"Air temperature (minimum)",
-    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_tmin_air_temperature",
-    "polygonDrill":"https://mswx-mtmenipwta-ts.a.run.app/wps",
+    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -48,9 +48,9 @@
     "type":"grid",
     "source":"custom",
     "label":"Air temperature (maximum)",
-    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_tmax_air_temperature",
-    "polygonDrill":"https://mswx-mtmenipwta-ts.a.run.app/wps",
+    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -63,9 +63,9 @@
     "type":"grid",
     "source":"custom",
     "label":"Relative Humidity",
-    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_relative_humidity",
-    "polygonDrill":"https://mswx-mtmenipwta-ts.a.run.app/wps",
+    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
@@ -78,9 +78,9 @@
     "type":"grid",
     "source":"custom",
     "label":"Surface Pressure",
-    "url":"https://mswx-mtmenipwta-ts.a.run.app/wms",
+    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_surface_pressure",
-    "polygonDrill":"https://mswx-mtmenipwta-ts.a.run.app/wps",
+    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
