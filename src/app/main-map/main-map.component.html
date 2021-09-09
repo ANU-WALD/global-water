@@ -32,12 +32,14 @@
                        [url]="vectorLayer.tiles"
                        [styles]="vectorStyles"
                        [sublayers]="vectorLayer.tileLayers"
+                       [minNativeZoom]="vectorLayer.availableZooms[0]"
+                       [maxNativeZoom]="vectorLayer.availableZooms[1]"
                        (featureSelected)="vectorFeatureClicked($event)"></vector-tile-layer>
 
 
     <map-control [position]="'TOP_RIGHT'">
       <app-map-buttons [basemaps]="basemaps"
-                       [minZoom]="5"
+                       [minZoom]="0"
                        [maxZoom]="16"
                        [vectorLayers]="vectorLayers"
                        (optionsChanged)="displayOptionsChanged($event)"
@@ -102,9 +104,9 @@
                 </div>
                 <div class="col-6">
                   <vector-layer-selection [vectorLayers]="vectorLayers"
-                                              [currentZoom]="zoom"
-                                              [enabled]="showVectors"
-                                              (vectorLayerSelected)="vectorLayerChanged($event)">
+                                          [currentZoom]="zoom"
+                                          [enabled]="showVectors"
+                                          (vectorLayerSelected)="vectorLayerChanged($event)">
                   </vector-layer-selection>
                 </div>
               </div>
@@ -147,6 +149,7 @@
                   <option *ngFor="let cm of chartModes" [ngValue]="cm">{{cm}}</option>
 
                 </select>
+                <p *ngIf="chartPolygonLabel">{{chartPolygonLabel}}</p>
                 <app-chart [series]="chartSeries"
                            axisLabel=""
                            x="date"

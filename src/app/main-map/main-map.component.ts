@@ -91,6 +91,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   wmsParams: any = {};
   vectorStyles: any = {};
   rawChartData: ChartSeries;
+  chartPolygonLabel: string;
   chartSeries: ChartSeries[] = [];
   legendColours: string[] = [];
   legendLabels: string[] = [];
@@ -297,6 +298,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   setupChart(title: string, chartData: TableRow[]): void{
     if(!chartData) {
+      this.chartPolygonLabel=null;
       this.chartSeries = [];
       this.rawChartData = null;
       return;
@@ -421,6 +423,7 @@ export class MainMapComponent implements OnInit, OnChanges {
         };
       }).filter(row=>(row.value!==null)&&!isNaN(row.value));
       this.setupChart(layer.label,chartData);
+      this.chartPolygonLabel=null;
     });
   }
 
@@ -490,6 +493,9 @@ export class MainMapComponent implements OnInit, OnChanges {
             };
           });
           data = data.reverse();
+          if(this.vectorLayer.label){
+            this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label,geoJSON['properties']);
+          }
           this.setupChart(layer.label,data);
         });
       }

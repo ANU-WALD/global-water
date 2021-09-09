@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter, OnChanges, SimpleChange
 import { VectorLayerDescriptor } from 'map-wald-leaflet';
 
 @Component({
-  selector: 'app-vector-layer-selection',
+  selector: 'vector-layer-selection',
   templateUrl: './vector-layer-selection.component.html',
   styleUrls: ['./vector-layer-selection.component.scss']
 })
