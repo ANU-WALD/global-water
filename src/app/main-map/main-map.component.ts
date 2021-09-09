@@ -432,7 +432,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     const currentSelection = this.selectionNum;
 
     this.http.post(this.layer.polygonDrill,{
-      layer_name:this.layer.variable,
+      product:this.layer.variable,
       feature:geoJSON
     }, {
       responseType:'text'
@@ -442,7 +442,8 @@ export class MainMapComponent implements OnInit, OnChanges {
       }
 
       const data = parseCSV(res,{
-        columns:DATA_COLUMNS
+        columns:DATA_COLUMNS,
+        headerRows:1
       });
       callback(data);
     });
@@ -475,9 +476,16 @@ export class MainMapComponent implements OnInit, OnChanges {
       if(layer.polygonDrill){
         this.getValues(geoJSON,data=>{
           data = data.filter(rec=>rec.value!==-9999).map(rec=>{
-            const dString = ''+rec.date;
+            let theDate:Date;
+            if(rec.date?.getUTCFullYear){
+              theDate = rec.date;
+            } else {
+              const dString = ''+rec.date;
+              theDate = new Date(+dString.slice(0,4),+dString.slice(4,6)-1,+dString.slice(6,8));
+            }
+
             return {
-              date: new Date(+dString.slice(0,4),+dString.slice(4,6)-1,+dString.slice(6,8)),
+              date: theDate,
               value:rec.value
             };
           });
