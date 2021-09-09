@@ -1,10 +1,15 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { TableRow } from 'map-wald';
+import { UTCDate } from 'map-wald';
 import * as Plotly from 'plotly.js/dist/plotly-basic';
+
+export interface ChartEntry {
+  date: UTCDate;
+  value: number;
+}
 
 export interface ChartSeries {
   title: string;
-  data: TableRow[];
+  data: ChartEntry[];
 }
 
 const MAIN_COLOUR='#3c4172';

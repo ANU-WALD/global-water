@@ -3,7 +3,7 @@ import * as L from 'leaflet';
 import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate, RangeStyle, PaletteService } from 'map-wald';
-import { ChartSeries } from '../chart/chart.component';
+import { ChartEntry, ChartSeries } from '../chart/chart.component';
 import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings, PaletteDescriptor } from '../data';
 import { ConfigService } from '../config.service';
 import { LeafletService, OneTimeSplashComponent, BasemapDescriptor,
@@ -297,7 +297,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
-  setupChart(title: string, chartData: TableRow[]): void{
+  setupChart(title: string, chartData: ChartEntry[]): void{
     if(!chartData) {
       this.chartPolygonLabel=null;
       this.chartSeries = [];
@@ -335,10 +335,10 @@ export class MainMapComponent implements OnInit, OnChanges {
         const years = Object.keys(groups).map(yr=>+yr).sort().reverse();
         const maxYear = years[0];
         this.chartSeries = years.map(yr=>{
-          const result = {
+          const result:ChartSeries = {
             title: `${this.rawChartData.title}: ${yr}`,
             data: groups[yr.toString()].map(r=>{
-              const d = new Date(r.date);
+              const d = new Date(r.date as Date);
               d.setUTCFullYear(maxYear);
               return {
                 date:d,
@@ -356,7 +356,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     }
   }
 
-  convertToMonthlyVariance(chartData: TableRow[]): TableRow[] {
+  convertToMonthlyVariance(chartData: ChartEntry[]): ChartEntry[] {
     const monthlyTotals = new Array<number>(12).fill(0);
     const monthlyCounts = new Array<number>(12).fill(0);
     chartData.forEach(row=>{
@@ -421,7 +421,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     console.log(geoJSON);
     const layer = this.layer;
     this.pointData.getTimeSeries(layer.label,geoJSON).subscribe(timeseries=>{
-      const chartData = timeseries.dates.map((d,i)=>{
+      const chartData:ChartEntry[] = timeseries.dates.map((d,i)=>{
         return {
           date:d,
           value:timeseries.values[i]
@@ -492,16 +492,17 @@ export class MainMapComponent implements OnInit, OnChanges {
               theDate = new Date(+dString.slice(0,4),+dString.slice(4,6)-1,+dString.slice(6,8));
             }
 
-            return {
+            const result:ChartEntry = {
               date: theDate,
               value:rec.value
             };
+            return result;
           });
           data = data.reverse();
           if(this.vectorLayer.label){
             this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label,geoJSON['properties']);
           }
-          this.setupChart(layer.label,data);
+          this.setupChart(layer.label,data as ChartEntry[]);
         });
       }
     });
@@ -575,7 +576,7 @@ function pad(n: number,digits?: number): string{
   return result;
 }
 
-function toCumulative(table:TableRow[]):TableRow[] {
+function toCumulative(table:ChartEntry[]):ChartEntry[] {
   let sum = 0.0;
   return table.map(row=>{
     sum += row.value;
