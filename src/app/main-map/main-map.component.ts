@@ -35,6 +35,7 @@ const DEFAULT_DELTA_OFFSET=-50;
 const CM_NORMAL='Normal';
 const CM_DEVIATION='Deviation from monthly mean';
 const CM_YR_ON_YR='Year on year';
+const CM_YR_ON_YR_CUMUL='Year on year (cumulative)';
 const INITIAL_TRANSPARENCY=25;//%
 const DEFAULT_PALETTE:PaletteDescriptor = {
   name:'YlOrBr',
@@ -73,7 +74,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   mapRelativeMode: string;
 
   pointLayerFeatures: any;
-  chartModes = [CM_NORMAL,CM_DEVIATION,CM_YR_ON_YR];
+  chartModes = [CM_NORMAL,CM_DEVIATION,CM_YR_ON_YR,CM_YR_ON_YR_CUMUL];
   chartMode = CM_NORMAL;
 
   get opacity(): number {
@@ -328,14 +329,13 @@ export class MainMapComponent implements OnInit, OnChanges {
         ];
         break;
       case CM_YR_ON_YR:
+      case CM_YR_ON_YR_CUMUL:
         const orig = this.rawChartData.data;
-        // const years = orig.map(r=>(r.date as UTCDate).getUTCFullYear());
         const groups = groupBy(r=>(r.date as UTCDate).getUTCFullYear().toString(),orig);
         const years = Object.keys(groups).map(yr=>+yr).sort().reverse();
         const maxYear = years[0];
-        console.log(maxYear,years,groups);
         this.chartSeries = years.map(yr=>{
-          return {
+          const result = {
             title: `${this.rawChartData.title}: ${yr}`,
             data: groups[yr.toString()].map(r=>{
               const d = new Date(r.date);
@@ -346,6 +346,11 @@ export class MainMapComponent implements OnInit, OnChanges {
               };
             })
           };
+          if(this.chartMode===CM_YR_ON_YR_CUMUL){
+            result.data = toCumulative(result.data.reverse());
+          }
+
+          return result;
         });
         break;
     }
@@ -570,6 +575,16 @@ function pad(n: number,digits?: number): string{
   return result;
 }
 
+function toCumulative(table:TableRow[]):TableRow[] {
+  let sum = 0.0;
+  return table.map(row=>{
+    sum += row.value;
+    return {
+      date:row.date,
+      value:sum
+    };
+  });
+}
 // &threshold=50&styles=
 
 // &styles=time=2008-01-01T00%3A00%3A00.000Z&time_diff=2010-01-01T00%3A00%3A00.000Z
