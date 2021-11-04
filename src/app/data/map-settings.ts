@@ -8,7 +8,7 @@ export interface MapSettings {
   // referenceYear: number;
   // threshold: number;
   layer: LayerDescriptor;
-  transparency: number;
+  opacity: number;
   relative: boolean;
   relativeVariable: string;
   dateStep: number;

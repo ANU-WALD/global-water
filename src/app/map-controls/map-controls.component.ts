@@ -1,5 +1,5 @@
 import { Component, OnInit, EventEmitter, Output, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { LayerDescriptor, MapSettings } from '../data';
+import { DisplaySettingsChange, LayerDescriptor, MapSettings } from '../data';
 import { LayersService } from '../layers.service';
 
 const MIN_YEAR=1990;
@@ -15,6 +15,7 @@ export class MapControlsComponent implements OnInit, OnChanges {
   @Input() settings: MapSettings;
 
   @Output() optionsChanged = new EventEmitter<MapSettings>();
+  @Output() settingChanged = new EventEmitter<DisplaySettingsChange>();
 
   constructor(private layersService: LayersService) {
     // this.years = (new Array(31)).fill(0).map((_,ix) => MIN_YEAR+ix);
@@ -42,20 +43,20 @@ export class MapControlsComponent implements OnInit, OnChanges {
     this.formControlChanged();
   }
 
-  relativeSwitchChanged(): void {
-    if(this.settings.relative){
-      const options = Object.keys(this.settings.layer.relativeOptions||{});
-      if(!this.settings.relativeVariable||!options.includes(this.settings.relativeVariable)){
-        this.settings.relativeVariable = options[0];
-      }
-    }
-    this.formControlChanged();
-  }
+  // relativeSwitchChanged(): void {
+  //   if(this.settings.relative){
+  //     const options = Object.keys(this.settings.layer.relativeOptions||{});
+  //     if(!this.settings.relativeVariable||!options.includes(this.settings.relativeVariable)){
+  //       this.settings.relativeVariable = options[0];
+  //     }
+  //   }
+  //   this.formControlChanged();
+  // }
 
-  relativeModeChanged(): void {
-    this.settings.relative = true;
-    this.formControlChanged();
-  }
+  // relativeModeChanged(): void {
+  //   this.settings.relative = true;
+  //   this.formControlChanged();
+  // }
 
   constrainDate(): void {
     this.settings.date = this.layersService.constrainDate(this.settings.date,this.settings.layer);
@@ -66,4 +67,9 @@ export class MapControlsComponent implements OnInit, OnChanges {
     this.constrainDate();
     this.formControlChanged();
   }
+
+  settingControlChanged(event: DisplaySettingsChange) {
+    this.settingChanged.emit(event);
+  }
 }
+

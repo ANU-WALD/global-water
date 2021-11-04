@@ -18,10 +18,19 @@ export interface RelativeOption {
   palette?: PaletteDescriptor;
 }
 
-export interface LayerDescriptor extends MetadataConfig {
+export interface LayerDescriptorCommon {
+  label:string;
+}
+
+export interface LayerVariant extends LayerDescriptorCommon {
+  variantLabel:string;
+  relative:RelativeOption;
+}
+
+export interface LayerDescriptor extends MetadataConfig, LayerDescriptorCommon {
   type:string;
   source:string;
-  label:string;
+  icon?:string;
   attribution?:string;
   attributionURL?:string;
   url?: string;
@@ -31,9 +40,12 @@ export interface LayerDescriptor extends MetadataConfig {
   mapParams?:any;
   timePeriod?:DateRange;
   relatedFiles?:MetadataConfig[];
-  relativeOptions?:{[key:string]:RelativeOption};
-  palette?:PaletteDescriptor
+  // relativeOptions?:{[key:string]:RelativeOption};
+  palette?:PaletteDescriptor;
+  variants?:LayerVariant[];
 }
+
+export interface FlattenedLayerDescriptor extends LayerDescriptor, LayerVariant { }
 
 // export interface LayerDescriptor {
 //   label: string;

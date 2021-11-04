@@ -3,7 +3,7 @@
     "extent":"Global",
     "name": "National borders",
     "description": "TODO",
-    "tiles":"https://storage.googleapis.com/wald-vector/AdminSHP-global/{z}/{x}/{y}.pbf",
+    "filename":"AdminSHP-global",
     "tileLayers":[
       {
         "layer":"AdminSHPglobal",
@@ -18,7 +18,7 @@
     "extent":"Global",
     "name": "State/Province borders",
     "description": "TODO",
-    "tiles":"https://storage.googleapis.com/wald-vector/AdminSHP-local/{z}/{x}/{y}.pbf",
+    "filename":"AdminSHP-local",
     "tileLayers":[
       {
         "layer":"AdminSHPlocal",
@@ -33,7 +33,7 @@
     "extent":"Global",
     "name": "Basins",
     "description": "TODO",
-    "tiles":"https://storage.googleapis.com/wald-vector/HydroSHP-global/{z}/{x}/{y}.pbf",
+    "filename":"HydroSHP-global",
     "tileLayers":[
       {
         "layer":"HydroSHPglobal",
@@ -48,7 +48,7 @@
     "extent":"Global",
     "name": "Catchments",
     "description": "TODO",
-    "tiles":"https://storage.googleapis.com/wald-vector/HydroSHP-local/{z}/{x}/{y}.pbf",
+    "filename":"HydroSHP-local",
     "tileLayers":[
       {
         "layer":"HydroSHPlocal",

@@ -8,7 +8,7 @@ import { FeatureCollection, Feature, GeoJsonProperties } from 'geojson';
 import { Point } from 'leaflet';
 import { FeatureDataService, FeatureDataConfig } from './feature-data.service';
 import { LayersService } from './layers.service';
-import { LayerDescriptor } from './data';
+import { FlattenedLayerDescriptor, LayerDescriptor } from './data';
 
 const standardVariables = [
   'longitude',
@@ -72,12 +72,12 @@ export class PointDataService {
     return val - comp;
   }
 
-  getValues(layer:string, 
+  getValues(layer:FlattenedLayerDescriptor, 
             filter:{[key:string]:any},
             timestep: UTCDate,
             variable?: string,
             relativeMode?: string): Observable<FeatureCollection>{
-    return this._layerConfig(layer).pipe(
+    return this._layerConfig(layer.label).pipe(
       map(lyr=>forkJoin([of(lyr),this.featureData.getValues(lyr,filter,timestep,variable)])),
       switchAll(),
       map(([layer,coverage])=>{
@@ -91,7 +91,7 @@ export class PointDataService {
           return;
         }
         data.coverage.features.forEach(f=>{
-          f.properties.value = this._computeRelative(f.properties.value,f.properties,data.layer.relativeOptions[relativeMode].variable);
+          f.properties.value = this._computeRelative(f.properties.value,f.properties,layer.relative?.variable);
         })
       }),
       map(data=>data.coverage));

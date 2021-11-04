@@ -5,5 +5,7 @@ export const environment = {
   vectorConfig:'assets/config/foci.json',
   tds:'http://dapds00.nci.org.au/thredds',
   pointConfig:'assets/config/points.json',
-  geojsons: 'assets/selection_layers/'
+  geojsons: 'assets/selection_layers/',
+  tiles:'https://storage.googleapis.com/wald-vector/{{filename}}/{z}/{x}/{y}.pbf',
+  splitGeoJSONS:'https://storage.googleapis.com/wald-vector/split_polygons/{{filename}}/{{id}}.json'
 };

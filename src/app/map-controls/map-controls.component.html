@@ -23,7 +23,7 @@
     </div>
   </div>
 
-  <div class="row" *ngIf="settings.layer?.relativeOptions">
+  <!-- <div class="row" *ngIf="settings.layer?.relativeOptions">
     <div class="col-6">
       <div class="custom-control custom-switch custom-switch-md">
         <input type="checkbox"
@@ -44,20 +44,6 @@
         </option>
       </select>
     </div>
-  </div>
+  </div> -->
 
-  <div class="row form-group">
-    <div class="col-6">
-      <label for="transparencySlider">transparency</label>
-    </div>
-    <div class="col-6">
-      <input type="range"
-             class="custom-range"
-             id="transparencySlider"
-             [(ngModel)]="settings.transparency"
-             (ngModelChange)="formControlChanged()"
-             min="0"
-             max="100">
-    </div>
-  </div>
 </div>

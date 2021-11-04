@@ -3,6 +3,7 @@
     "type":"grid",
     "source":"custom",
     "label":"Precipitation",
+    "icon":"fa-tint",
     "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_precipitation",
     "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
@@ -17,9 +18,9 @@
   {
     "type":"grid",
     "source":"custom",
-    "label":"Air Temperature (average?)",
+    "label":"Air Temperature",
+    "icon":"fa-thermometer-half",
     "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
-    "variable":"MSWX_air_temperature",
     "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
@@ -27,42 +28,27 @@
     "timePeriod":{
       "start":1979,
       "end":2020
-    }
-  },
-  {
-    "type":"grid",
-    "source":"custom",
-    "label":"Air temperature (minimum)",
-    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
-    "variable":"MSWX_tmin_air_temperature",
-    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
-    "mapParams":{
-      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
-    "timePeriod":{
-      "start":1979,
-      "end":2020
-    }
-  },
-  {
-    "type":"grid",
-    "source":"custom",
-    "label":"Air temperature (maximum)",
-    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
-    "variable":"MSWX_tmax_air_temperature",
-    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
-    "mapParams":{
-      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
-    },
-    "timePeriod":{
-      "start":1979,
-      "end":2020
-    }
+    "variants":[
+      {
+        "variantLabel":"Average",
+        "variable":"MSWX_air_temperature"
+      },
+      {
+        "variantLabel":"Minimum",
+        "variable":"MSWX_tmin_air_temperature"
+      },
+      {
+        "variantLabel":"Maximum",
+        "variable":"MSWX_tmax_air_temperature"
+      }
+    ]
   },
   {
     "type":"grid",
     "source":"custom",
     "label":"Relative Humidity",
+    "icon":"fa-cloud",
     "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_relative_humidity",
     "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
@@ -75,23 +61,9 @@
     }
   },
   {
-    "type":"grid",
-    "source":"custom",
-    "label":"Surface Pressure",
-    "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
-    "variable":"MSWX_surface_pressure",
-    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
-    "mapParams":{
-      "time":"{{year}}-{{month}}-01T00:00:00.000Z"
-    },
-    "timePeriod":{
-      "start":1979,
-      "end":2020
-    }
-  },
-  {
     "type":"point",
     "label":"Water bodies",
+    "icon":"",
     "filename":"ub8/global/GRALM/Global_Lake_NRT_Storage (1984-present).nc",
     "filenameX":"ub8/global/GRALM/Global_Reservoir_Storage_B (1984-current).nc",
     "relatedFiles":[
@@ -109,25 +81,32 @@
     ],
     "time":"time",
     "timeFirst":true,
-    "palette": {
-      "name": "PuBu",
-      "count": 6,
-      "reverse": false
-    },
-    "relativeOptions":{
-      "Median":{
-        "variable":"decile[5]",
+    "variants":[
+      {
+        "variantLabel":"Storage",
+        "palette": {
+          "name": "PuBu",
+          "count": 6,
+          "reverse": false
+        }
+      },
+      {
+        "variantLabel":"Median",
+        "relative":{
+          "variable":"decile[5]"
+        },
         "palette": {
           "name": "RdBu",
           "count": 6,
           "reverse": false
         }
       }
-    }
+    ]
   },
   {
     "type":"point",
     "label":"Streamflow",
+    "icon":"",
     "filename":"ub8/global/GRALM/Global_River_Discharge_GSGR (2000-present).nc",
     "relatedFiles":[
       {
@@ -151,37 +130,50 @@
       "count": 6,
       "reverse": false
     },
-    "relativeOptions":{
-      "Median":{
-        "variable":"decile[5]",
+    "variants":[
+      {
+        "variantLabel":"Current"
+      },
+      {
+        "variantLabel":"Median",
+        "relative":{
+          "variable":"decile[5]"
+        },
         "palette": {
           "name": "RdBu",
           "count": 6,
           "reverse": false
         }
       },
-      "Mean":{
-        "variable":"Riv_Qmean",
-        "palette": {
+      {
+        "variantLabel":"Mean",
+        "relative":{
+          "variable":"Riv_Qmean"
+        },
+        "palette":{
           "name": "PuBu",
           "count": 6,
           "reverse": false
         }
       },
-      "Max":{
-        "variable":"Riv_Qmax",
-        "palette": {
+      {
+        "variantLabel":"Maximum",
+        "relative":{
+          "variable":"Riv_Qmax"
+        },
+        "palette":{
           "name": "PuBu",
           "count": 6,
           "reverse": false
         }
       }
-    }
+    ]
   },
   {
     "type":"grid",
     "source":"tds",
     "label":"Soil Moisture",
+    "icon":"",
     "filename":"/ub8/global/GRAFS/GRAFS_v2/GRAFS_TopSoilRelativeWetness_{{year}}.nc",
     "variable":"relative_wetness",
     "mapParams":{

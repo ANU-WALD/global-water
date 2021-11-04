@@ -16,6 +16,9 @@ import { AboutComponent } from './about/about.component';
 import { FeatureDataService } from './feature-data.service';
 import { PointDataService } from './point-data.service';
 import { LayersService } from './layers.service';
+import { MapCoordinatesComponent } from './map-coordinates/map-coordinates.component';
+import { DisplaySettingsComponent } from './display-settings/display-settings.component';
+import { OpacitySliderComponent } from './opacity-slider/opacity-slider.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +29,9 @@ import { LayersService } from './layers.service';
     ChartComponent,
     VectorLayerSelectionComponent,
     AboutComponent,
+    MapCoordinatesComponent,
+    DisplaySettingsComponent,
+    OpacitySliderComponent,
     // DownloadFormComponent
   ],
   imports: [

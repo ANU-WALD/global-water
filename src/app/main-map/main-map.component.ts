@@ -4,7 +4,8 @@ import { environment } from 'src/environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate, RangeStyle, PaletteService } from 'map-wald';
 import { ChartEntry, ChartSeries } from '../chart/chart.component';
-import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings, PaletteDescriptor } from '../data';
+import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings, PaletteDescriptor, 
+         DisplaySettingsChange, LayerVariant, FlattenedLayerDescriptor } from '../data';
 import { ConfigService } from '../config.service';
 import { LeafletService, OneTimeSplashComponent, BasemapDescriptor,
   VectorLayerDescriptor, PointMode, makeColour } from 'map-wald-leaflet';
@@ -15,8 +16,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import area from '@turf/area';
 import { LayersService } from '../layers.service';
 import { PointDataService } from '../point-data.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import {groupBy} from 'ramda';
+import { map } from 'rxjs/operators';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -36,7 +38,7 @@ const CM_NORMAL='Normal';
 const CM_DEVIATION='Deviation from monthly mean';
 const CM_YR_ON_YR='Year on year';
 const CM_YR_ON_YR_CUMUL='Year on year (cumulative)';
-const INITIAL_TRANSPARENCY=25;//%
+const INITIAL_OPACITY=75;//%
 const DEFAULT_PALETTE:PaletteDescriptor = {
   name:'YlOrBr',
   count:6,
@@ -46,7 +48,7 @@ const DEFAULT_PALETTE:PaletteDescriptor = {
 const INITIAL_MAP_SETTINGS:MapSettings = {
   date: new Date(),
   layer: null as LayerDescriptor,
-  transparency: INITIAL_TRANSPARENCY,
+  opacity: INITIAL_OPACITY,
   relative: false,
   relativeVariable: '',
   dateStep: 7
@@ -70,16 +72,17 @@ export class MainMapComponent implements OnInit, OnChanges {
   vectorLayer: VectorLayerDescriptor;
   showWindows = true;
   basemap: BasemapDescriptor;
-  transparency = 0;
+  // transparency = 0;
   mapRelativeMode: string;
 
   pointLayerFeatures: any;
   chartModes = [CM_NORMAL,CM_DEVIATION,CM_YR_ON_YR,CM_YR_ON_YR_CUMUL];
   chartMode = CM_NORMAL;
 
-  get opacity(): number {
-    return 1-0.01*this.transparency;
-  }
+  opacity = INITIAL_OPACITY;
+  // get opacity(): number {
+  //   return 1-0.01*this.transparency;
+  // }
 
   layers: LayerDescriptor[];
   basemaps: BasemapDescriptor[];
@@ -99,6 +102,10 @@ export class MainMapComponent implements OnInit, OnChanges {
   legendShape: string[] = [''];
   polygonMode: 'predefined' | 'draw' = 'predefined';
   showVectors = true;
+
+  layerVariants:LayerVariant[] = [];
+  selectedVariant:LayerVariant;
+  layerSettingsFlat: FlattenedLayerDescriptor;
 
   area: number;
   areaUnits = 'km'+SUPER2;
@@ -162,6 +169,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   mapFilename(): string {
+    // TODO: Should this be layerSettingsFlat?
     if(!this.layer){
       return '';
     }
@@ -169,6 +177,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   mapUrl(): string {
+    // TODO: Should this be layerSettingsFlat?
     if(!this.layer){
       return null;
     }
@@ -199,15 +208,20 @@ export class MainMapComponent implements OnInit, OnChanges {
     return result;
   }
 
+  variantChanged():void{
+    this.setupMapLayer();
+  }
+
   setupMapLayer(): void {
     if(!this.layer){
       return;
     }
 
+    this.layerSettingsFlat = Object.assign({},this.layer,this.selectedVariant);
     this.wmsParams = null;
     this.pointLayerFeatures = null;
 
-    if(this.layer.type==='grid'){
+    if(this.layerSettingsFlat.type==='grid'){
       this.setupWMSLayer();
     } else {
       this.setupPointLayer();
@@ -215,13 +229,13 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   private setupPointLayer(): void {
-    let palette = this.layer.palette || DEFAULT_PALETTE;
-    if(this.mapRelativeMode){
-      palette = this.layer.relativeOptions[this.mapRelativeMode]?.palette || palette;
-    }
+    let palette = this.layerSettingsFlat.palette || DEFAULT_PALETTE;
+    // if(this.mapRelativeMode){
+    //   palette = this.layer.relativeOptions[this.mapRelativeMode]?.palette || palette;
+    // }
 
     forkJoin([
-      this.pointData.getValues(this.layer.label,{},this.date,null,this.mapRelativeMode),
+      this.pointData.getValues(this.layerSettingsFlat,{},this.date,null,this.mapRelativeMode),
       this.palettes.getPalette(palette.name,palette.reverse,palette.count)
     ]).subscribe(([features,palette]) => {
       this.pointLayerFeatures = features;
@@ -249,8 +263,8 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.wmsURL = this.mapUrl();
 
     const options: any =  {
-      layers: this.layer.variable?this.layer.variable:this.layer.variables[0],
-      opacity: this.opacity,
+      layers: this.layerSettingsFlat.variable?this.layerSettingsFlat.variable:this.layerSettingsFlat.variables[0],
+      opacity: this.opacity*0.01,
       updateWhenIdle: true,
       updateWhenZooming: false,
       updateInterval: 500,
@@ -270,7 +284,8 @@ export class MainMapComponent implements OnInit, OnChanges {
     //   options.threshold = this.threshold;
     // }
 
-    this.wmsParams = this.substituteParameters(Object.assign({},options,this.layer.mapParams||{}));
+    this.wmsParams = this.substituteParameters(Object.assign({},options,this.layerSettingsFlat.mapParams||{}));
+    console.log(this.wmsParams);
     // this.mapLayer = L.tileLayer.wms(environment.wms,options as L.WMSOptions);
 
     // this.mapLayer.addTo(this.map);
@@ -347,7 +362,7 @@ export class MainMapComponent implements OnInit, OnChanges {
             })
           };
           if(this.chartMode===CM_YR_ON_YR_CUMUL){
-            result.data = toCumulative(result.data.reverse());
+            result.data = toCumulative(result.data/*.reverse()*/);
           }
 
           return result;
@@ -381,21 +396,39 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.applySettings();
   }
 
+  mapSettingChanged(event:DisplaySettingsChange): void {
+    console.log(event);
+    if(this[event.setting]!==undefined){
+      this[event.setting] = event.value;
+    }
+
+    if(event.setting==='opacity'){
+      this.setOpacity();
+    }
+  }
+
   applySettings() {
-    this.layer = this.mapSettings.layer;
+    this.mapRelativeMode = this.mapSettings.relative?this.mapSettings.relativeVariable:null;
+    this.setLayer(this.mapSettings.layer);
+  }
+
+  setLayer(layer: LayerDescriptor) {
+    if(this.layer===layer){
+      return;
+    }
+
+    this.layer = layer;
+    this.layerVariants = layer?.variants||[];
+    this.selectedVariant = this.layerVariants[0];
+
     if(this.layer){
       this.date = this.layersService.constrainDate(this.mapSettings.date,this.layer);
     }
-    this.transparency = this.mapSettings.transparency;
-    this.mapRelativeMode = this.mapSettings.relative?this.mapSettings.relativeVariable:null;
     this.setupMapLayer();
   }
 
   displayOptionsChanged(event: DisplaySettings): void {
-    if(event.opacity!==undefined){
-      this.transparency = 100*(1-event.opacity);
-      this.setOpacity();
-    }
+    this.setOpacity();
 
     if(event.resetBounds){
       this.resetBounds();
@@ -460,52 +493,66 @@ export class MainMapComponent implements OnInit, OnChanges {
   vectorFeatureClicked(geoJSON: any): void {
     this.selectionNum++;
     const currentSelection = this.selectionNum;
+    const drawn = !this.showVectors;
     this.gaEvent('action','select-polygon',`${this.showVectors?this.vectorLayer.name:'custom-drawn'}`);
-    this.area = area(geoJSON);
-    if(this.area < 10000) {
-      this.areaUnits = 'm'+SUPER2;
-    } else if(this.area < 1000000) {
-      this.area /= 10000;
-      this.areaUnits = 'ha';
-    } else {
-      this.area /= 1000000;
-      this.areaUnits = 'km'+SUPER2;
-    }
-
-    this.area = +this.area.toFixed(DECIMAL_PLACES);
+    const realFeature$ = (this.vectorLayer.tiles&&!drawn) ? this.fetchGeoJSON(geoJSON) : of(geoJSON);
 
     setTimeout(()=>{
-      if(this.selectionNum!==currentSelection){
-        return;
-      }
+      realFeature$.subscribe(feature=>{
+        this.area = area(feature);
+        if(this.area < 10000) {
+          this.areaUnits = 'm'+SUPER2;
+        } else if(this.area < 1000000) {
+          this.area /= 10000;
+          this.areaUnits = 'ha';
+        } else {
+          this.area /= 1000000;
+          this.areaUnits = 'km'+SUPER2;
+        }
+    
+        this.area = +this.area.toFixed(DECIMAL_PLACES);
+    
+        if(this.selectionNum!==currentSelection){
+          return;
+        }
 
-      this.setupChart(null,null);
-      const layer = this.layer;
-      if(layer.polygonDrill){
-        this.getValues(geoJSON,data=>{
-          data = data.filter(rec=>rec.value!==-9999).map(rec=>{
-            let theDate:Date;
-            if(rec.date?.getUTCFullYear){
-              theDate = rec.date;
-            } else {
-              const dString = ''+rec.date;
-              theDate = new Date(+dString.slice(0,4),+dString.slice(4,6)-1,+dString.slice(6,8));
+        this.setupChart(null,null);
+        const layer = this.layer;
+        if(layer.polygonDrill){
+          this.getValues(feature,data=>{
+            data = data.filter(rec=>rec.value!==-9999).map(rec=>{
+              let theDate:Date;
+              if(rec.date?.getUTCFullYear){
+                theDate = rec.date;
+              } else {
+                const dString = ''+rec.date;
+                theDate = new Date(+dString.slice(0,4),+dString.slice(4,6)-1,+dString.slice(6,8));
+              }
+
+              const result:ChartEntry = {
+                date: theDate,
+                value:rec.value
+              };
+              return result;
+            });
+            // data = data.reverse();
+            if(this.vectorLayer.label){
+              this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label,feature['properties']);
             }
-
-            const result:ChartEntry = {
-              date: theDate,
-              value:rec.value
-            };
-            return result;
+            this.setupChart(layer.label,data as ChartEntry[]);
           });
-          data = data.reverse();
-          if(this.vectorLayer.label){
-            this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label,geoJSON['properties']);
-          }
-          this.setupChart(layer.label,data as ChartEntry[]);
-        });
-      }
+        }
+      });
+
     });
+  }
+
+  fetchGeoJSON(proxyFeature:any):Observable<any>{
+    const id = proxyFeature.properties[this.vectorLayer.tileLayers[0].keyField];
+    const url = InterpolationService.interpolate(environment.splitGeoJSONS,Object.assign({id},this.vectorLayer,proxyFeature.properties));
+    return this.http.get(url).pipe(
+      map((featurecollection:any)=>featurecollection.features[0])
+    );
   }
 
   resetBounds(): void {
@@ -518,8 +565,12 @@ export class MainMapComponent implements OnInit, OnChanges {
     }
 
     this.vectorLayer = l;
-    if(!l||!l.tiles){
+    if(!l||!l.tileLayers){
       return;
+    }
+
+    if(!l.tiles){
+      l.tiles = InterpolationService.interpolate(environment.tiles,l);
     }
 
     this.vectorStyles = {};
@@ -533,7 +584,8 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   setOpacity(): void {
-    this.wmsParams = Object.assign({},this.wmsParams,{opacity:this.opacity});
+    this.wmsParams = Object.assign({},this.wmsParams,{opacity:this.opacity*0.01});
+    console.log(this.wmsParams);
   }
 
   vectorLayerChanged(vl: VectorLayerDescriptor): void {

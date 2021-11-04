@@ -28,7 +28,7 @@
 
     </geojson-layer>
 
-    <vector-tile-layer *ngIf="showVectors&&vectorLayer?.tiles"
+    <vector-tile-layer *ngIf="showVectors&&vectorLayer?.tileLayers"
                        [url]="vectorLayer.tiles"
                        [styles]="vectorStyles"
                        [sublayers]="vectorLayer.tileLayers"
@@ -44,8 +44,10 @@
                        [vectorLayers]="vectorLayers"
                        (optionsChanged)="displayOptionsChanged($event)"
                        [helpModal]="splash">
-
       </app-map-buttons>
+    </map-control>
+
+    <map-control [position]="'TOP_CENTER'">
     </map-control>
 
     <map-control [position]="'TOP_LEFT'">
@@ -58,14 +60,33 @@
                  height="50">
           </span>
 
-          <span class="float-right">
+          <!-- <span class="float-right">
             <a class="logo" href="http://wald.anu.edu.au/" target="_blank">
               <img  class="logo"
                     alt="Centre for Water and Landscape Dynamics"
                     src="assets/anuwald_round_large_tr.png"
                     height="50">
             </a>
-          </span>
+          </span> -->
+          <div class="theme-bar float-right">
+            <div class="btn-group" role="group">
+              <button *ngFor="let lyr of layers" type="button" class="btn btn-primary"
+                      [ngClass]="{'active':lyr===layer}"
+                      [ngbTooltip]="lyr.label"
+                      (click)="setLayer(lyr)">
+                <span *ngIf="!lyr.icon">{{lyr.label}}</span>
+                <i *ngIf="lyr.icon" class="fa" [ngClass]="lyr.icon"></i>
+              </button>
+            </div>
+            <div *ngIf="layerVariants?.length" class='float-right'>
+              <select class="form-control" 
+                      [(ngModel)]="selectedVariant"
+                      (ngModelChange)="variantChanged($event)"
+                      [ngbTooltip]="'Variant'">
+                <option *ngFor="let variant of layerVariants" [ngValue]="variant">{{variant.variantLabel}}</option>
+              </select>
+            </div>
+          </div>
         </div>
         <ngb-accordion *ngIf="showWindows" #acc="ngbAccordion" activeIds="map-panel">
           <ngb-panel id="map-panel">
@@ -81,35 +102,10 @@
               <app-map-controls [layers]="layers"
                                 [settings]="mapSettings"
                                 [orientation]="'vertical'"
-                                (optionsChanged)="mapOptionsChanged($event)">
+                                (optionsChanged)="mapOptionsChanged($event)"
+                                (settingChanged)="mapSettingChanged($event)">
               </app-map-controls>
 
-              <div class="row form-group">
-                <div class="col-6">
-                  <label for="basemapSelect">background</label>
-                </div>
-                <div class="col-6">
-                  <select [(ngModel)]="basemap"
-                          id="basemapSelect"
-                          (ngModelChange)="basemapChanged()"
-                          class="form-control form-control-sm">
-                    <option *ngFor="let bl of basemaps" [ngValue]="bl">{{bl.name}}</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-6">
-                  <label for="vector-selection">boundaries</label>
-                </div>
-                <div class="col-6">
-                  <vector-layer-selection [vectorLayers]="vectorLayers"
-                                          [currentZoom]="zoom"
-                                          [enabled]="showVectors"
-                                          (vectorLayerSelected)="vectorLayerChanged($event)">
-                  </vector-layer-selection>
-                </div>
-              </div>
             </ng-template>
           </ngb-panel>
 
@@ -183,6 +179,46 @@
         <span>
             Data by <a [href]="layer.attributionURL" target="_blank">{{layer.attribution}}</a>
         </span>
+      </div>
+    </map-control>
+
+    <map-control [position]="'BOTTOM_LEFT'">
+      <div *ngIf="showWindows">
+        <map-coordinates></map-coordinates>
+      </div>
+    </map-control>
+
+    <map-control [position]="'BOTTOM_LEFT'">
+      <div *ngIf="showWindows" class="map-control">
+        <app-display-settings (displaySettingsChange)="mapSettingChanged($event)"></app-display-settings>
+
+        <div class="row form-group">
+          <div class="col-6">
+            <label for="basemapSelect">background</label>
+          </div>
+          <div class="col-6">
+            <select [(ngModel)]="basemap"
+                    id="basemapSelect"
+                    (ngModelChange)="basemapChanged()"
+                    class="form-control form-control-sm">
+              <option *ngFor="let bl of basemaps" [ngValue]="bl">{{bl.name}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-6">
+            <label for="vector-selection">boundaries</label>
+          </div>
+          <div class="col-6">
+            <vector-layer-selection [vectorLayers]="vectorLayers"
+                                    [currentZoom]="zoom"
+                                    [enabled]="showVectors"
+                                    (vectorLayerSelected)="vectorLayerChanged($event)">
+            </vector-layer-selection>
+          </div>
+        </div>
+
       </div>
     </map-control>
 
