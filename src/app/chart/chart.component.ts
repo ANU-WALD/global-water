@@ -46,6 +46,7 @@ export class ChartComponent implements OnInit, OnChanges {
     Plotly.purge(node);
 
     const series = this.series.map((chartData,ix)=>{
+      const col = ix ? SAT_COLOUR : MAIN_COLOUR;
       return {
         x: chartData.data.map(r=>r[this.x]),
         y: chartData.data.map(r=>r[this.y]),
@@ -53,10 +54,15 @@ export class ChartComponent implements OnInit, OnChanges {
         mode: 'lines+markers',
         connectgaps: true,
         marker: {
-          size: ix ? 2 : 6
+          size: ix ? 2 : 6,
+          color: 'rgba(0,0,0,0)',
+          line: {
+            color: col,
+            width: 1
+          }
         },
         line: {
-          color: ix ? SAT_COLOUR : MAIN_COLOUR
+          color: col
         }
       };
     }).reverse();
