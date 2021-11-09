@@ -60,6 +60,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   @ViewChild('splash', { static: true }) splash: OneTimeSplashComponent;
 
   layerDates: UTCDate[] = [];
+  dateFormat = '%B/%Y';
 
   mapSettings: MapSettings = Object.assign({},INITIAL_MAP_SETTINGS);
   pointMode = PointMode;
@@ -366,7 +367,19 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.date = this.layersService.constrainDate(this.mapSettings.date,this.layer);
     this.layersService.availableDates(this.layer).subscribe(dates=>{
       this.layerDates = dates;
-      console.log(this.layerDates);
+
+      if(this.layer.timePeriod?.format){
+        this.dateFormat = this.layer.timePeriod.format;
+      } else if(this.layer.timePeriod?.interval){
+        const interval = this.layer.timePeriod.interval;
+        if(interval.days){
+          this.dateFormat = '%B %d, %Y';
+        } else if(interval.months){
+          this.dateFormat = '%B %Y';
+        } else {
+          this.dateFormat = '%Y';
+        }
+      }
     });
   }
 

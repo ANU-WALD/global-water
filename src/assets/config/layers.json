@@ -90,6 +90,9 @@
     ],
     "time":"time",
     "timeFirst":true,
+    "timePeriod":{
+      "format":"%B %d, %Y"
+    },
     "variants":[
       {
         "variantLabel":"Storage",
@@ -134,6 +137,9 @@
     ],
     "time":"time",
     "timeFirst":false,
+    "timePeriod":{
+      "format":"%B %d, %Y"
+    },
     "palette": {
       "name": "PuBu",
       "count": 6,

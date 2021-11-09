@@ -1,11 +1,12 @@
 
 <input type="range"
+       class="time-slider"
        [(ngModel)]="currentStep"
-       (ngModelChange)="stepChanged()"
+       (ngModelChange)="stepChanged(true)"
        [min]="min"
        [max]="max">
 
-<span>{{currentStep}}</span>
+<span>{{currentDate}}</span>
 
 
 <!-- 
