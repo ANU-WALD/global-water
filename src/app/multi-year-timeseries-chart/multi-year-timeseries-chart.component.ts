@@ -2,6 +2,7 @@ import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/cor
 import { UTCDate } from 'map-wald';
 import { ChartEntry, ChartSeries } from '../chart/chart.component';
 import {groupBy} from 'ramda';
+import * as FileSaver from 'file-saver';
 
 const CM_NORMAL='Normal';
 const CM_DEVIATION='Deviation from monthly mean';
@@ -82,6 +83,21 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
     }
   }
 
+  downloadClick(): void {
+    const fileName = `global-water-monitor-${this.chartSeries.title}-${this.chartLabel}.csv`;
+
+    const output = new Blob(
+      [this.makeCSV()],
+      {type: 'text/plain;charset=utf-8'});
+    FileSaver.saveAs(output, fileName);
+  }
+
+  makeCSV(): string {
+    const res = ([] as string[]).concat(
+      ['date,value'],
+      this.chartSeries.data.map(r=>`${r.date},${r.value}`))
+    return res.join('\n');
+  }
 }
 
 function toCumulative(table:ChartEntry[]):ChartEntry[] {
