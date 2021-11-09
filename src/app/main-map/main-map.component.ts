@@ -163,7 +163,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   dateChange(): void {
-    this.applySettings();
+    this.setupMapLayer();
   }
 
   mapFilename(): string {
