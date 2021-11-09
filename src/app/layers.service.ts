@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable, of } from 'rxjs';
-import { map, publishReplay, refCount, switchAll } from 'rxjs/operators';
+import { map, publishReplay, refCount, switchAll, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LayerDescriptor } from './data';
 import { DateRange, UTCDate } from 'map-wald';
@@ -83,5 +83,34 @@ export class LayersService {
       return lyr.timePeriod.start;
     }
     return lyr.timePeriod.end;
+  }
+
+  availableDates(lyr:LayerDescriptor): Observable<UTCDate[]>{
+    if(!lyr.timePeriod){
+      return of([]);
+    }
+
+    if(lyr.type==='grid'){
+      const interval = lyr.timePeriod.interval || {days:1};
+      let d = lyr.timePeriod.start;
+      const result:UTCDate[] = [];
+      while(d<=lyr.timePeriod.end){
+        result.push(d);
+        d = new Date(d.getTime());
+        if(interval.years){
+          d.setUTCFullYear(d.getUTCFullYear()+interval.years);
+        }
+        if(interval.months){
+          d.setUTCMonth(d.getUTCMonth()+interval.months);
+        }
+        if(interval.days){
+          d.setUTCDate(d.getUTCDate()+interval.days);
+        }
+      }
+
+      return of(result);
+    }
+
+    return this.featureData.getTimes(lyr);
   }
 }

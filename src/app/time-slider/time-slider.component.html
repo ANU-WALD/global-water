@@ -1,0 +1,14 @@
+
+<input type="range"
+       [(ngModel)]="currentStep"
+       (ngModelChange)="stepChanged()"
+       [min]="min"
+       [max]="max">
+
+<span>{{currentStep}}</span>
+
+
+<!-- 
+<date-selection></date-selection>
+-->
+

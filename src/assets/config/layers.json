@@ -12,7 +12,10 @@
     },
     "timePeriod":{
       "start":1979,
-      "end":2020
+      "end":2020,
+      "interval":{
+        "months":1
+      }
     }
   },
   {
@@ -27,7 +30,10 @@
     },
     "timePeriod":{
       "start":1979,
-      "end":2020
+      "end":2020,
+      "interval":{
+        "months":1
+      }
     },
     "variants":[
       {
@@ -57,7 +63,10 @@
     },
     "timePeriod":{
       "start":1979,
-      "end":2020
+      "end":2020,
+      "interval":{
+        "months":1
+      }
     }
   },
   {
@@ -186,7 +195,10 @@
     },
     "timePeriod":{
       "start":2015,
-      "end":-5
+      "end":-5,
+      "interval":{
+        "days":1
+      }
     }
   }
 ]

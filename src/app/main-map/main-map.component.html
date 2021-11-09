@@ -88,6 +88,16 @@
             </div>
           </div>
         </div>
+        <div class="map-control">
+          <app-time-slider [dates]="layerDates"
+                           [(date)]="date"
+                           (dateChange)="dateChange()"></app-time-slider>
+        </div>
+      </div>
+
+    </map-control>
+
+<!-- 
         <ngb-accordion *ngIf="showWindows" #acc="ngbAccordion" activeIds="map-panel">
           <ngb-panel id="map-panel">
             <ng-template ngbPanelHeader let-opened="opened">
@@ -119,53 +129,40 @@
               </div>
             </ng-template>
             <ng-template ngbPanelContent>
-              <div class="row">
-                <div class="col-12">
-                  <div class="btn-group btn-group-toggle"
-                       *ngIf="layer&&layer.polygonDrill"
-                       ngbRadioGroup
-                       name="polygonSelection"
-                       [(ngModel)]="polygonMode"
-                       (ngModelChange)="polygonModeChanged()">
-                    <label ngbButtonLabel [ngClass]="(polygonMode==='predefined')?'btn-primary':'btn-secondary'">
-                      <input ngbButton type="radio" value="predefined">Select area
-                    </label>
-                    <label ngbButtonLabel [ngClass]="(polygonMode==='draw')?'btn-primary':'btn-secondary'">
-                      <input ngbButton type="radio" value="draw">Draw polygon
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              <div *ngIf="chartSeries?.length">
-                <select [(ngModel)]="chartMode"
-                        id="chartModeSelect"
-                        (ngModelChange)="configureChartMode()"
-                        class="form-control form-control-sm">
-                  <option *ngFor="let cm of chartModes" [ngValue]="cm">{{cm}}</option>
-
-                </select>
-                <p *ngIf="chartPolygonLabel">{{chartPolygonLabel}}</p>
-                <app-chart [series]="chartSeries"
-                           axisLabel=""
-                           x="date"
-                           y="value">
-
-                </app-chart>
-                <div class="row">
-                  <div class="col-4">
-                    <button disabled class="btn btn-primary btn-download" (click)="downloadClick()">Download</button>
-                  </div>
-                </div>
-              </div>
             </ng-template>
           </ngb-panel>
 
         </ngb-accordion>
+ -->
+
+    <map-control [position]="'BOTTOM_CENTER'">
+      <div class="map-control">
+        <div class="row">
+          <div class="col-12">
+            <div class="btn-group btn-group-toggle"
+                 *ngIf="layer&&layer.polygonDrill"
+                 ngbRadioGroup
+                 name="polygonSelection"
+                 [(ngModel)]="polygonMode"
+                 (ngModelChange)="polygonModeChanged()">
+              <label ngbButtonLabel [ngClass]="(polygonMode==='predefined')?'btn-primary':'btn-secondary'">
+                <input ngbButton type="radio" value="predefined">Select area
+              </label>
+              <label ngbButtonLabel [ngClass]="(polygonMode==='draw')?'btn-primary':'btn-secondary'">
+                <input ngbButton type="radio" value="draw">Draw polygon
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <app-multi-year-timeseries-chart [chartSeries]="rawChartData"
+                                           [chartLabel]="chartPolygonLabel">
+
+          </app-multi-year-timeseries-chart>
+        </div>
       </div>
-
     </map-control>
-
     <map-control [position]="'BOTTOM_RIGHT'">
       <div *ngIf="showWindows&&layer" class="legend">
         <legend [labels]="legendLabels"

@@ -17,7 +17,6 @@ import area from '@turf/area';
 import { LayersService } from '../layers.service';
 import { PointDataService } from '../point-data.service';
 import { forkJoin, Observable, of } from 'rxjs';
-import {groupBy} from 'ramda';
 import { map } from 'rxjs/operators';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
@@ -34,10 +33,6 @@ const FULL_EXTENT: Bounds = {
 };
 const DATA_COLUMNS=['date','value'];
 const DEFAULT_DELTA_OFFSET=-50;
-const CM_NORMAL='Normal';
-const CM_DEVIATION='Deviation from monthly mean';
-const CM_YR_ON_YR='Year on year';
-const CM_YR_ON_YR_CUMUL='Year on year (cumulative)';
 const INITIAL_OPACITY=75;//%
 const DEFAULT_PALETTE:PaletteDescriptor = {
   name:'YlOrBr',
@@ -64,6 +59,8 @@ export class MainMapComponent implements OnInit, OnChanges {
   @Input() layer: LayerDescriptor;
   @ViewChild('splash', { static: true }) splash: OneTimeSplashComponent;
 
+  layerDates: UTCDate[] = [];
+
   mapSettings: MapSettings = Object.assign({},INITIAL_MAP_SETTINGS);
   pointMode = PointMode;
   selectionNum = 0;
@@ -76,8 +73,6 @@ export class MainMapComponent implements OnInit, OnChanges {
   mapRelativeMode: string;
 
   pointLayerFeatures: any;
-  chartModes = [CM_NORMAL,CM_DEVIATION,CM_YR_ON_YR,CM_YR_ON_YR_CUMUL];
-  chartMode = CM_NORMAL;
 
   opacity = INITIAL_OPACITY;
   // get opacity(): number {
@@ -96,7 +91,6 @@ export class MainMapComponent implements OnInit, OnChanges {
   vectorStyles: any = {};
   rawChartData: ChartSeries;
   chartPolygonLabel: string;
-  chartSeries: ChartSeries[] = [];
   legendColours: string[] = [];
   legendLabels: string[] = [];
   legendShape: string[] = [''];
@@ -119,7 +113,6 @@ export class MainMapComponent implements OnInit, OnChanges {
               private layersService: LayersService,
               private pointData: PointDataService,
               private palettes: PaletteService ) {
-    console.log('MainMapComponent');
     this.resetBounds();
 
     this.appConfig.vectorLayers$.subscribe(layers=>{
@@ -134,6 +127,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
 
     this.layersService.layerConfig$.subscribe(layers=>{
+      console.log(this.layers,layers);
       this.layers = layers;
       this.mapSettings.layer = this.layers[0];
       this.date = this.mapSettings.layer.timePeriod?.end;
@@ -166,6 +160,10 @@ export class MainMapComponent implements OnInit, OnChanges {
       subs.day = pad(this.date.getUTCDate());
     }
     return subs;
+  }
+
+  dateChange(): void {
+    this.applySettings();
   }
 
   mapFilename(): string {
@@ -315,7 +313,6 @@ export class MainMapComponent implements OnInit, OnChanges {
   setupChart(title: string, chartData: ChartEntry[]): void{
     if(!chartData) {
       this.chartPolygonLabel=null;
-      this.chartSeries = [];
       this.rawChartData = null;
       return;
     }
@@ -324,68 +321,6 @@ export class MainMapComponent implements OnInit, OnChanges {
       title,
       data:chartData
     };
-
-    this.configureChartMode();
-  }
-
-  configureChartMode(): void {
-    switch(this.chartMode){
-      case CM_NORMAL:
-        this.chartSeries = [
-          this.rawChartData
-        ];
-        break;
-      case CM_DEVIATION:
-        this.chartSeries = [
-          {
-            title: this.rawChartData.title,
-            data: this.convertToMonthlyVariance(this.rawChartData.data)
-          }
-        ];
-        break;
-      case CM_YR_ON_YR:
-      case CM_YR_ON_YR_CUMUL:
-        const orig = this.rawChartData.data;
-        const groups = groupBy(r=>(r.date as UTCDate).getUTCFullYear().toString(),orig);
-        const years = Object.keys(groups).map(yr=>+yr).sort().reverse();
-        const maxYear = years[0];
-        this.chartSeries = years.map(yr=>{
-          const result:ChartSeries = {
-            title: `${this.rawChartData.title}: ${yr}`,
-            data: groups[yr.toString()].map(r=>{
-              const d = new Date(r.date as Date);
-              d.setUTCFullYear(maxYear);
-              return {
-                date:d,
-                value:r.value
-              };
-            })
-          };
-          if(this.chartMode===CM_YR_ON_YR_CUMUL){
-            result.data = toCumulative(result.data/*.reverse()*/);
-          }
-
-          return result;
-        });
-        break;
-    }
-  }
-
-  convertToMonthlyVariance(chartData: ChartEntry[]): ChartEntry[] {
-    const monthlyTotals = new Array<number>(12).fill(0);
-    const monthlyCounts = new Array<number>(12).fill(0);
-    chartData.forEach(row=>{
-      const month = (row.date as UTCDate).getUTCMonth();
-      monthlyTotals[month] += row.value;
-      monthlyCounts[month]++;
-    });
-    const monthlyMeans = monthlyCounts.map((c,i)=>(c?(monthlyTotals[i]/c):NaN));
-    return chartData.map(row=>{
-      return {
-        date:row.date,
-        value:row.value - monthlyMeans[(row.date as UTCDate).getUTCMonth()]
-      };
-    });
   }
 
   mapOptionsChanged(event: MapSettings): void {
@@ -422,9 +357,17 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.selectedVariant = this.layerVariants[0];
 
     if(this.layer){
-      this.date = this.layersService.constrainDate(this.mapSettings.date,this.layer);
+      this.initLayerDates();
     }
+
     this.setupMapLayer();
+  }
+  initLayerDates() {
+    this.date = this.layersService.constrainDate(this.mapSettings.date,this.layer);
+    this.layersService.availableDates(this.layer).subscribe(dates=>{
+      this.layerDates = dates;
+      console.log(this.layerDates);
+    });
   }
 
   displayOptionsChanged(event: DisplaySettings): void {
@@ -628,16 +571,6 @@ function pad(n: number,digits?: number): string{
   return result;
 }
 
-function toCumulative(table:ChartEntry[]):ChartEntry[] {
-  let sum = 0.0;
-  return table.map(row=>{
-    sum += row.value;
-    return {
-      date:row.date,
-      value:sum
-    };
-  });
-}
 // &threshold=50&styles=
 
 // &styles=time=2008-01-01T00%3A00%3A00.000Z&time_diff=2010-01-01T00%3A00%3A00.000Z
