@@ -422,29 +422,31 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
-  getValues(geoJSON: any, callback: ((data: TableRow[])=>void)): void {
+  getValues(geoJSON: any): Observable<TableRow[]> {
     if(!this.layer.polygonDrill){
-      return;
+      return of(null);
     }
 
     const currentSelection = this.selectionNum;
 
-    this.http.post(this.layer.polygonDrill,{
+    const result$ = this.http.post(this.layer.polygonDrill,{
       product:this.layerSettingsFlat.variable,
       feature:geoJSON
     }, {
       responseType:'text'
-    }).subscribe(res=>{
-      if(this.selectionNum !== currentSelection) {
-        return;
-      }
+    }).pipe(
+      map(res=>{
+        if(this.selectionNum !== currentSelection) {
+          return null;
+        }
 
-      const data = parseCSV(res,{
-        columns:DATA_COLUMNS,
-        headerRows:1
-      });
-      callback(data);
-    });
+        const data = parseCSV(res,{
+          columns:DATA_COLUMNS,
+          headerRows:1
+        });
+        return data;
+      }));
+    return result$;
   }
 
   vectorFeatureClicked(geoJSON: any): void {
@@ -476,7 +478,11 @@ export class MainMapComponent implements OnInit, OnChanges {
         this.setupChart(null,null);
         const layer = this.layer;
         if(layer.polygonDrill){
-          this.getValues(feature,data=>{
+          this.getValues(feature).subscribe(data=>{
+            if(!data?.length){
+              return;
+            }
+
             data = data.filter(rec=>rec.value!==-9999).map(rec=>{
               let theDate:Date;
               if(rec.date?.getUTCFullYear){
