@@ -37,7 +37,7 @@
                        (featureSelected)="vectorFeatureClicked($event)"></vector-tile-layer>
 
 
-    <map-control [position]="'TOP_RIGHT'">
+    <map-control [position]="'TOP_LEFT'">
       <app-map-buttons [basemaps]="basemaps"
                        [minZoom]="0"
                        [maxZoom]="16"
@@ -47,10 +47,10 @@
       </app-map-buttons>
     </map-control>
 
-    <map-control [position]="'TOP_CENTER'">
-    </map-control>
+    <!-- <map-control [position]="'TOP_CENTER'">
+    </map-control> -->
 
-    <map-control [position]="'TOP_LEFT'">
+    <map-control [position]="'TOP_CENTER'">
       <div class="map-controls">
         <div class="logo-block">
           <span class="header-title">
@@ -136,7 +136,7 @@
         </ngb-accordion>
  -->
 
-    <map-control [position]="'BOTTOM_CENTER'">
+    <map-control [position]="'BOTTOM_RIGHT'">
       <div class="map-control">
         <div class="row">
           <div class="col-12">
@@ -164,7 +164,7 @@
         </div>
       </div>
     </map-control>
-    <map-control [position]="'BOTTOM_RIGHT'">
+    <map-control [position]="'BOTTOM_LEFT'">
       <div *ngIf="showWindows&&layer" class="legend">
         <legend [labels]="legendLabels"
                 [colours]="legendColours"
@@ -179,14 +179,15 @@
         </span>
       </div>
     </map-control>
-
+<!-- 
     <map-control [position]="'BOTTOM_LEFT'">
       <div *ngIf="showWindows">
         <map-coordinates></map-coordinates>
       </div>
     </map-control>
+ -->
 
-    <map-control [position]="'BOTTOM_LEFT'">
+    <map-control [position]="'TOP_RIGHT'">
       <div *ngIf="showWindows" class="map-control">
         <app-display-settings (displaySettingsChange)="mapSettingChanged($event)"></app-display-settings>
 
