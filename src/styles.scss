@@ -35,13 +35,24 @@ $navbar-height: 0px;
 
 .map-controls {
   // background: white;
-  background: transparent;
+  // background: transparent;
+
   padding: 10px;
+  width: 750px;
 
   h5 {
     color: $primary;
   }
 }
+
+.chart-control, .map-controls, .display-settings, .map-legend {
+  // background: white;
+  // background: transparent;
+
+  background-color: rgba(255,255,255,0.5);
+  border-radius: 5px;
+}
+
 
 .citation {
   padding-left: 15px;
