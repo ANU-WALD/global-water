@@ -4,7 +4,7 @@ import { ChartEntry, ChartSeries } from '../chart/chart.component';
 import {groupBy} from 'ramda';
 import * as FileSaver from 'file-saver';
 
-const CM_NORMAL='Normal';
+const CM_NORMAL='Time series';
 const CM_DEVIATION='Deviation from monthly mean';
 const CM_YR_ON_YR='Year on year';
 const CM_YR_ON_YR_CUMUL='Year on year (cumulative)';
@@ -19,7 +19,7 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
   @Input() chartLabel = '';
 
   chartModes = [CM_NORMAL,CM_DEVIATION,CM_YR_ON_YR,CM_YR_ON_YR_CUMUL];
-  chartMode = CM_NORMAL;
+  chartMode = CM_YR_ON_YR;
 
   effectiveChartSeries: ChartSeries[] = [];
 
