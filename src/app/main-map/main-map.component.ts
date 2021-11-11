@@ -430,7 +430,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     const currentSelection = this.selectionNum;
 
     this.http.post(this.layer.polygonDrill,{
-      product:this.layer.variable,
+      product:this.layerSettingsFlat.variable,
       feature:geoJSON
     }, {
       responseType:'text'
