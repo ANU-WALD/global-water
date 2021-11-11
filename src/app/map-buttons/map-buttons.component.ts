@@ -16,6 +16,8 @@ export class MapButtonsComponent implements OnInit, OnChanges {
   @Output() optionsChanged = new EventEmitter<DisplaySettings>();
   @Input() minZoom = 5;
   @Input() maxZoom = 16;
+  @Input() hintPlacement = 'left';
+
   private vp: any;
 
   currentZoom: number;

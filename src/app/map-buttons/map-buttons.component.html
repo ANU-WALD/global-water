@@ -1,31 +1,33 @@
 <div class="button-bar bb-vertical">
   <div>
     <button class="btn btn-secondary btn-sm" (click)="toggleButtons()" [ngbTooltip]="showWindows?'Hide windows':'Show windows'"
-      placement="left">
+      [placement]="hintPlacement">
       <i class="fa" [ngClass]="showWindows?'fa-eye-slash':'fa-eye'"></i>
     </button>
   </div>
   <div *ngIf="showWindows">
     <button class="btn btn-secondary btn-sm" (click)="zoomIn()" [disabled]="zoom>=maxZoom" ngbTooltip="Zoom in"
-      placement="left">
+      [placement]="hintPlacement">
       <i class="fa fa-plus"></i>
     </button>
   </div>
   <div *ngIf="showWindows">
     <button class="btn btn-secondary btn-sm" (click)="zoomOut()" [disabled]="zoom<=minZoom" ngbTooltip="Zoom out"
-      placement="left">
+      [placement]="hintPlacement">
       <i class="fa fa-minus"></i>
     </button>
   </div>
   <div *ngIf="showWindows">
     <button class="btn btn-secondary btn-sm" (click)="zoomToFit()" ngbTooltip="Zoom to full extent"
-      placement="left">
+      [placement]="hintPlacement">
       <i class="fa fa-arrows-alt"></i>
     </button>
   </div>
   <div *ngIf="showWindows&&helpModal">
     <button class="btn btn-secondary btn-sm"
-            (click)="helpModal.show()">
+            (click)="helpModal.show()"
+            ngbTooltip="Show welcome (help) screen"
+            [placement]="hintPlacement">
       <i class="fa fa-question"></i>
     </button>
   </div>
@@ -38,7 +40,7 @@
             [openDelay]="500"
             [autoClose]="true"
             [closeDelay]="3000"
-            placement="left">
+            [placement]="hintPlacement">
       <i class="fa" [ngClass]="(opacity<0.5)?'fa-circle-o':((opacity<0.9)?'fa-adjust':'fa-circle')"></i>
     </button>
   </div>
@@ -50,7 +52,7 @@
             [openDelay]="500"
             [autoClose]="false"
             [closeDelay]="5000"
-            placement="left">
+            [placement]="hintPlacement">
       <i class="fa" [ngClass]="baseLayer?.icon"></i>
     </button>
   </div>
