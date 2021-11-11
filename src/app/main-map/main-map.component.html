@@ -54,7 +54,7 @@
     <map-control [position]="'TOP_CENTER'">
       <div *ngIf="showWindows" class="map-controls">
         <div class="logo-block">
-          <span class="header-title">
+          <span class="header-title float-left">
             <img class="logo"
                  alt="Water Monitor"
                  src="assets/anuwald_round_large_tr.png"
@@ -69,7 +69,7 @@
                     height="50">
             </a>
           </span> -->
-          <div class="theme-bar float-right">
+          <div class="theme-bar float-left">
             <div class="btn-group" role="group">
               <button *ngFor="let lyr of layers" type="button" class="btn btn-primary"
                       [ngClass]="{'active':lyr===layer}"
@@ -89,7 +89,7 @@
             </div>
           </div>
         </div>
-        <div class="map-control">
+        <div>
           <app-time-slider [dates]="layerDates"
                            [(date)]="date"
                            [format]="dateFormat"
@@ -138,7 +138,7 @@
  -->
 
     <map-control [position]="'BOTTOM_RIGHT'">
-      <div *ngIf="showWindows" class="map-control">
+      <div *ngIf="showWindows" class="chart-control">
         <div class="row">
           <div class="col-12">
             <div class="btn-group btn-group-toggle"
@@ -147,6 +147,9 @@
                  name="polygonSelection"
                  [(ngModel)]="polygonMode"
                  (ngModelChange)="polygonModeChanged()">
+              <label ngbButtonLabel [ngClass]="(polygonMode==='point')?'btn-primary':'btn-secondary'">
+                <input ngbButton type="radio" value="point">Select point
+              </label>
               <label ngbButtonLabel [ngClass]="(polygonMode==='predefined')?'btn-primary':'btn-secondary'">
                 <input ngbButton type="radio" value="predefined">Select area
               </label>
@@ -165,8 +168,8 @@
         </div>
       </div>
     </map-control>
-    <map-control [position]="'BOTTOM_LEFT'">
-      <div *ngIf="showWindows&&layer" class="legend">
+    <map-control [position]="'BOTTOM_LEFT'" >
+      <div *ngIf="showWindows&&layer" class="map-controls legend">
         <legend [labels]="legendLabels"
                 [colours]="legendColours"
                 [markerClasses]="legendShape"

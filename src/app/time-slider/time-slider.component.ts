@@ -58,3 +58,5 @@ export class TimeSliderComponent implements OnInit, OnChanges {
     this.dateChange.emit(this.date);
   }
 }
+
+
