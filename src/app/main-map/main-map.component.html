@@ -52,7 +52,7 @@
     </map-control> -->
 
     <map-control [position]="'TOP_CENTER'">
-      <div class="map-controls">
+      <div *ngIf="showWindows" class="map-controls">
         <div class="logo-block">
           <span class="header-title">
             <img class="logo"
@@ -138,7 +138,7 @@
  -->
 
     <map-control [position]="'BOTTOM_RIGHT'">
-      <div class="map-control">
+      <div *ngIf="showWindows" class="map-control">
         <div class="row">
           <div class="col-12">
             <div class="btn-group btn-group-toggle"
@@ -189,33 +189,40 @@
  -->
 
     <map-control [position]="'TOP_RIGHT'">
-      <div *ngIf="showWindows" class="map-control">
-        <app-display-settings (displaySettingsChange)="mapSettingChanged($event)"></app-display-settings>
-
-        <div class="row form-group">
-          <div class="col-6">
-            <label for="basemapSelect">background</label>
-          </div>
-          <div class="col-6">
-            <select [(ngModel)]="basemap"
-                    id="basemapSelect"
-                    (ngModelChange)="basemapChanged()"
-                    class="form-control form-control-sm">
-              <option *ngFor="let bl of basemaps" [ngValue]="bl">{{bl.name}}</option>
-            </select>
-          </div>
-        </div>
-
+      <div *ngIf="showWindows" class="map-control display-settings">
         <div class="row">
-          <div class="col-6">
-            <label for="vector-selection">boundaries</label>
+          <div class="col-4">
+            <app-display-settings (displaySettingsChange)="mapSettingChanged($event)"></app-display-settings>
           </div>
-          <div class="col-6">
-            <vector-layer-selection [vectorLayers]="vectorLayers"
-                                    [currentZoom]="zoom"
-                                    [enabled]="showVectors"
-                                    (vectorLayerSelected)="vectorLayerChanged($event)">
-            </vector-layer-selection>
+          <div class="col-4">
+            <div class="row form-group">
+              <div class="col-12">
+                <label for="basemapSelect">background</label>
+              </div>
+              <div class="col-12">
+                <select [(ngModel)]="basemap"
+                        id="basemapSelect"
+                        (ngModelChange)="basemapChanged()"
+                        class="form-control form-control-sm">
+                  <option *ngFor="let bl of basemaps" [ngValue]="bl">{{bl.name}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-4">
+            <div class="row">
+              <div class="col-12">
+                <label for="vector-selection">boundaries</label>
+              </div>
+              <div class="col-12">
+                <vector-layer-selection [vectorLayers]="vectorLayers"
+                                        [currentZoom]="zoom"
+                                        [enabled]="showVectors"
+                                        (vectorLayerSelected)="vectorLayerChanged($event)">
+                </vector-layer-selection>
+              </div>
+            </div>
           </div>
         </div>
 

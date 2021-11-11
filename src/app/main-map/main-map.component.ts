@@ -363,6 +363,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     this.setupMapLayer();
   }
+
   initLayerDates() {
     this.date = this.layersService.constrainDate(this.mapSettings.date,this.layer);
     this.layersService.availableDates(this.layer).subscribe(dates=>{
