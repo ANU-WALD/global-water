@@ -366,7 +366,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     this.setupMapLayer();
 
-    if((this.layer.type==='grid')&&this.selectedPolygonFeature){
+    if((this.layer?.type==='grid')&&this.selectedPolygonFeature){
       this.chartPolygonTimeSeries();
     } else {
       this.selectedPolygonFeature = null;
