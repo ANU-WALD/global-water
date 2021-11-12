@@ -458,56 +458,71 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     setTimeout(()=>{
       realFeature$.subscribe(feature=>{
-        this.area = area(feature);
-        if(this.area < 10000) {
-          this.areaUnits = 'm'+SUPER2;
-        } else if(this.area < 1000000) {
-          this.area /= 10000;
-          this.areaUnits = 'ha';
-        } else {
-          this.area /= 1000000;
-          this.areaUnits = 'km'+SUPER2;
-        }
-    
-        this.area = +this.area.toFixed(DECIMAL_PLACES);
-    
         if(this.selectionNum!==currentSelection){
           return;
         }
 
-        this.setupChart(null,null);
-        const layer = this.layer;
-        if(layer.polygonDrill){
-          this.getValues(feature).subscribe(data=>{
-            if(!data?.length){
-              return;
-            }
-
-            data = data.filter(rec=>rec.value!==-9999).map(rec=>{
-              let theDate:Date;
-              if(rec.date?.getUTCFullYear){
-                theDate = rec.date;
-              } else {
-                const dString = ''+rec.date;
-                theDate = new Date(+dString.slice(0,4),+dString.slice(4,6)-1,+dString.slice(6,8));
-              }
-
-              const result:ChartEntry = {
-                date: theDate,
-                value:rec.value
-              };
-              return result;
-            });
-            // data = data.reverse();
-            if(this.vectorLayer.label){
-              this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label,feature['properties']);
-            }
-            this.setupChart(layer.label,data as ChartEntry[]);
-          });
-        }
+        this.setFeature(feature);
       });
 
     });
+  }
+
+  selectedFeature: GeoJSON.Feature<GeoJSON.GeometryObject>;
+
+  setFeature(feature: GeoJSON.Feature<GeoJSON.GeometryObject>) {
+    this.selectedFeature = feature;
+    this.setFeatureArea(feature);
+
+    this.setupChart(null,null);
+    this.chartPolygonTimeSeries();
+  }
+
+  private chartPolygonTimeSeries() {
+    const layer = this.layer;
+    if (layer.polygonDrill) {
+      this.getValues(this.selectedFeature).subscribe(data => {
+        if (!data?.length) {
+          return;
+        }
+
+        data = data.filter(rec => rec.value !== -9999).map(rec => {
+          let theDate: Date;
+          if (rec.date?.getUTCFullYear) {
+            theDate = rec.date;
+          } else {
+            const dString = '' + rec.date;
+            theDate = new Date(+dString.slice(0, 4), +dString.slice(4, 6) - 1, +dString.slice(6, 8));
+          }
+
+          const result: ChartEntry = {
+            date: theDate,
+            value: rec.value
+          };
+          return result;
+        });
+        // data = data.reverse();
+        if (this.vectorLayer.label) {
+          this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label, this.selectedFeature['properties']);
+        }
+        this.setupChart(layer.label, data as ChartEntry[]);
+      });
+    }
+  }
+
+  private setFeatureArea(feature) {
+    this.area = area(feature);
+    if (this.area < 10000) {
+      this.areaUnits = 'm' + SUPER2;
+    } else if (this.area < 1000000) {
+      this.area /= 10000;
+      this.areaUnits = 'ha';
+    } else {
+      this.area /= 1000000;
+      this.areaUnits = 'km' + SUPER2;
+    }
+
+    this.area = +this.area.toFixed(DECIMAL_PLACES);
   }
 
   fetchGeoJSON(proxyFeature:any):Observable<any>{
