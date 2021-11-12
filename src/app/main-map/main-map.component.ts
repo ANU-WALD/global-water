@@ -64,7 +64,9 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   mapSettings: MapSettings = Object.assign({},INITIAL_MAP_SETTINGS);
   pointMode = PointMode;
-  selectionNum = 0;
+  selectedFeatureNumber = 0;
+  selectedPolygonFeature: GeoJSON.Feature<GeoJSON.GeometryObject>;
+
   zoom: number;
   vectorLayers: VectorLayerDescriptor[];
   vectorLayer: VectorLayerDescriptor;
@@ -209,6 +211,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   variantChanged():void{
     this.setupMapLayer();
+    this.chartPolygonTimeSeries();
   }
 
   setupMapLayer(): void {
@@ -362,6 +365,12 @@ export class MainMapComponent implements OnInit, OnChanges {
     }
 
     this.setupMapLayer();
+
+    if((this.layer.type==='grid')&&this.selectedPolygonFeature){
+      this.chartPolygonTimeSeries();
+    } else {
+      this.selectedPolygonFeature = null;
+    }
   }
 
   initLayerDates() {
@@ -427,7 +436,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       return of(null);
     }
 
-    const currentSelection = this.selectionNum;
+    const currentSelection = this.selectedFeatureNumber;
 
     const result$ = this.http.post(this.layer.polygonDrill,{
       product:this.layerSettingsFlat.variable,
@@ -436,7 +445,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       responseType:'text'
     }).pipe(
       map(res=>{
-        if(this.selectionNum !== currentSelection) {
+        if(this.selectedFeatureNumber !== currentSelection) {
           return null;
         }
 
@@ -450,28 +459,26 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   vectorFeatureClicked(geoJSON: any): void {
-    this.selectionNum++;
-    const currentSelection = this.selectionNum;
+    this.selectedFeatureNumber++;
+    const currentSelection = this.selectedFeatureNumber;
     const drawn = !this.showVectors;
     this.gaEvent('action','select-polygon',`${this.showVectors?this.vectorLayer.name:'custom-drawn'}`);
     const realFeature$ = (this.vectorLayer.tiles&&!drawn) ? this.fetchGeoJSON(geoJSON) : of(geoJSON);
 
     setTimeout(()=>{
       realFeature$.subscribe(feature=>{
-        if(this.selectionNum!==currentSelection){
+        if(this.selectedFeatureNumber!==currentSelection){
           return;
         }
 
-        this.setFeature(feature);
+        this.setSelectedPolygon(feature);
       });
 
     });
   }
 
-  selectedFeature: GeoJSON.Feature<GeoJSON.GeometryObject>;
-
-  setFeature(feature: GeoJSON.Feature<GeoJSON.GeometryObject>) {
-    this.selectedFeature = feature;
+  setSelectedPolygon(feature: GeoJSON.Feature<GeoJSON.GeometryObject>) {
+    this.selectedPolygonFeature = feature;
     this.setFeatureArea(feature);
 
     this.setupChart(null,null);
@@ -480,34 +487,40 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   private chartPolygonTimeSeries() {
     const layer = this.layer;
-    if (layer.polygonDrill) {
-      this.getValues(this.selectedFeature).subscribe(data => {
-        if (!data?.length) {
-          return;
-        }
-
-        data = data.filter(rec => rec.value !== -9999).map(rec => {
-          let theDate: Date;
-          if (rec.date?.getUTCFullYear) {
-            theDate = rec.date;
-          } else {
-            const dString = '' + rec.date;
-            theDate = new Date(+dString.slice(0, 4), +dString.slice(4, 6) - 1, +dString.slice(6, 8));
-          }
-
-          const result: ChartEntry = {
-            date: theDate,
-            value: rec.value
-          };
-          return result;
-        });
-        // data = data.reverse();
-        if (this.vectorLayer.label) {
-          this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label, this.selectedFeature['properties']);
-        }
-        this.setupChart(layer.label, data as ChartEntry[]);
-      });
+    if (!layer.polygonDrill||!this.selectedPolygonFeature) {
+      return;
     }
+
+    this.getValues(this.selectedPolygonFeature).subscribe(data => {
+      if (!data?.length) {
+        return;
+      }
+
+      if(layer!==this.layer){
+        return;
+      }
+
+      data = data.filter(rec => rec.value !== -9999).map(rec => {
+        let theDate: Date;
+        if (rec.date?.getUTCFullYear) {
+          theDate = rec.date;
+        } else {
+          const dString = '' + rec.date;
+          theDate = new Date(+dString.slice(0, 4), +dString.slice(4, 6) - 1, +dString.slice(6, 8));
+        }
+
+        const result: ChartEntry = {
+          date: theDate,
+          value: rec.value
+        };
+        return result;
+      });
+      // data = data.reverse();
+      if (this.vectorLayer.label) {
+        this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label, this.selectedPolygonFeature['properties']);
+      }
+      this.setupChart(layer.label, data as ChartEntry[]);
+    });
   }
 
   private setFeatureArea(feature) {
