@@ -455,6 +455,29 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
+  cleanFeature(geoJSON:any):any {
+    let points:number[][][] = geoJSON.geometry.coordinates;
+    let shiftEast = false;
+    let shiftWest = false; 
+    do{
+      shiftEast = points.every(poly=>poly.every(point=>point[0]<-180));
+      shiftWest = points.every(poly=>poly.every(point=>point[0]>180));
+
+      const shift = function(direction:number) {
+        return points.map(poly=>poly.map(point=>[point[0]+direction,point[1]]));
+      };
+  
+      if(shiftEast){
+        points = shift(360);
+      } else if(shiftWest){
+        points = shift(-360);
+      }
+    } while(shiftEast||shiftWest);
+
+    geoJSON.geometry.coordinates = points;
+    return geoJSON;
+  }
+
   getValues(geoJSON: any): Observable<TableRow[]> {
     if(!this.layer.polygonDrill){
       return of(null);
@@ -462,6 +485,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     const currentSelection = this.selectedFeatureNumber;
 
+    geoJSON = this.cleanFeature(geoJSON);
     const result$ = this.http.post(this.layer.polygonDrill,{
       product:this.layerSettingsFlat.variable,
       feature:geoJSON
