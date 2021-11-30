@@ -33,6 +33,7 @@ export interface LayerDescriptor extends MetadataConfig, LayerDescriptorCommon {
   icon?:string;
   attribution?:string;
   attributionURL?:string;
+  metadata?:string;
   url?: string;
   polygonDrill?: string;
   time:string;

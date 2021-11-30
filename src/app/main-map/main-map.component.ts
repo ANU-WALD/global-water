@@ -295,21 +295,45 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   getLegendData(): void {
-    const url =
-      `${this.wmsURL}?layers=${this.wmsParams.layers}&request=GetLegendGraphic&service=WMS&version=1.1.1`;
+    this.legendColours = [];
+    this.legendColours = [];
+    this.legendShape = [];
 
-    this.http.get(url).subscribe((data: LegendResponse)=>{
-      const TARGET_N_COLOURS = 6;
-      let filter = (v:any,i:number)=>true;
-      if(data.palette.length > TARGET_N_COLOURS) {
-        filter = (v:any,i:number)=>{
-          return (i===1) ||
-                 (i===data.palette.length-1)||
-                 (i&&(i%(Math.floor(data.palette.length / (TARGET_N_COLOURS-2)))===0));
-        };
+    if(!this.layerSettingsFlat?.metadata){
+      return;
+    }
+
+    const url = InterpolationService.interpolate(
+      this.layerSettingsFlat.metadata,this.layerSettingsFlat);
+
+    this.http.get(url).subscribe((metadata: LegendResponse)=>{
+      let vals:number[];
+      if(metadata.values){
+        vals = metadata.values;
+      } else {
+        const range = metadata.max_value-metadata.min_value;
+        const step = range/(metadata.palette.length-2);
+        vals = [metadata.min_value];
+        for(let i=1;i<metadata.palette.length-1;i++){
+          vals.push(vals[i-1]+step);
+        }
+        vals.push(metadata.max_value);
+        console.assert(vals.length===metadata.palette.length);
       }
-      this.legendLabels = data.values.filter(filter).map(v=>v.toFixed()).reverse();
-      this.legendColours = data.palette.filter(filter).map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse();
+
+      this.legendLabels = 
+      vals.map((v,i)=>{
+        const txt = v.toFixed();
+        if(!i){
+          return `< ${txt}`;
+        }
+        if(i===vals.length-1){
+          return `> ${txt}`;
+        }
+        return `${vals[i-1].toFixed()}-${txt}`;
+      }).reverse();
+
+      this.legendColours = metadata.palette.map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse();
       this.legendShape[0] = '';
     });
   }

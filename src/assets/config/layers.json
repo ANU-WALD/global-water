@@ -23,6 +23,7 @@
     "source":"custom",
     "label":"Air Temperature",
     "icon":"fa-thermometer-half",
+    "metadata":"https://mswx2-mtmenipwta-ts.a.run.app/config?layer={{variable}}",
     "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
@@ -36,6 +37,10 @@
       }
     },
     "variants":[
+      {
+        "variantLabel":"New",
+        "variable":"MSWX_air_temperature_GWM"
+      },
       {
         "variantLabel":"Average",
         "variable":"MSWX_air_temperature"
