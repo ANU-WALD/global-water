@@ -5,11 +5,16 @@ import * as Plotly from 'plotly.js/dist/plotly-basic';
 export interface ChartEntry {
   date: UTCDate;
   value: number;
+  text?: string;
 }
 
 export interface ChartSeries {
   title: string;
   data: ChartEntry[];
+  colour?: string;
+  mode?:string;
+  markerSize?:number;
+  textposition?:string;
 }
 
 const MAIN_COLOUR='#3c4172';
@@ -46,15 +51,17 @@ export class ChartComponent implements OnInit, OnChanges {
     Plotly.purge(node);
 
     const series = this.series.map((chartData,ix)=>{
-      const col = ix ? SAT_COLOUR : MAIN_COLOUR;
+      const col = chartData.colour || (ix ? SAT_COLOUR : MAIN_COLOUR);
       return {
         x: chartData.data.map(r=>r[this.x]),
         y: chartData.data.map(r=>r[this.y]),
+        text: chartData.data[0].text?chartData.data.map(r=>r.text):undefined,
+        textposition: chartData.textposition,
         name: chartData.title,
-        mode: 'lines+markers',
+        mode: chartData.mode || 'lines+markers',
         connectgaps: true,
         marker: {
-          size: ix ? 2 : 6,
+          size: chartData.markerSize===undefined ? (ix ? 2 : 6) : chartData.markerSize,
           color: 'rgba(0,0,0,0)',
           line: {
             color: col,

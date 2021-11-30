@@ -3,6 +3,7 @@ import { UTCDate } from 'map-wald';
 import { ChartEntry, ChartSeries } from '../chart/chart.component';
 import {groupBy} from 'ramda';
 import * as FileSaver from 'file-saver';
+import * as R from 'ramda';
 
 const CM_NORMAL='Time series';
 const CM_DEVIATION='Deviation from monthly mean';
@@ -79,6 +80,30 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
 
           return result;
         });
+
+        const makeExtremity = (lbl:string,fn,pos:string) => {
+          const seriesLen = Math.max(...this.effectiveChartSeries.map(s=>s.data.length));
+          const result = {
+            title: lbl,
+            data: R.range(0,seriesLen).map(i=>{
+              const d =
+                this.effectiveChartSeries[this.effectiveChartSeries.length-1].data[i].date;
+              const v = fn(...this.effectiveChartSeries.map(s=>s.data[i]?.value).filter(v=>v!==undefined));
+              return {
+                date:d,
+                value:v,
+                text:this.effectiveChartSeries.find(s=>s.data[i]?.value===v).title.split(': ')[1]
+              };
+            }),
+            colour:'red',
+            mode:'markers+text',
+            markerSize:10,
+            textposition:pos
+          };
+          return result;
+        };
+        this.effectiveChartSeries.push(makeExtremity('Min',Math.min,'bottom'));
+        this.effectiveChartSeries.push(makeExtremity('Max',Math.max,'top'));
         break;
     }
   }
