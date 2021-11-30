@@ -81,18 +81,25 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
           return result;
         });
 
-        const makeExtremity = (lbl:string,fn,pos:string) => {
-          const seriesLen = Math.max(...this.effectiveChartSeries.map(s=>s.data.length));
+        const makeExtremity = (lbl:string,fn:((...arr:number[])=>number),pos:string) => {
+          const seriesLen = 12;
           const result = {
             title: lbl,
             data: R.range(0,seriesLen).map(i=>{
-              const d =
-                this.effectiveChartSeries[this.effectiveChartSeries.length-1].data[i].date;
-              const v = fn(...this.effectiveChartSeries.map(s=>s.data[i]?.value).filter(v=>v!==undefined));
+              const d = new Date(Date.UTC(maxYear,i,1));
+              const seriesSummary = this.effectiveChartSeries.map(s=>{
+                const vals = s.data.filter(r=>r.date.getUTCMonth()===i).map(r=>r.value)
+                if(!vals.length){
+                  return undefined;
+                }
+                return fn(...vals);
+              });
+              const v = fn(...seriesSummary.filter(v=>v!==undefined));
+              const sourceOfExtremity = seriesSummary.indexOf(v);
               return {
                 date:d,
                 value:v,
-                text:this.effectiveChartSeries.find(s=>s.data[i]?.value===v).title.split(': ')[1]
+                text:this.effectiveChartSeries[sourceOfExtremity].title.split(': ')[1]
               };
             }),
             colour:'red',
