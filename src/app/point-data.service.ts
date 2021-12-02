@@ -78,7 +78,7 @@ export class PointDataService {
             variable?: string,
             relativeMode?: string): Observable<FeatureCollection>{
     return this._layerConfig(layer.label).pipe(
-      map(lyr=>forkJoin([of(lyr),this.featureData.getValues(lyr,filter,timestep,variable)])),
+      map(lyr=>forkJoin([of(lyr),this.featureData.getValues(lyr,filter,timestep,variable,true)])),
       switchAll(),
       map(([layer,coverage])=>{
         return {

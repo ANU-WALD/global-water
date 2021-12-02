@@ -67,11 +67,11 @@ export class FeatureDataService {
     return closest;
   }
 
-  getValues(layer:FeatureDataConfig, filter:{[key:string]:any}, timestep: UTCDate, variable?: string): Observable<FeatureCollection>{
+  getValues(layer:FeatureDataConfig, filter:{[key:string]:any}, timestep: UTCDate, variable?: string, keepNulls?: boolean): Observable<FeatureCollection>{
     return this.getFeatures(layer).pipe(
       map((f)=>{
         const features:FeatureCollection = f;
-        const config:FeatureDataConfig = layer;
+        const config = layer;
         variable = variable || config.variables[0];
         return {
           features,
@@ -120,8 +120,11 @@ export class FeatureDataService {
           const idCol = layer.id||DEFAULT_ID_COLUMN;
           const idx = (data[idCol] as number[]).indexOf(newF.properties[idCol]);
           newF.properties.value = data[query.variable][idx];
+          if(keepNulls){
+            newF.properties.value = newF.properties.value || 0.0;
+          }
           return newF;
-        }).filter(f=>f.properties.value!==null)
+        }).filter(f=>keepNulls||f.properties.value!==null)
         return result;
       }));
   }
