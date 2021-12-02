@@ -130,7 +130,6 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
 
     this.layersService.layerConfig$.subscribe(layers=>{
-      console.log(this.layers,layers);
       this.layers = layers;
       this.mapSettings.layer = this.layers[0];
       this.date = this.mapSettings.layer.timePeriod?.end;
@@ -289,7 +288,6 @@ export class MainMapComponent implements OnInit, OnChanges {
     // }
 
     this.wmsParams = this.substituteParameters(Object.assign({},options,this.layerSettingsFlat.mapParams||{}));
-    console.log(this.wmsParams);
     // this.mapLayer = L.tileLayer.wms(environment.wms,options as L.WMSOptions);
 
     // this.mapLayer.addTo(this.map);
@@ -362,7 +360,6 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   mapSettingChanged(event:DisplaySettingsChange): void {
-    console.log(event);
     if(this[event.setting]!==undefined){
       this[event.setting] = event.value;
     }
@@ -443,7 +440,6 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   pointClicked(geoJSON: any): void {
-    console.log(geoJSON);
     const layer = this.layer;
     this.pointData.getTimeSeries(layer.label,geoJSON).subscribe(timeseries=>{
       const chartData:ChartEntry[] = timeseries.dates.map((d,i)=>{
@@ -626,7 +622,6 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   setOpacity(): void {
     this.wmsParams = Object.assign({},this.wmsParams,{opacity:this.opacity*0.01});
-    console.log(this.wmsParams);
   }
 
   vectorLayerChanged(vl: VectorLayerDescriptor): void {
