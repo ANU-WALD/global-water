@@ -15,6 +15,7 @@ export interface ChartSeries {
   mode?:string;
   markerSize?:number;
   textposition?:string;
+  hoverinfo?:string;
 }
 
 const MAIN_COLOUR='#3c4172';
@@ -59,6 +60,7 @@ export class ChartComponent implements OnInit, OnChanges {
         textposition: chartData.textposition,
         name: chartData.title,
         mode: chartData.mode || 'lines+markers',
+        hoverinfo: chartData.hoverinfo,
         connectgaps: true,
         marker: {
           size: chartData.markerSize===undefined ? (ix ? 2 : 6) : chartData.markerSize,

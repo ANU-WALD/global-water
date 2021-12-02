@@ -62,7 +62,7 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
         const groups = groupBy(r=>(r.date as UTCDate).getUTCFullYear().toString(),orig);
         const years = Object.keys(groups).map(yr=>+yr).sort().reverse();
         const maxYear = years[0];
-        this.effectiveChartSeries = years.map(yr=>{
+        this.effectiveChartSeries = years.map((yr,i)=>{
           const result:ChartSeries = {
             title: `${this.chartSeries.title}: ${yr}`,
             data: groups[yr.toString()].map(r=>{
@@ -77,6 +77,8 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
           if(this.chartMode===CM_YR_ON_YR_CUMUL){
             result.data = toCumulative(result.data/*.reverse()*/);
           }
+
+          result.hoverinfo=i?'none':'x+y'
 
           return result;
         });
@@ -105,7 +107,8 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
             colour:'red',
             mode:'markers+text',
             markerSize:10,
-            textposition:pos
+            textposition:pos,
+            hoverinfo:'y',
           };
           return result;
         };
