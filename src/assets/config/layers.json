@@ -3,13 +3,26 @@
     "type":"grid",
     "source":"custom",
     "label":"Precipitation",
-    "icon":"fa-tint",
+    "icon":"",
+    "metadata":"https://mswx2-mtmenipwta-ts.a.run.app/config?layer={{variable}}",
     "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
-    "variable":"MSWX_precipitation",
+    "variable":"MSWX_precipitation_GWM",
     "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
+    "legendLabels":[
+      "> 1000 mm/mo",
+      "750 - 1000 mm/mo",
+      "500 - 750 mm/mo",
+      "300 - 500 mm/mo",
+      "200 - 300 mm/mo",
+      "100 - 200 mm/mo",
+      "50 - 100 mm/mo",
+      "25 - 50 mm/mo",
+      "5 - 25 mm/mo",
+      "< 5mm/mo"
+    ],
     "timePeriod":{
       "start":1979,
       "end":2020,
@@ -21,14 +34,27 @@
   {
     "type":"grid",
     "source":"custom",
-    "label":"Air Temperature",
-    "icon":"fa-thermometer-half",
+    "label":"Temperature",
+    "icon":"",
     "metadata":"https://mswx2-mtmenipwta-ts.a.run.app/config?layer={{variable}}",
     "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
     "mapParams":{
       "time":"{{year}}-{{month}}-01T00:00:00.000Z"
     },
+    "legendLabels":[
+      ">35",
+      "30 - 35",
+      "25 - 30",
+      "20 - 25",
+      "15 - 20",
+      "10 - 15",
+      "5 - 10",
+      "0 - 5",
+      "-10 - 0",
+      "-20 - -10",
+      "<-20"
+    ],
     "timePeriod":{
       "start":1979,
       "end":2020,
@@ -38,19 +64,27 @@
     },
     "variants":[
       {
-        "variantLabel":"New",
+        "variantLabel":"Average (binned)",
         "variable":"MSWX_air_temperature_GWM"
       },
       {
-        "variantLabel":"Average",
+        "variantLabel":"Average (continuous)",
         "variable":"MSWX_air_temperature"
       },
       {
-        "variantLabel":"Minimum",
+        "variantLabel":"Minimum (binned)",
+        "variable":"MSWX_tmin_air_temperature_GWM"
+      },
+      {
+        "variantLabel":"Minimum (continuous)",
         "variable":"MSWX_tmin_air_temperature"
       },
       {
-        "variantLabel":"Maximum",
+        "variantLabel":"Maximum (binned)",
+        "variable":"MSWX_tmax_air_temperature_GWM"
+      },
+      {
+        "variantLabel":"Maximum (continuous)",
         "variable":"MSWX_tmax_air_temperature"
       }
     ]
@@ -58,8 +92,8 @@
   {
     "type":"grid",
     "source":"custom",
-    "label":"Relative Humidity",
-    "icon":"fa-cloud",
+    "label":"Humidity",
+    "icon":"",
     "url":"https://mswx2-mtmenipwta-ts.a.run.app/wms",
     "variable":"MSWX_relative_humidity",
     "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/mswx-tx",
