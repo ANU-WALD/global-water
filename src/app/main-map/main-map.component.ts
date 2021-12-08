@@ -315,33 +315,36 @@ export class MainMapComponent implements OnInit, OnChanges {
       this.layerSettingsFlat.metadata,this.layerSettingsFlat);
 
     this.http.get(url).subscribe((metadata: LegendResponse)=>{
-      let vals:number[];
-      if(metadata.values){
-        vals = metadata.values;
-      } else {
-        const range = metadata.max_value-metadata.min_value;
-        const step = range/(metadata.palette.length-2);
-        vals = [metadata.min_value];
-        for(let i=1;i<metadata.palette.length-1;i++){
-          vals.push(vals[i-1]+step);
+      const colours = R.uniq(metadata.palette.map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse());
+      this.legendColours = colours;
+      this.legendLabels = this.layerSettingsFlat.legendLabels;
+      if(!this.legendLabels){
+        let vals:number[];
+        if(metadata.values){
+          vals = metadata.values;
+        } else {
+          const range = metadata.max_value-metadata.min_value;
+          const step = range/(colours.length-2);
+          vals = [metadata.min_value];
+          for(let i=1;i<colours.length-1;i++){
+            vals.push(vals[i-1]+step);
+          }
+          vals.push(metadata.max_value);
+          console.assert(vals.length===metadata.palette.length);
         }
-        vals.push(metadata.max_value);
-        console.assert(vals.length===metadata.palette.length);
+
+        this.legendLabels = vals.map((v,i)=>{
+          const txt = v.toFixed();
+          if(!i){
+            return `< ${txt}`;
+          }
+          if(i===vals.length-1){
+            return `> ${txt}`;
+          }
+          return `${vals[i-1].toFixed()}-${txt}`;
+        }).reverse();
       }
 
-      this.legendLabels = 
-      vals.map((v,i)=>{
-        const txt = v.toFixed();
-        if(!i){
-          return `< ${txt}`;
-        }
-        if(i===vals.length-1){
-          return `> ${txt}`;
-        }
-        return `${vals[i-1].toFixed()}-${txt}`;
-      }).reverse();
-
-      this.legendColours = metadata.palette.map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse();
       this.legendShape[0] = '';
     });
   }
