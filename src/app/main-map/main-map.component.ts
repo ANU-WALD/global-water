@@ -18,6 +18,7 @@ import { LayersService } from '../layers.service';
 import { PointDataService } from '../point-data.service';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
+import * as R from 'ramda';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -47,6 +48,12 @@ const INITIAL_MAP_SETTINGS:MapSettings = {
   relative: false,
   relativeVariable: '',
   dateStep: 7
+};
+
+const CHART_PROMPTS = {
+  predefined: 'Select a region',
+  draw: 'Draw a region',
+  point: 'Select a point'
 };
 
 @Component({
@@ -98,6 +105,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   legendLabels: string[] = [];
   legendShape: string[] = [''];
   polygonMode: 'predefined' | 'draw' = 'predefined';
+  chartPrompt = CHART_PROMPTS;
   showVectors = true;
 
   layerVariants:LayerVariant[] = [];

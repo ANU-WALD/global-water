@@ -160,11 +160,17 @@
           </div>
         </div>
 
-        <div>
+        <div *ngIf="rawChartData">
           <app-multi-year-timeseries-chart [chartSeries]="rawChartData"
                                            [chartLabel]="chartPolygonLabel">
 
           </app-multi-year-timeseries-chart>
+        </div>
+        <div *ngIf="!rawChartData">
+          <div class="alert alert-info">
+            <i class="fa fa-info-circle"></i>
+            {{chartPrompt[polygonMode]}}
+          </div>
         </div>
       </div>
     </map-control>
