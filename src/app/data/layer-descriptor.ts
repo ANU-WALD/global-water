@@ -20,6 +20,7 @@ export interface RelativeOption {
 
 export interface LayerDescriptorCommon {
   label:string;
+  legendLabels?:string[];
 }
 
 export interface LayerVariant extends LayerDescriptorCommon {
