@@ -54,13 +54,6 @@
     <map-control [position]="'TOP_CENTER'">
       <div *ngIf="showWindows" class="map-controls">
         <div class="logo-block">
-          <span class="header-title float-left">
-            <img class="logo"
-                 alt="Water Monitor"
-                 src="assets/anuwald_round_large_tr.png"
-                 height="50">
-          </span>
-
           <!-- <span class="float-right">
             <a class="logo" href="http://wald.anu.edu.au/" target="_blank">
               <img  class="logo"
@@ -187,6 +180,17 @@
         <span>
             Data by <a [href]="layer.attributionURL" target="_blank">{{layer.attribution}}</a>
         </span>
+        <div>
+          <span *ngFor="let logo of logos" [ngbTooltip]="logo.label">
+            <a [href]="logo.url" target="_blank">
+              <img  class="logo"
+                    alt="{{logo.label}}"
+                    src="assets/{{logo.image}}"
+                    height="50">
+            </a>
+          </span>
+        </div>
+
       </div>
     </map-control>
 <!-- 
