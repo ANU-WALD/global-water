@@ -25,9 +25,24 @@ export class LayersService {
     const url = `${environment.layerConfig}?_=${(new Date()).getTime()}`;
     this.layerConfig$ = this.http.get(url).pipe(
       map((origLayers:LayerDescriptor[])=>{
-        return origLayers.map(l=>{
+        const constants:any = origLayers.filter(l=>l.type==='constants')[0];
+        let layers:LayerDescriptor[] = origLayers.filter(l=>l.type!=='constants');
+        layers = layers.map(l=>{
           return Object.assign({},DEFAULT_LAYER_SETTINGS,l)
         });
+
+        if(constants){
+          layers.forEach(l=>{
+            Object.keys(l).forEach(k=>{
+              const val = l[k];
+              if((typeof(val)==='string') && val.startsWith('$') && val.endsWith('$')){
+                l[k] = constants[val.slice(1,-1)];
+              }
+            });
+          });
+        }
+
+        return layers;
       }),
       map((rawLayers:LayerDescriptor[])=>{
         return forkJoin(rawLayers.map(l=>{
