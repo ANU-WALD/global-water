@@ -217,22 +217,18 @@
   },
   {
     "type":"grid",
-    "source":"tds",
+    "source":"custom",
     "label":"Soil Moisture",
     "icon":"",
-    "filename":"/ub8/global/GRAFS/GRAFS_v2/GRAFS_TopSoilRelativeWetness_{{year}}.nc",
-    "variable":"relative_wetness",
-    "mapParams":{
-      "colorscalerange": "0,1",
-      "belowmincolor": "transparent",
-      "abovemaxcolor":"transparent",
-      "styles": "boxfill/anu_fmc_rdylbu_9",
-      "numcolorbands": 9,
-      "time":"{{year}}-{{month}}-{{day}}T00%3A00%3A00.000Z"
-    },
+    "metadata":"https://c3s-sm-mtmenipwta-ts.a.run.app/config?layer={{variable}}",
+    "url":"https://c3s-sm-mtmenipwta-ts.a.run.app/wms",
+    "variable":"C3S-SoilMoisture",
+    "X":"https://c3s-sm-mtmenipwta-ts.a.run.app/wms?service=WMS&request=GetMap&layers=C3S-SoilMoisture&styles=&format=image%2Fpng&transparent=true&version=1.1.1&height=256&width=256&srs=EPSG%3A3857&time=2020-12-01T00%3A00%3A00.000Z&bbox=7514065.628545968,2504688.542848655,10018754.171394622,5009377.085697314",
+    "polygonDrill":"$mswx_drill$",
+    "mapParams":"$mswx_params$",
     "timePeriod":{
-      "start":2015,
-      "end":-5,
+      "start":2000,
+      "end":2021,
       "interval":{
         "days":1
       }
