@@ -63,10 +63,18 @@ a.logo:focus {
   outline: none;
 }
 
+.title-block h1 {
+  text-align: center;
+}
+
 .logo-block {
   padding-bottom: 15px;
   padding-left: 40px;
   padding-right: 40px;
+}
+
+.logo-block-standalone {
+  background-color: rgba(255,255,255,1.0);
 }
 
 .btn-download {

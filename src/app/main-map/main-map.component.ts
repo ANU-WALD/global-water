@@ -91,23 +91,6 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   layers: LayerDescriptor[];
   basemaps: BasemapDescriptor[];
-  logos = [
-    {
-      url:'https://anu.edu.au',
-      label:'Australian National University',
-      image:'2x_anu_logo_small_black.png'
-    },
-    {
-      url:'https://www.wur.nl/en/Research-Results/Chair-groups/Environmental-Sciences/Hydrology-and-Quantitative-Water-Management-Group.htm',
-      label:'Wageningen University & Research',
-      image:'WUR_stack_transp.png'
-    },
-    {
-      url:'http://www.gloh2o.org/mswx/',
-      label:'GloH2O - Multi Source Weather',
-      image:'GloH2O-logo-recoloured.png'
-    }
-  ]
   bounds: Bounds;
   map: L.Map;
   mapLayer: L.TileLayer;
