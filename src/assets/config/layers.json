@@ -102,7 +102,7 @@
   },
   {
     "type":"point",
-    "label":"Water bodies",
+    "label":"Waterbodies",
     "icon":"",
     "filename":"ub8/global/GRALM/Global_Lake_NRT_Storage (1984-present).nc",
     "filenameX":"ub8/global/GRALM/Global_Reservoir_Storage_B (1984-current).nc",
