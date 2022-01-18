@@ -518,7 +518,9 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.selectedFeatureNumber++;
     const currentSelection = this.selectedFeatureNumber;
     const drawn = !this.showVectors;
-    this.gaEvent('action','select-polygon',`${this.showVectors?this.vectorLayer.name:'custom-drawn'}`);
+    const polygonSource = this.showVectors?this.vectorLayer.name:'custom-drawn';
+    geoJSON.properties.source = polygonSource;
+    this.gaEvent('action','select-polygon',`${polygonSource}`);
     const realFeature$ = (this.vectorLayer.tiles&&!drawn) ? this.fetchGeoJSON(geoJSON) : of(geoJSON);
 
     setTimeout(()=>{
@@ -572,8 +574,8 @@ export class MainMapComponent implements OnInit, OnChanges {
         return result;
       });
       // data = data.reverse();
-      if (this.vectorLayer.label) {
-        this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label, this.selectedPolygonFeature['properties']);
+      if ((this.selectedPolygonFeature.properties.source!=='custom-drawn')&&this.vectorLayer.label) {
+        this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label, this.selectedPolygonFeature.properties);
       }
       this.setupChart(layer.label, data as ChartEntry[]);
     });
