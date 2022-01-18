@@ -20,6 +20,7 @@ import { DisplaySettingsComponent } from './display-settings/display-settings.co
 import { OpacitySliderComponent } from './opacity-slider/opacity-slider.component';
 import { TimeSliderComponent } from './time-slider/time-slider.component';
 import { MultiYearTimeseriesChartComponent } from './multi-year-timeseries-chart/multi-year-timeseries-chart.component';
+import { LogoBlockComponent } from './logo-block/logo-block.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +35,7 @@ import { MultiYearTimeseriesChartComponent } from './multi-year-timeseries-chart
     OpacitySliderComponent,
     TimeSliderComponent,
     MultiYearTimeseriesChartComponent,
+    LogoBlockComponent,
     // DownloadFormComponent
   ],
   imports: [
