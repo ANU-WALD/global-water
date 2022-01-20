@@ -92,6 +92,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   layers: LayerDescriptor[];
   basemaps: BasemapDescriptor[];
   bounds: Bounds;
+  maxBounds = Object.assign({},FULL_EXTENT);
   map: L.Map;
   mapLayer: L.TileLayer;
   baseMapURL: string;
