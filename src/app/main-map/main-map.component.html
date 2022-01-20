@@ -14,25 +14,30 @@
 
     <wms-layer [url]="wmsURL" [params]="wmsParams" [zIndex]="-30"></wms-layer>
 
-    <draw *ngIf="layer&&layer.polygonDrill&&!showVectors"
+    <draw *ngIf="mapConfig.enableDrawing"
           (featureClosed)="vectorFeatureClicked($event)">
     </draw>
 
     <geojson-layer *ngIf="pointLayerFeatures"
                    [features]="pointLayerFeatures"
                    [pointMode]="pointMode.circle"
-                   [style]="{weight:1,radius:siteSize,fillOpacity:1,fillColor:siteFill,color:'#00000022'}"
+                   [style]="{weight:1,radius:siteStyles.size,fillOpacity:1,fillColor:siteStyles.fill,color:'#00000022'}"
                    (featureSelected)="pointClicked($event)">
 
     </geojson-layer>
 
-    <geojson-layer *ngIf="showVectors&&vectorLayer?.source"
+    <geojson-layer *ngIf="mapConfig.latLngSelection&&polygonFeaturesForSelectedPoint"
+      [features]="polygonFeaturesForSelectedPoint"
+      [style]="{weight:1,fillOpacity:1,color:'#00000099'}">
+    </geojson-layer>
+
+    <geojson-layer *ngIf="mapConfig.showVectors&&vectorLayer?.source"
                    [url]="vectorLayer.source"
                    (featureSelected)="vectorFeatureClicked($event)">
 
     </geojson-layer>
 
-    <vector-tile-layer *ngIf="showVectors&&vectorLayer?.tileLayers"
+    <vector-tile-layer *ngIf="mapConfig.showVectors&&vectorLayer?.tileLayers"
                        [url]="vectorLayer.tiles"
                        [styles]="vectorStyles"
                        [sublayers]="vectorLayer.tileLayers"
@@ -133,13 +138,17 @@
 
         </ngb-accordion>
  -->
+<!--
+                   *ngIf="layer&&layer.polygonDrill"
+
+-->
 
     <map-control [position]="'BOTTOM_RIGHT'">
       <div *ngIf="showWindows" class="chart-control">
         <div class="row">
           <div class="col-12">
             <div class="btn-group btn-group-toggle"
-                 *ngIf="layer&&layer.polygonDrill"
+                 *ngIf="layer"
                  ngbRadioGroup
                  name="polygonSelection"
                  [(ngModel)]="polygonMode"
@@ -148,10 +157,10 @@
                 <input ngbButton type="radio" value="point">Select point
               </label>
               <label ngbButtonLabel [ngClass]="(polygonMode==='predefined')?'btn-primary':'btn-secondary'">
-                <input ngbButton type="radio" value="predefined">Select area
+                <input ngbButton type="radio" value="predefined" [disabled]="!layer.polygonDrill">Select area
               </label>
               <label ngbButtonLabel [ngClass]="(polygonMode==='draw')?'btn-primary':'btn-secondary'">
-                <input ngbButton type="radio" value="draw">Draw polygon
+                <input ngbButton type="radio" value="draw" [disabled]="!layer.polygonDrill">Draw polygon
               </label>
             </div>
           </div>
@@ -171,11 +180,13 @@
         </div>
       </div>
     </map-control>
+
+
     <map-control [position]="'BOTTOM_LEFT'" >
       <div *ngIf="showWindows&&layer" class="map-controls legend">
-        <legend [labels]="legendLabels"
-                [colours]="legendColours"
-                [markerClasses]="legendShape"
+        <legend [labels]="legend.labels"
+                [colours]="legend.colours"
+                [markerClasses]="legend.shape"
                 [title]="layer.label"
                 [mapUnits]="layer.units"
                 [helpText]="layer.help"
@@ -226,7 +237,7 @@
               <div class="col-12">
                 <vector-layer-selection [vectorLayers]="vectorLayers"
                                         [currentZoom]="zoom"
-                                        [enabled]="showVectors"
+                                        [enabled]="mapConfig.showVectors"
                                         (vectorLayerSelected)="vectorLayerChanged($event)">
                 </vector-layer-selection>
               </div>

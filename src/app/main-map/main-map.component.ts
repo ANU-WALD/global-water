@@ -24,6 +24,9 @@ declare var gtag: (a: string,b: string,c?: any) => void;
 
 // const VECTOR_TILE_URL = 'https://storage.googleapis.com/wald-vector/tileserver/{z}/{x}/{y}.pbf';
 // const FEATURE_ID_COL='PR_PY_PID';
+
+const POINT_FEATURE_SIZE = 1;
+
 const SUPER2='²';
 const DECIMAL_PLACES=1;
 const FULL_EXTENT: Bounds = {
@@ -69,6 +72,12 @@ export class MainMapComponent implements OnInit, OnChanges {
   layerDates: UTCDate[] = [];
   dateFormat = '%B/%Y';
 
+  mapConfig = {
+    latLngSelection: false,
+    enableDrawing: false,
+    showVectors: false
+  };
+
   mapSettings: MapSettings = Object.assign({},INITIAL_MAP_SETTINGS);
   pointMode = PointMode;
   selectedFeatureNumber = 0;
@@ -102,21 +111,29 @@ export class MainMapComponent implements OnInit, OnChanges {
   vectorStyles: any = {};
   rawChartData: ChartSeries;
   chartPolygonLabel: string;
-  legendColours: string[] = [];
-  legendLabels: string[] = [];
-  legendShape: string[] = [''];
-  polygonMode: 'predefined' | 'draw' = 'predefined';
+  legend = {
+    colours: [] as string[],
+    labels: [] as string[],
+    shape: ['']
+  }
+
+  polygonMode: 'point' | 'predefined' | 'draw' = 'predefined';
   chartPrompt = CHART_PROMPTS;
-  showVectors = true;
 
   layerVariants:LayerVariant[] = [];
   selectedVariant:LayerVariant;
   layerSettingsFlat: FlattenedLayerDescriptor;
 
-  area: number;
-  areaUnits = 'km'+SUPER2;
-  siteFill: RangeStyle<string>;
-  siteSize: RangeStyle<number>;
+  // Not used?
+  featureStats = {
+    area: null as number,
+    areaUnits: 'km'+SUPER2
+  };
+
+  siteStyles = {
+    fill: null as RangeStyle<string>,
+    size: null as RangeStyle<number>
+  }
 
   constructor(private http: HttpClient,
               private appConfig: ConfigService,
@@ -160,6 +177,16 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     this.applySettings();
+  }
+
+  updateMapConfig(): void {
+    const cfg = this.mapConfig;
+    const pd = this.layer?.polygonDrill;
+    cfg.latLngSelection = pd && (this.polygonMode==='point');
+    cfg.enableDrawing =   pd && (this.polygonMode==='draw');
+    cfg.showVectors =     pd && (this.polygonMode==='predefined');
+    // this.mapConfig = Object.assign({},cfg);
+    console.log('updateMapConfig',this.mapConfig);
   }
 
   interpolationSubstitutions(): any {
@@ -252,12 +279,12 @@ export class MainMapComponent implements OnInit, OnChanges {
       this.pointLayerFeatures = features;
       const max = Math.max(...(features.features).map(f=>f.properties.value));
       const breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
-      this.siteFill = new RangeStyle('value',palette,breaks);
+      this.siteStyles.fill = new RangeStyle('value',palette,breaks);
       // this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
-      this.siteSize = new RangeStyle('value',[5,5,5,5,5,5,5],breaks);
-      this.legendColours = palette.slice().reverse();
-      this.legendLabels = this.getLabels(this.siteFill).reverse();
-      this.legendShape[0] = 'circle';
+      this.siteStyles.size = new RangeStyle('value',[5,5,5,5,5,5,5],breaks);
+      this.legend.colours = palette.slice().reverse();
+      this.legend.labels = this.getLabels(this.siteStyles.fill).reverse();
+      this.legend.shape[0] = 'circle';
     });
   }
 
@@ -304,9 +331,9 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   getLegendData(): void {
-    this.legendColours = [];
-    this.legendColours = [];
-    this.legendShape = [];
+    this.legend.colours = [];
+    this.legend.colours = [];
+    this.legend.shape = [];
 
     if(!this.layerSettingsFlat?.metadata){
       return;
@@ -317,9 +344,9 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     this.http.get(url).subscribe((metadata: LegendResponse)=>{
       const colours = R.uniq(metadata.palette.map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse());
-      this.legendColours = colours;
-      this.legendLabels = this.layerSettingsFlat.legendLabels;
-      if(!this.legendLabels){
+      this.legend.colours = colours;
+      this.legend.labels = this.layerSettingsFlat.legendLabels;
+      if(!this.legend.labels){
         let vals:number[];
         if(metadata.values){
           vals = metadata.values;
@@ -334,7 +361,7 @@ export class MainMapComponent implements OnInit, OnChanges {
           console.assert(vals.length===metadata.palette.length);
         }
 
-        this.legendLabels = vals.map((v,i)=>{
+        this.legend.labels = vals.map((v,i)=>{
           const txt = v.toFixed();
           if(!i){
             return `< ${txt}`;
@@ -346,7 +373,7 @@ export class MainMapComponent implements OnInit, OnChanges {
         }).reverse();
       }
 
-      this.legendShape[0] = '';
+      this.legend.shape[0] = '';
     });
   }
 
@@ -401,11 +428,17 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     this.setupMapLayer();
 
+    if(!this.layer?.polygonDrill){
+      this.polygonMode = 'point';
+    }
+
     if((this.layer?.type==='grid')&&this.selectedPolygonFeature){
       this.chartPolygonTimeSeries();
     } else {
       this.selectedPolygonFeature = null;
     }
+
+    this.updateMapConfig();
   }
 
   initLayerDates() {
@@ -525,8 +558,8 @@ export class MainMapComponent implements OnInit, OnChanges {
   vectorFeatureClicked(geoJSON: any): void {
     this.selectedFeatureNumber++;
     const currentSelection = this.selectedFeatureNumber;
-    const drawn = !this.showVectors;
-    const polygonSource = this.showVectors?this.vectorLayer.name:'custom-drawn';
+    const drawn = !this.mapConfig.showVectors;
+    const polygonSource = drawn?'custom-drawn':this.vectorLayer.name;
     geoJSON.properties.source = polygonSource;
     this.gaEvent('action','select-polygon',`${polygonSource}`);
     const realFeature$ = (this.vectorLayer.tiles&&!drawn) ? this.fetchGeoJSON(geoJSON) : of(geoJSON);
@@ -590,18 +623,18 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   private setFeatureArea(feature) {
-    this.area = area(feature);
-    if (this.area < 10000) {
-      this.areaUnits = 'm' + SUPER2;
-    } else if (this.area < 1000000) {
-      this.area /= 10000;
-      this.areaUnits = 'ha';
+    this.featureStats.area = area(feature);
+    if (this.featureStats.area < 10000) {
+      this.featureStats.areaUnits = 'm' + SUPER2;
+    } else if (this.featureStats.area < 1000000) {
+      this.featureStats.area /= 10000;
+      this.featureStats.areaUnits = 'ha';
     } else {
-      this.area /= 1000000;
-      this.areaUnits = 'km' + SUPER2;
+      this.featureStats.area /= 1000000;
+      this.featureStats.areaUnits = 'km' + SUPER2;
     }
 
-    this.area = +this.area.toFixed(DECIMAL_PLACES);
+    this.featureStats.area = +this.featureStats.area.toFixed(DECIMAL_PLACES);
   }
 
   fetchGeoJSON(proxyFeature:any):Observable<any>{
@@ -653,7 +686,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   polygonModeChanged(): void {
-    this.showVectors = this.polygonMode==='predefined';
+    this.updateMapConfig();
   }
 
   closeAbout(): void {
