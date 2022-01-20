@@ -8,7 +8,10 @@
                [maxBounds]="maxBounds"
                [minZoom]="1"
                [maxZoom]="16"
-               [zoomControl]="false">
+               [zoomControl]="false"
+               [pointSelection]="mapConfig.latLngSelection"
+               (pointSelected)="pointSelected($event)">
+
     <wms-layer [url]="wmsURL" [params]="wmsParams"></wms-layer>
 
     <draw *ngIf="layer&&layer.polygonDrill&&!showVectors"

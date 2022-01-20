@@ -73,6 +73,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   pointMode = PointMode;
   selectedFeatureNumber = 0;
   selectedPolygonFeature: GeoJSON.Feature<GeoJSON.GeometryObject>;
+  polygonFeaturesForSelectedPoint: GeoJSON.FeatureCollection<GeoJSON.Polygon>;
 
   zoom: number;
   vectorLayers: VectorLayerDescriptor[];
@@ -450,6 +451,12 @@ export class MainMapComponent implements OnInit, OnChanges {
     }
   }
 
+  pointSelected(latlng: L.LatLng): void {
+    const f = makeSquareFeature(latlng);
+    this.polygonFeaturesForSelectedPoint = makeFeatureCollection(f)
+    this.setSelectedPolygon(f);
+  }
+
   pointClicked(geoJSON: any): void {
     const layer = this.layer;
     this.pointData.getTimeSeries(layer.label,geoJSON).subscribe(timeseries=>{
@@ -680,3 +687,35 @@ function pad(n: number,digits?: number): string{
 // &threshold=50&styles=
 
 // &styles=time=2008-01-01T00%3A00%3A00.000Z&time_diff=2010-01-01T00%3A00%3A00.000Z
+
+function makeFeatureCollection(...features:GeoJSON.Feature<GeoJSON.Polygon>[]):GeoJSON.FeatureCollection<GeoJSON.Polygon>{
+  return {
+    type:'FeatureCollection',
+    features:features
+  };
+}
+
+function makeSquareFeature(latlng: L.LatLng): GeoJSON.Feature<GeoJSON.Polygon> {
+  const w = latlng.lng - POINT_FEATURE_SIZE/2;
+  const e = latlng.lng + POINT_FEATURE_SIZE/2;
+  const n = latlng.lat + POINT_FEATURE_SIZE/2;
+  const s = latlng.lat - POINT_FEATURE_SIZE/2;
+
+  const square = [[
+    [w,n],
+    [w,s],
+    [e,s],
+    [e,n],
+    [w,n]
+  ]];
+
+  return {
+    type: 'Feature',
+    geometry: {
+      type: 'Polygon',
+      coordinates: square
+    },
+    properties: {
+    }
+  };
+}
