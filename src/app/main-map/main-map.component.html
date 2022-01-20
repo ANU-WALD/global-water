@@ -12,7 +12,7 @@
                [pointSelection]="mapConfig.latLngSelection"
                (pointSelected)="pointSelected($event)">
 
-    <wms-layer [url]="wmsURL" [params]="wmsParams"></wms-layer>
+    <wms-layer [url]="wmsURL" [params]="wmsParams" [zIndex]="-30"></wms-layer>
 
     <draw *ngIf="layer&&layer.polygonDrill&&!showVectors"
           (featureClosed)="vectorFeatureClicked($event)">
