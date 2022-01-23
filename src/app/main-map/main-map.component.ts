@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, OnChanges, SimpleChanges, ViewChild, NgModuleRef } from '@angular/core';
 import * as L from 'leaflet';
 import { environment } from 'src/environments/environment';
-import { HttpClient } from '@angular/common/http';
 import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate, RangeStyle, PaletteService } from 'map-wald';
 import { ChartEntry, ChartSeries } from '../chart/chart.component';
 import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings, PaletteDescriptor, 
@@ -19,6 +18,7 @@ import { PointDataService } from '../point-data.service';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import * as R from 'ramda';
+import { CacheService } from '../cache.service';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -135,7 +135,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     size: null as RangeStyle<number>
   }
 
-  constructor(private http: HttpClient,
+  constructor(private http: CacheService,
               private appConfig: ConfigService,
               private _map: LeafletService,
               private modalService: NgbModal,
