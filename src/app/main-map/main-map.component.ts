@@ -17,8 +17,8 @@ import { LayersService } from '../layers.service';
 import { PointDataService } from '../point-data.service';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import * as R from 'ramda';
 import { CacheService } from '../cache.service';
+import { LegendConfig, LegendUtils } from '../legend-utils';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -112,11 +112,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   vectorStyles: any = {};
   rawChartData: ChartSeries;
   chartPolygonLabel: string;
-  legend = {
-    colours: [] as string[],
-    labels: [] as string[],
-    shape: ['']
-  }
+  legend = LegendUtils.resetLegend();
 
   polygonMode: 'point' | 'predefined' | 'draw' = 'predefined';
   chartPrompt = CHART_PROMPTS;
@@ -283,20 +279,8 @@ export class MainMapComponent implements OnInit, OnChanges {
       this.siteStyles.fill = new RangeStyle('value',palette,breaks);
       // this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
       this.siteStyles.size = new RangeStyle('value',[5,5,5,5,5,5,5],breaks);
-      this.legend.colours = palette.slice().reverse();
-      this.legend.labels = this.getLabels(this.siteStyles.fill).reverse();
-      this.legend.shape[0] = 'circle';
+      this.legend = LegendUtils.makePointLegend(palette,this.siteStyles.fill);
     });
-  }
-
-  getLabels(range:RangeStyle<any>,digits?:number):string[] {
-    const fmt = (v:number) => v.toFixed(digits||0);
-    return range.breakpoints.map((b,i)=>{
-      if(i<(range.breakpoints.length-1)){
-        return `${fmt(b)}-${fmt(range.breakpoints[i+1])}`;
-      }
-      return `> ${fmt(b)}`;
-    })
   }
 
   private setupWMSLayer(): void {
@@ -332,9 +316,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   getLegendData(): void {
-    this.legend.colours = [];
-    this.legend.colours = [];
-    this.legend.shape = [];
+    this.legend = LegendUtils.resetLegend();
 
     if(!this.layerSettingsFlat?.metadata){
       return;
@@ -344,37 +326,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       this.layerSettingsFlat.metadata,this.layerSettingsFlat);
 
     this.http.get(url).subscribe((metadata: LegendResponse)=>{
-      const colours = R.uniq(metadata.palette.map(c=>makeColour(c.R,c.G,c.B,c.A/255)).reverse());
-      this.legend.colours = colours;
-      this.legend.labels = this.layerSettingsFlat.legendLabels;
-      if(!this.legend.labels){
-        let vals:number[];
-        if(metadata.values){
-          vals = metadata.values;
-        } else {
-          const range = metadata.max_value-metadata.min_value;
-          const step = range/(colours.length-2);
-          vals = [metadata.min_value];
-          for(let i=1;i<colours.length-1;i++){
-            vals.push(vals[i-1]+step);
-          }
-          vals.push(metadata.max_value);
-          console.assert(vals.length===metadata.palette.length);
-        }
-
-        this.legend.labels = vals.map((v,i)=>{
-          const txt = v.toFixed();
-          if(!i){
-            return `< ${txt}`;
-          }
-          if(i===vals.length-1){
-            return `> ${txt}`;
-          }
-          return `${vals[i-1].toFixed()}-${txt}`;
-        }).reverse();
-      }
-
-      this.legend.shape[0] = '';
+      this.legend = LegendUtils.makeLegend(metadata,this.layerSettingsFlat.legendLabels);
     });
   }
 
@@ -754,3 +706,4 @@ function makeSquareFeature(latlng: L.LatLng): GeoJSON.Feature<GeoJSON.Polygon> {
     }
   };
 }
+
