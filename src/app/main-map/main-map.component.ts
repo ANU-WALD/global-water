@@ -427,7 +427,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.setSelectedPolygon(f);
   }
 
-  pointClicked(geoJSON: any): void {
+  pointFeatureSelected(geoJSON: any): void {
     const layer = this.layer;
     this.pointData.getTimeSeries(layer.label,geoJSON).subscribe(timeseries=>{
       const chartData:ChartEntry[] = timeseries.dates.map((d,i)=>{
@@ -441,29 +441,6 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
-  cleanFeature(geoJSON:any):any {
-    let points:number[][][] = geoJSON.geometry.coordinates;
-    let shiftEast = false;
-    let shiftWest = false; 
-    do{
-      shiftEast = points.every(poly=>poly.every(point=>point[0]<-180));
-      shiftWest = points.every(poly=>poly.every(point=>point[0]>180));
-
-      const shift = function(direction:number) {
-        return points.map(poly=>poly.map(point=>[point[0]+direction,point[1]]));
-      };
-  
-      if(shiftEast){
-        points = shift(360);
-      } else if(shiftWest){
-        points = shift(-360);
-      }
-    } while(shiftEast||shiftWest);
-
-    geoJSON.geometry.coordinates = points;
-    return geoJSON;
-  }
-
   getValues(geoJSON: any): Observable<TableRow[]> {
     if(!this.layer.polygonDrill){
       return of(null);
@@ -471,7 +448,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     const currentSelection = this.selectedFeatureNumber;
 
-    geoJSON = this.cleanFeature(geoJSON);
+    geoJSON = cleanFeature(geoJSON);
     const result$ = this.http.post(this.layer.polygonDrill,{
       product:this.layerSettingsFlat.variable,
       feature:geoJSON
@@ -492,14 +469,14 @@ export class MainMapComponent implements OnInit, OnChanges {
     return result$;
   }
 
-  vectorFeatureClicked(geoJSON: any): void {
+  polygonFeatureSelected(geoJSON: any): void {
     this.selectedFeatureNumber++;
     const currentSelection = this.selectedFeatureNumber;
     const drawn = !this.mapConfig.showVectors;
     const polygonSource = drawn?CUSTOM_POLYGON:this.vectorLayer.name;
     geoJSON.properties.source = polygonSource;
     this.gaEvent('action','select-polygon',`${polygonSource}`);
-    const realFeature$ = (this.vectorLayer.tiles&&!drawn) ? this.fetchGeoJSON(geoJSON) : of(geoJSON);
+    const realFeature$ = (this.vectorLayer.tiles&&!drawn) ? this.fetchGeoJSONForFeature(geoJSON) : of(geoJSON);
 
     setTimeout(()=>{
       realFeature$.subscribe(feature=>{
@@ -559,7 +536,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
-  fetchGeoJSON(proxyFeature:any):Observable<any>{
+  fetchGeoJSONForFeature(proxyFeature:any):Observable<any>{
     const id = proxyFeature.properties[this.vectorLayer.tileLayers[0].keyField];
     const url = InterpolationService.interpolate(environment.splitGeoJSONS,Object.assign({id},this.vectorLayer,proxyFeature.properties));
     return this.http.get(url).pipe(
@@ -688,4 +665,27 @@ function calcFeatureStats(feature): FeatureStats {
   }
   result.area = +result.area.toFixed(DECIMAL_PLACES);
   return result;
+}
+
+function cleanFeature(geoJSON:any):any {
+  let points:number[][][] = geoJSON.geometry.coordinates;
+  let shiftEast = false;
+  let shiftWest = false; 
+  do{
+    shiftEast = points.every(poly=>poly.every(point=>point[0]<-180));
+    shiftWest = points.every(poly=>poly.every(point=>point[0]>180));
+
+    const shift = function(direction:number) {
+      return points.map(poly=>poly.map(point=>[point[0]+direction,point[1]]));
+    };
+
+    if(shiftEast){
+      points = shift(360);
+    } else if(shiftWest){
+      points = shift(-360);
+    }
+  } while(shiftEast||shiftWest);
+
+  geoJSON.geometry.coordinates = points;
+  return geoJSON;
 }

@@ -15,14 +15,14 @@
     <wms-layer [url]="wmsURL" [params]="wmsParams" [zIndex]="-30"></wms-layer>
 
     <draw *ngIf="mapConfig.enableDrawing"
-          (featureClosed)="vectorFeatureClicked($event)">
+          (featureClosed)="polygonFeatureSelected($event)">
     </draw>
 
     <geojson-layer *ngIf="pointLayerFeatures"
                    [features]="pointLayerFeatures"
                    [pointMode]="pointMode.circle"
                    [style]="{weight:1,radius:siteStyles.size,fillOpacity:1,fillColor:siteStyles.fill,color:'#00000022'}"
-                   (featureSelected)="pointClicked($event)">
+                   (featureSelected)="pointFeatureSelected($event)">
 
     </geojson-layer>
 
@@ -33,7 +33,7 @@
 
     <geojson-layer *ngIf="mapConfig.showVectors&&vectorLayer?.source"
                    [url]="vectorLayer.source"
-                   (featureSelected)="vectorFeatureClicked($event)">
+                   (featureSelected)="polygonFeatureSelected($event)">
 
     </geojson-layer>
 
@@ -43,7 +43,7 @@
                        [sublayers]="vectorLayer.tileLayers"
                        [minNativeZoom]="vectorLayer.availableZooms[0]"
                        [maxNativeZoom]="vectorLayer.availableZooms[1]"
-                       (featureSelected)="vectorFeatureClicked($event)"></vector-tile-layer>
+                       (featureSelected)="polygonFeatureSelected($event)"></vector-tile-layer>
 
 
     <map-control [position]="'TOP_LEFT'">
