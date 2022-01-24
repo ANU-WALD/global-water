@@ -26,6 +26,7 @@ declare var gtag: (a: string,b: string,c?: any) => void;
 // const FEATURE_ID_COL='PR_PY_PID';
 
 const POINT_FEATURE_SIZE = 1;
+const CUSTOM_POLYGON='custom-drawn';
 
 const SUPER2='²';
 const DECIMAL_PLACES=1;
@@ -486,6 +487,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   pointSelected(latlng: L.LatLng): void {
     const f = makeSquareFeature(latlng);
+    f.properties.source = CUSTOM_POLYGON;
     this.polygonFeaturesForSelectedPoint = makeFeatureCollection(f)
     this.setSelectedPolygon(f);
   }
@@ -559,7 +561,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.selectedFeatureNumber++;
     const currentSelection = this.selectedFeatureNumber;
     const drawn = !this.mapConfig.showVectors;
-    const polygonSource = drawn?'custom-drawn':this.vectorLayer.name;
+    const polygonSource = drawn?CUSTOM_POLYGON:this.vectorLayer.name;
     geoJSON.properties.source = polygonSource;
     this.gaEvent('action','select-polygon',`${polygonSource}`);
     const realFeature$ = (this.vectorLayer.tiles&&!drawn) ? this.fetchGeoJSON(geoJSON) : of(geoJSON);
@@ -615,7 +617,7 @@ export class MainMapComponent implements OnInit, OnChanges {
         return result;
       });
       // data = data.reverse();
-      if ((this.selectedPolygonFeature.properties.source!=='custom-drawn')&&this.vectorLayer.label) {
+      if ((this.selectedPolygonFeature.properties.source!==CUSTOM_POLYGON)&&this.vectorLayer.label) {
         this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label, this.selectedPolygonFeature.properties);
       }
       this.setupChart(layer.label, data as ChartEntry[]);
