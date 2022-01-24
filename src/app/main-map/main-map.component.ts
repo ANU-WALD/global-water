@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges, ViewChild, NgModuleRef } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
 import * as L from 'leaflet';
 import { environment } from 'src/environments/environment';
 import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate, RangeStyle, PaletteService } from 'map-wald';
@@ -7,18 +7,15 @@ import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings, PaletteD
          DisplaySettingsChange, LayerVariant, FlattenedLayerDescriptor } from '../data';
 import { ConfigService } from '../config.service';
 import { LeafletService, OneTimeSplashComponent, BasemapDescriptor,
-  VectorLayerDescriptor, PointMode, makeColour } from 'map-wald-leaflet';
+  VectorLayerDescriptor, PointMode } from 'map-wald-leaflet';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-// import { DownloadFormComponent } from '../download-form/download-form.component';
-// import * as store from 'store';
-// import * as FileSaver from 'file-saver';
 import area from '@turf/area';
 import { LayersService } from '../layers.service';
 import { PointDataService } from '../point-data.service';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CacheService } from '../cache.service';
-import { LegendConfig, LegendUtils } from '../legend-utils';
+import { LegendUtils } from '../legend-utils';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -59,6 +56,11 @@ const CHART_PROMPTS = {
   draw: 'Draw a region',
   point: 'Select a point'
 };
+
+export interface FeatureStats {
+  area: number;
+  areaUnits: string;
+}
 
 @Component({
   selector: 'app-main-map',
@@ -121,11 +123,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   selectedVariant:LayerVariant;
   layerSettingsFlat: FlattenedLayerDescriptor;
 
-  // Not used?
-  featureStats = {
-    area: null as number,
-    areaUnits: 'km'+SUPER2
-  };
+  featureStats: FeatureStats
 
   siteStyles = {
     fill: null as RangeStyle<string>,
@@ -295,27 +293,12 @@ export class MainMapComponent implements OnInit, OnChanges {
       attribution: '<a href="http://wald.anu.edu.au/">WALD ANU</a>'
     };
 
-    // if(this.layer.options&&this.layer.options.temporal){
-    //   options.time =`${this.year}-01-01T00:00:00.000Z`;
-
-    //   if(this.layer.options.delta&&this.difference){
-    //     options.time_diff=`${this.referenceYear}-01-01T00:00:00.000Z`;
-    //     options.layers += 'd';
-    //   }
-    // }
-
-    // if(this.binary&&this.layer.options.threshold){
-    //   options.threshold = this.threshold;
-    // }
-
     this.wmsParams = this.substituteParameters(Object.assign({},options,this.layerSettingsFlat.mapParams||{}));
-    // this.mapLayer = L.tileLayer.wms(environment.wms,options as L.WMSOptions);
 
-    // this.mapLayer.addTo(this.map);
-    this.getLegendData();
+    this.configureWMSLegend();
   }
 
-  getLegendData(): void {
+  configureWMSLegend(): void {
     this.legend = LegendUtils.resetLegend();
 
     if(!this.layerSettingsFlat?.metadata){
@@ -532,7 +515,7 @@ export class MainMapComponent implements OnInit, OnChanges {
 
   setSelectedPolygon(feature: GeoJSON.Feature<GeoJSON.GeometryObject>) {
     this.selectedPolygonFeature = feature;
-    this.setFeatureArea(feature);
+    this.featureStats = calcFeatureStats(feature);
 
     this.setupChart(null,null);
     this.chartPolygonTimeSeries();
@@ -574,21 +557,6 @@ export class MainMapComponent implements OnInit, OnChanges {
       }
       this.setupChart(layer.label, data as ChartEntry[]);
     });
-  }
-
-  private setFeatureArea(feature) {
-    this.featureStats.area = area(feature);
-    if (this.featureStats.area < 10000) {
-      this.featureStats.areaUnits = 'm' + SUPER2;
-    } else if (this.featureStats.area < 1000000) {
-      this.featureStats.area /= 10000;
-      this.featureStats.areaUnits = 'ha';
-    } else {
-      this.featureStats.area /= 1000000;
-      this.featureStats.areaUnits = 'km' + SUPER2;
-    }
-
-    this.featureStats.area = +this.featureStats.area.toFixed(DECIMAL_PLACES);
   }
 
   fetchGeoJSON(proxyFeature:any):Observable<any>{
@@ -671,10 +639,6 @@ function pad(n: number,digits?: number): string{
   return result;
 }
 
-// &threshold=50&styles=
-
-// &styles=time=2008-01-01T00%3A00%3A00.000Z&time_diff=2010-01-01T00%3A00%3A00.000Z
-
 function makeFeatureCollection(...features:GeoJSON.Feature<GeoJSON.Polygon>[]):GeoJSON.FeatureCollection<GeoJSON.Polygon>{
   return {
     type:'FeatureCollection',
@@ -707,3 +671,21 @@ function makeSquareFeature(latlng: L.LatLng): GeoJSON.Feature<GeoJSON.Polygon> {
   };
 }
 
+function calcFeatureStats(feature): FeatureStats {
+  const result = {
+    area: area(feature),
+    areaUnits:'m' + SUPER2
+  };
+
+  if (result.area > 10000) {
+    if(result.area>1000000){
+      result.area /= 1000000;
+      result.areaUnits = 'km' + SUPER2;
+    } else {
+      result.area /= 10000;
+      result.areaUnits = 'ha';
+    }
+  }
+  result.area = +result.area.toFixed(DECIMAL_PLACES);
+  return result;
+}
