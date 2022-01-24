@@ -420,14 +420,9 @@ export class MainMapComponent implements OnInit, OnChanges {
     }
   }
 
-  pointSelected(latlng: L.LatLng): void {
-    const f = makeSquareFeature(latlng);
-    f.properties.source = CUSTOM_POLYGON;
-    this.polygonFeaturesForSelectedPoint = makeFeatureCollection(f)
-    this.setSelectedPolygon(f);
-  }
-
   pointFeatureSelected(geoJSON: any): void {
+    this.setupChart(null,null);
+
     const layer = this.layer;
     this.pointData.getTimeSeries(layer.label,geoJSON).subscribe(timeseries=>{
       const chartData:ChartEntry[] = timeseries.dates.map((d,i)=>{
@@ -441,32 +436,11 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
-  getValues(geoJSON: any): Observable<TableRow[]> {
-    if(!this.layer.polygonDrill){
-      return of(null);
-    }
-
-    const currentSelection = this.selectedFeatureNumber;
-
-    geoJSON = cleanFeature(geoJSON);
-    const result$ = this.http.post(this.layer.polygonDrill,{
-      product:this.layerSettingsFlat.variable,
-      feature:geoJSON
-    }, {
-      responseType:'text'
-    }).pipe(
-      map(res=>{
-        if(this.selectedFeatureNumber !== currentSelection) {
-          return null;
-        }
-
-        const data = parseCSV(res,{
-          columns:DATA_COLUMNS,
-          headerRows:1
-        });
-        return data;
-      }));
-    return result$;
+  pointSelected(latlng: L.LatLng): void {
+    const f = makeSquareFeature(latlng);
+    f.properties.source = CUSTOM_POLYGON;
+    this.polygonFeaturesForSelectedPoint = makeFeatureCollection(f)
+    this.setSelectedPolygonFeature(f);
   }
 
   polygonFeatureSelected(geoJSON: any): void {
@@ -484,13 +458,12 @@ export class MainMapComponent implements OnInit, OnChanges {
           return;
         }
 
-        this.setSelectedPolygon(feature);
+        this.setSelectedPolygonFeature(feature);
       });
-
     });
   }
 
-  setSelectedPolygon(feature: GeoJSON.Feature<GeoJSON.GeometryObject>) {
+  setSelectedPolygonFeature(feature: GeoJSON.Feature<GeoJSON.GeometryObject>) {
     this.selectedPolygonFeature = feature;
     this.featureStats = calcFeatureStats(feature);
 
@@ -504,7 +477,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       return;
     }
 
-    this.getValues(this.selectedPolygonFeature).subscribe(data => {
+    this.getPolygonTimeSeries(this.selectedPolygonFeature).subscribe(data => {
       if (!data?.length) {
         return;
       }
@@ -542,6 +515,34 @@ export class MainMapComponent implements OnInit, OnChanges {
     return this.http.get(url).pipe(
       map((featurecollection:any)=>featurecollection.features[0])
     );
+  }
+
+  getPolygonTimeSeries(geoJSON: any): Observable<TableRow[]> {
+    if(!this.layer.polygonDrill){
+      return of(null);
+    }
+
+    const currentSelection = this.selectedFeatureNumber;
+
+    geoJSON = cleanFeature(geoJSON);
+    const result$ = this.http.post(this.layer.polygonDrill,{
+      product:this.layerSettingsFlat.variable,
+      feature:geoJSON
+    }, {
+      responseType:'text'
+    }).pipe(
+      map(res=>{
+        if(this.selectedFeatureNumber !== currentSelection) {
+          return null;
+        }
+
+        const data = parseCSV(res,{
+          columns:DATA_COLUMNS,
+          headerRows:1
+        });
+        return data;
+      }));
+    return result$;
   }
 
   resetBounds(): void {
