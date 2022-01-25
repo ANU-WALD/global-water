@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Point, Feature, FeatureCollection, Geometry } from 'geojson';
+import { Point, Feature, FeatureCollection } from 'geojson';
 import { Observable, forkJoin, of } from 'rxjs';
 import { TimeSeries, MetadataService, OpendapService, UTCDate } from 'map-wald';
-import { map, switchAll } from 'rxjs/operators';
+import { map, shareReplay, switchAll } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LayerDescriptor, MetadataConfig } from './data';
+import { DapData, DapDAS } from 'dap-query-js/dist/dap-query';
 
 const DEFAULT_ID_COLUMN = 'ID';
 
@@ -18,6 +19,7 @@ export interface FeatureDataConfig extends LayerDescriptor {
 })
 export class FeatureDataService {
   private layerCache: { [key: string]: Observable<FeatureCollection<Point>> } = {};
+  private dapCache: { [key: string]: Observable<DapData> } = {};
 
   constructor(private metadata: MetadataService, private dap: OpendapService) {
   }
@@ -99,7 +101,7 @@ export class FeatureDataService {
          `${timeQuery}${featureRange}`:
          `${featureRange}${timeQuery}`;
         return forkJoin([
-          this.dap.getData(`${query.url}.ascii?${query.variable}${constraint}`,das),
+          this.getDAP(`${query.url}.ascii?${query.variable}${constraint}`,das),
           of(query)
         ]);
       }),
@@ -126,6 +128,13 @@ export class FeatureDataService {
         }).filter(f=>keepNulls||f.properties.value!==null)
         return result;
       }));
+  }
+
+  private getDAP(url:string,das:DapDAS):Observable<DapData>{
+    if(!this.dapCache[url]){
+      this.dapCache[url] = this.dap.getData(url,das).pipe(shareReplay());
+    }
+    return this.dapCache[url];
   }
 
   getTimeSeries(layer:FeatureDataConfig,feature:Feature,variable?:string):Observable<TimeSeries>{
@@ -156,7 +165,7 @@ export class FeatureDataService {
           dateRange = this.dap.dapRangeQuery(0,timeSize-1);
         }
         const url = `${query.url}.ascii?${query.variable}${dateRange}${range}`;
-        return forkJoin([this.dap.getData(url,das),of(query)]);
+        return forkJoin([this.getDAP(url,das),of(query)]);
       }),
       switchAll(),
       map(([data,query])=>{
@@ -184,7 +193,7 @@ export class FeatureDataService {
         const size = +ddx.variables[idCol].dimensions[0].size;
         const rangeQuery = this.dap.dapRangeQuery(0,size-1);
         return forkJoin(variables.map(v => {
-          return this.dap.getData(`${url}.ascii?${v}`, das);
+          return this.getDAP(`${url}.ascii?${v}`, das);
         }));
       }),
       switchAll(),

@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
 import { shareReplay, map, switchAll, tap } from 'rxjs/operators';
-import { Observable, forkJoin, of, config } from 'rxjs';
-import { MetadataService, OpendapService, TimeSeries, UTCDate } from 'map-wald';
-import { Point, FeatureCollection, Feature, GeoJsonProperties } from 'geojson';
+import { Observable, forkJoin, of } from 'rxjs';
+import { TimeSeries, UTCDate } from 'map-wald';
+import { Point, FeatureCollection, Feature } from 'geojson';
 import { FeatureDataService, FeatureDataConfig } from './feature-data.service';
 import { LayersService } from './layers.service';
 import { FlattenedLayerDescriptor, LayerDescriptor } from './data';
@@ -26,8 +24,7 @@ export class PointDataService {
   private layers: Observable<LayerDescriptor[]>;
 
   constructor(private layersService:LayersService,
-              private featureData:FeatureDataService,
-              http: HttpClient) {
+              private featureData:FeatureDataService) {
     this.layers = this.layersService.matchingLayers({type:'point'}).pipe(shareReplay());
 
     // http.get(`${environment.pointConfig}?${(new Date()).getTime()}`).pipe(
