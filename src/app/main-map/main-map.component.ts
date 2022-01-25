@@ -208,21 +208,6 @@ export class MainMapComponent implements OnInit {
     return this.layer.url;
   }
 
-  substituteParameters(params: any): any{
-    const subs = this.interpolationSubstitutions();
-
-    const result:any = {};
-    Object.keys(params).forEach(k=>{
-      if(typeof(k)==='string'){
-        result[k] = InterpolationService.interpolate(params[k],subs);
-      } else {
-        result[k] = params[k];
-      }
-    });
-
-    return result;
-  }
-
   variantChanged():void{
     this.setupDataOverlayLayer();
     this.chartPolygonTimeSeries();
@@ -273,7 +258,8 @@ export class MainMapComponent implements OnInit {
       attribution: '<a href="http://wald.anu.edu.au/">WALD ANU</a>' // SHOULD LOOK AT LAYER ATTRIBUTION
     };
 
-    this.wmsParams = this.substituteParameters(Object.assign({},options,this.layerSettingsFlat.mapParams||{}));
+    this.wmsParams = interpolateAll(Object.assign({},options,this.layerSettingsFlat.mapParams||{}),
+                                    this.interpolationSubstitutions());
     this.configureWMSLegend();
   }
 
@@ -590,6 +576,19 @@ export class MainMapComponent implements OnInit {
       event_label: context
     });
   }
+}
+
+function interpolateAll(params: any, subs: any) {
+  const result: any = {};
+  Object.keys(params).forEach(k => {
+    if (typeof (k) === 'string') {
+      result[k] = InterpolationService.interpolate(params[k], subs);
+    } else {
+      result[k] = params[k];
+    }
+  });
+
+  return result;
 }
 
 function pad(n: number,digits?: number): string{
