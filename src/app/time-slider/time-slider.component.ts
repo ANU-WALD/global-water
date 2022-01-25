@@ -15,6 +15,7 @@ export class TimeSliderComponent implements OnInit, OnChanges {
   @Output() dateChange = new EventEmitter<UTCDate>();
 
   userSet = false;
+  oldStep = -1;
   currentDate = ''
   currentStep = 0;
   min = 0;
@@ -35,7 +36,7 @@ export class TimeSliderComponent implements OnInit, OnChanges {
       this.max=1;
       return;
     }
-
+    this.oldStep = -1;
     this.max = this.dates.length-1;
     if(!this.userSet) {
       this.currentStep = this.max;
@@ -51,11 +52,17 @@ export class TimeSliderComponent implements OnInit, OnChanges {
   }
 
   stepChanged(userSet: boolean) {
+    // console.log('stepChanged', userSet, this.currentStep, this.dates[this.currentStep]);
     this.userSet = this.userSet || userSet;
+
+    if(this.currentStep===this.oldStep) {
+      return;
+    }
 
     this.date = this.dates[this.currentStep];
     this.currentDate = d3.time.format(this.format)(this.date);
     this.dateChange.emit(this.date);
+    this.oldStep = this.currentStep;
   }
 }
 
