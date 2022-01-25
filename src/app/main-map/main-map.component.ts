@@ -1,7 +1,7 @@
-import { Component, OnInit, Input, OnChanges, SimpleChanges, ViewChild} from '@angular/core';
+import { Component, OnInit, Input, ViewChild} from '@angular/core';
 import * as L from 'leaflet';
 import { environment } from 'src/environments/environment';
-import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate, RangeStyle, PaletteService } from 'map-wald';
+import { parseCSV, TableRow, Bounds, InterpolationService, UTCDate, RangeStyle, PaletteService, ColourPalette } from 'map-wald';
 import { ChartEntry, ChartSeries } from '../chart/chart.component';
 import { LayerDescriptor, LegendResponse, MapSettings, DisplaySettings, PaletteDescriptor, 
          DisplaySettingsChange, LayerVariant, FlattenedLayerDescriptor } from '../data';
@@ -42,15 +42,6 @@ const DEFAULT_PALETTE:PaletteDescriptor = {
   reverse:false
 };
 
-const INITIAL_MAP_SETTINGS:MapSettings = {
-  date: new Date(),
-  layer: null as LayerDescriptor,
-  opacity: INITIAL_OPACITY,
-  relative: false,
-  relativeVariable: '',
-  dateStep: 7
-};
-
 const CHART_PROMPTS = {
   predefined: 'Select a region',
   draw: 'Draw a region',
@@ -67,7 +58,7 @@ export interface FeatureStats {
   templateUrl: './main-map.component.html',
   styleUrls: ['./main-map.component.scss']
 })
-export class MainMapComponent implements OnInit, OnChanges {
+export class MainMapComponent implements OnInit {
   @Input() date: UTCDate;
   @Input() layer: LayerDescriptor;
   @ViewChild('splash', { static: true }) splash: OneTimeSplashComponent;
@@ -81,7 +72,6 @@ export class MainMapComponent implements OnInit, OnChanges {
     showVectors: false
   };
 
-  mapSettings: MapSettings = Object.assign({},INITIAL_MAP_SETTINGS);
   pointMode = PointMode;
   selectedFeatureNumber = 0;
   selectedPolygonFeature: GeoJSON.Feature<GeoJSON.GeometryObject>;
@@ -93,9 +83,10 @@ export class MainMapComponent implements OnInit, OnChanges {
   showWindows = true;
   basemap: BasemapDescriptor;
   // transparency = 0;
-  mapRelativeMode: string;
 
-  pointLayerFeatures: any;
+  // mapRelativeMode: string; // NOT getting set when it should
+
+  pointLayerFeatures: GeoJSON.FeatureCollection<GeoJSON.Point>;
 
   opacity = INITIAL_OPACITY;
   // get opacity(): number {
@@ -152,15 +143,14 @@ export class MainMapComponent implements OnInit, OnChanges {
 
     this.layersService.layerConfig$.subscribe(layers=>{
       this.layers = layers;
-      this.mapSettings.layer = this.layers[0];
-      this.date = this.mapSettings.layer.timePeriod?.end;
-      this.applySettings();
+      const initialLayer = this.layers[0];
+      this.date = initialLayer.timePeriod?.end;
+      this.setLayer(initialLayer);
     });
   }
 
   ngOnInit(): void {
     gtag('send', 'pageview');
-    this.applySettings();
 
     this._map.withMap(m=>{
       this.zoom = m.getZoom();
@@ -170,18 +160,12 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    this.applySettings();
-  }
-
   updateMapConfig(): void {
     const cfg = this.mapConfig;
     const pd = this.layer?.polygonDrill;
     cfg.latLngSelection = pd && (this.polygonMode==='point');
     cfg.enableDrawing =   pd && (this.polygonMode==='draw');
     cfg.showVectors =     pd && (this.polygonMode==='predefined');
-    // this.mapConfig = Object.assign({},cfg);
-    console.log('updateMapConfig',this.mapConfig);
   }
 
   interpolationSubstitutions(): any {
@@ -196,7 +180,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   dateChange(): void {
-    this.setupMapLayer();
+    this.setupDataOverlayLayer();
   }
 
   mapFilename(): string {
@@ -240,20 +224,22 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   variantChanged():void{
-    this.setupMapLayer();
+    this.setupDataOverlayLayer();
     this.chartPolygonTimeSeries();
   }
 
-  setupMapLayer(): void {
+  setupDataOverlayLayer(): void {
     if(!this.layer){
       return;
     }
 
+    this.gaEvent('layer','wms', `${this.layer.label}:${(this.date as Date).toUTCString()}`); // + ${this.relative?event.relativeVariable:'-'}
+
     this.layerSettingsFlat = Object.assign({},this.layer,this.selectedVariant);
     this.wmsParams = null;
-    this.pointLayerFeatures = null;
 
     if(this.layerSettingsFlat.type==='grid'){
+      this.pointLayerFeatures = null;
       this.setupWMSLayer();
     } else {
       this.setupPointLayer();
@@ -267,17 +253,11 @@ export class MainMapComponent implements OnInit, OnChanges {
     // }
 
     forkJoin([
-      this.pointData.getValues(this.layerSettingsFlat,{},this.date,null,this.mapRelativeMode),
+      this.pointData.getValues(this.layerSettingsFlat,{},this.date,null,null/*this.mapRelativeMode*/),
       this.palettes.getPalette(palette.name,palette.reverse,palette.count)
     ]).subscribe(([features,palette]) => {
-      palette = palette.map(c=>c.replace(')',',0.5)').replace('rgb','rgba'));
       this.pointLayerFeatures = features;
-      const max = Math.max(...(features.features).map(f=>f.properties.value));
-      const breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
-      this.siteStyles.fill = new RangeStyle('value',palette,breaks);
-      // this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
-      this.siteStyles.size = new RangeStyle('value',[5,5,5,5,5,5,5],breaks);
-      this.legend = LegendUtils.makePointLegend(palette,this.siteStyles.fill);
+      this.configurePointLegend(palette);
     });
   }
 
@@ -290,12 +270,21 @@ export class MainMapComponent implements OnInit, OnChanges {
       updateWhenIdle: true,
       updateWhenZooming: false,
       updateInterval: 500,
-      attribution: '<a href="http://wald.anu.edu.au/">WALD ANU</a>'
+      attribution: '<a href="http://wald.anu.edu.au/">WALD ANU</a>' // SHOULD LOOK AT LAYER ATTRIBUTION
     };
 
     this.wmsParams = this.substituteParameters(Object.assign({},options,this.layerSettingsFlat.mapParams||{}));
-
     this.configureWMSLegend();
+  }
+
+  configurePointLegend(palette:ColourPalette): void {
+    palette = palette.map(c=>c.replace(')',',0.5)').replace('rgb','rgba'));
+    const max = Math.max(...(this.pointLayerFeatures.features).map(f=>f.properties.value));
+    const breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
+    this.siteStyles.fill = new RangeStyle('value',palette,breaks);
+    // this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
+    this.siteStyles.size = new RangeStyle('value',[5,5,5,5,5,5,5],breaks);
+    this.legend = LegendUtils.makePointLegend(palette,this.siteStyles.fill);
   }
 
   configureWMSLegend(): void {
@@ -313,6 +302,10 @@ export class MainMapComponent implements OnInit, OnChanges {
     });
   }
 
+  clearChart(): void {
+    this.setupChart(null,null);
+  }
+
   setupChart(title: string, chartData: ChartEntry[]): void{
     if(!chartData) {
       this.chartPolygonLabel=null;
@@ -326,14 +319,6 @@ export class MainMapComponent implements OnInit, OnChanges {
     };
   }
 
-  mapOptionsChanged(event: MapSettings): void {
-    this.gaEvent('layer','wms',
-      `${event.layer.label}:${(event.date as Date).toUTCString()}:${event.relative?event.relativeVariable:'-'}`);
-
-      this.mapSettings = event;
-    this.applySettings();
-  }
-
   mapSettingChanged(event:DisplaySettingsChange): void {
     if(this[event.setting]!==undefined){
       this[event.setting] = event.value;
@@ -342,11 +327,6 @@ export class MainMapComponent implements OnInit, OnChanges {
     if(event.setting==='opacity'){
       this.setOpacity();
     }
-  }
-
-  applySettings() {
-    this.mapRelativeMode = this.mapSettings.relative?this.mapSettings.relativeVariable:null;
-    this.setLayer(this.mapSettings.layer);
   }
 
   setLayer(layer: LayerDescriptor) {
@@ -362,7 +342,7 @@ export class MainMapComponent implements OnInit, OnChanges {
       this.initLayerDates();
     }
 
-    this.setupMapLayer();
+    this.setupDataOverlayLayer();
 
     if(!this.layer?.polygonDrill){
       this.polygonMode = 'point';
@@ -371,6 +351,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     if((this.layer?.type==='grid')&&this.selectedPolygonFeature){
       this.chartPolygonTimeSeries();
     } else {
+      this.clearChart();
       this.selectedPolygonFeature = null;
     }
 
@@ -378,7 +359,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   initLayerDates() {
-    this.date = this.layersService.constrainDate(this.mapSettings.date,this.layer);
+    this.date = this.layersService.constrainDate(this.date,this.layer); // Necessary?
     this.layersService.availableDates(this.layer).subscribe(dates=>{
       this.layerDates = dates;
 
@@ -421,7 +402,7 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   pointFeatureSelected(geoJSON: any): void {
-    this.setupChart(null,null);
+    this.clearChart();
 
     const layer = this.layer;
     this.pointData.getTimeSeries(layer.label,geoJSON).subscribe(timeseries=>{
@@ -467,7 +448,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.selectedPolygonFeature = feature;
     this.featureStats = calcFeatureStats(feature);
 
-    this.setupChart(null,null);
+    this.clearChart();
     this.chartPolygonTimeSeries();
   }
 
@@ -585,7 +566,7 @@ export class MainMapComponent implements OnInit, OnChanges {
     this.baseMapURL = this.basemap.urlTemplate;
   }
 
-  polygonModeChanged(): void {
+  featureSelectionModeChanged(): void {
     this.updateMapConfig();
   }
 
@@ -600,6 +581,10 @@ export class MainMapComponent implements OnInit, OnChanges {
   }
 
   gaEvent(category: string, action: string, context: string): void {
+    if(!environment.trackActions){
+      return;
+    }
+
     gtag('event', 'category', {
       event_category: action,
       event_label: context

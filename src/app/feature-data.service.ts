@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Feature, FeatureCollection } from 'geojson';
+import { Point, Feature, FeatureCollection, Geometry } from 'geojson';
 import { Observable, forkJoin, of } from 'rxjs';
 import { TimeSeries, MetadataService, OpendapService, UTCDate } from 'map-wald';
 import { map, switchAll } from 'rxjs/operators';
@@ -17,12 +17,12 @@ export interface FeatureDataConfig extends LayerDescriptor {
   providedIn: 'root'
 })
 export class FeatureDataService {
-  private layerCache: { [key: string]: Observable<FeatureCollection> } = {};
+  private layerCache: { [key: string]: Observable<FeatureCollection<Point>> } = {};
 
   constructor(private metadata: MetadataService, private dap: OpendapService) {
   }
 
-  getFeatures(layer: FeatureDataConfig,filter?:{[key:string]:any}): Observable<FeatureCollection> {
+  getFeatures(layer: FeatureDataConfig,filter?:{[key:string]:any}): Observable<FeatureCollection<Point>> {
     const res$ = of(layer).pipe(
       map(lyr => {
         if (!this.layerCache[lyr.label]) {
@@ -67,10 +67,9 @@ export class FeatureDataService {
     return closest;
   }
 
-  getValues(layer:FeatureDataConfig, filter:{[key:string]:any}, timestep: UTCDate, variable?: string, keepNulls?: boolean): Observable<FeatureCollection>{
+  getValues(layer:FeatureDataConfig, filter:{[key:string]:any}, timestep: UTCDate, variable?: string, keepNulls?: boolean): Observable<FeatureCollection<Point>>{
     return this.getFeatures(layer).pipe(
-      map((f)=>{
-        const features:FeatureCollection = f;
+      map((features)=>{
         const config = layer;
         variable = variable || config.variables[0];
         return {
@@ -107,12 +106,12 @@ export class FeatureDataService {
       switchAll(),
       map(([data,query])=>{
         const vals = data[query.variable] as number[];
-        const result:FeatureCollection = {
+        const result:FeatureCollection<Point> = {
           type:'FeatureCollection',
           features:[]
         };
         result.features = query.features.features.map(f=>{
-          const newF: Feature = {
+          const newF: Feature<Point> = {
             type: 'Feature',
             geometry:f.geometry,
             properties:Object.assign({},f.properties)
@@ -199,7 +198,7 @@ export class FeatureDataService {
     return res$;
   }
 
-  private _retrieveLayer(lyr: FeatureDataConfig): Observable<FeatureCollection> {
+  private _retrieveLayer(lyr: FeatureDataConfig): Observable<FeatureCollection<Point>> {
     const idCol = lyr.id||DEFAULT_ID_COLUMN;
     const coreMeta:MetadataConfig = {
       filename: lyr.filename,
@@ -214,7 +213,7 @@ export class FeatureDataService {
     return res$.pipe(
       map(allMeta=>Object.assign({},...allMeta)),
       map(data => {
-        const result: FeatureCollection = {
+        const result: FeatureCollection<Point> = {
           type: 'FeatureCollection',
           features: []
         };

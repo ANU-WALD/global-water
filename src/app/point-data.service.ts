@@ -4,8 +4,7 @@ import { environment } from 'src/environments/environment';
 import { shareReplay, map, switchAll, tap } from 'rxjs/operators';
 import { Observable, forkJoin, of, config } from 'rxjs';
 import { MetadataService, OpendapService, TimeSeries, UTCDate } from 'map-wald';
-import { FeatureCollection, Feature, GeoJsonProperties } from 'geojson';
-import { Point } from 'leaflet';
+import { Point, FeatureCollection, Feature, GeoJsonProperties } from 'geojson';
 import { FeatureDataService, FeatureDataConfig } from './feature-data.service';
 import { LayersService } from './layers.service';
 import { FlattenedLayerDescriptor, LayerDescriptor } from './data';
@@ -76,7 +75,7 @@ export class PointDataService {
             filter:{[key:string]:any},
             timestep: UTCDate,
             variable?: string,
-            relativeMode?: string): Observable<FeatureCollection>{
+            relativeMode?: string): Observable<FeatureCollection<Point>>{
     return this._layerConfig(layer.label).pipe(
       map(lyr=>forkJoin([of(lyr),this.featureData.getValues(lyr,filter,timestep,variable,true)])),
       switchAll(),

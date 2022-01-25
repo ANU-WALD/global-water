@@ -101,48 +101,6 @@
 
     </map-control>
 
-<!-- 
-        <ngb-accordion *ngIf="showWindows" #acc="ngbAccordion" activeIds="map-panel">
-          <ngb-panel id="map-panel">
-            <ng-template ngbPanelHeader let-opened="opened">
-              <div class="d-flex align-items-center justify-content-between">
-                <h5 class="m-0">1. Choose map</h5>
-                <button ngbPanelToggle class="btn btn-link-primary btn-link p-0">
-                  <i class="fa" [ngClass]="opened?'fa-minus':'fa-plus'"></i>
-                </button>
-              </div>
-            </ng-template>
-            <ng-template ngbPanelContent>
-              <app-map-controls [layers]="layers"
-                                [settings]="mapSettings"
-                                [orientation]="'vertical'"
-                                (optionsChanged)="mapOptionsChanged($event)"
-                                (settingChanged)="mapSettingChanged($event)">
-              </app-map-controls>
-
-            </ng-template>
-          </ngb-panel>
-
-          <ngb-panel id="chart-panel" (hidden)="showVectors=true" (shown)="polygonModeChanged()">
-            <ng-template ngbPanelHeader let-opened="opened">
-              <div class="d-flex align-items-center justify-content-between">
-                <h5 class="m-0">2. Query data</h5>
-                <button ngbPanelToggle class="btn btn-link-primary btn-link p-0">
-                  <i class="fa" [ngClass]="opened?'fa-minus':'fa-plus'"></i>
-                </button>
-              </div>
-            </ng-template>
-            <ng-template ngbPanelContent>
-            </ng-template>
-          </ngb-panel>
-
-        </ngb-accordion>
- -->
-<!--
-                   *ngIf="layer&&layer.polygonDrill"
-
--->
-
     <map-control [position]="'BOTTOM_RIGHT'">
       <div *ngIf="showWindows" class="chart-control">
         <div class="row">
@@ -152,7 +110,7 @@
                  ngbRadioGroup
                  name="polygonSelection"
                  [(ngModel)]="polygonMode"
-                 (ngModelChange)="polygonModeChanged()">
+                 (ngModelChange)="featureSelectionModeChanged()">
               <label ngbButtonLabel [ngClass]="(polygonMode==='point')?'btn-primary':'btn-secondary'">
                 <input ngbButton type="radio" value="point">Select point
               </label>
