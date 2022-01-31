@@ -21,9 +21,9 @@ export interface FeatureDataConfig extends LayerDescriptor {
 export class FeatureDataService {
   private layerCache: { [key: string]: Observable<FeatureCollection<Point>> } = {};
   private dapCache: { [key: string]: Observable<DapData> } = {};
-  lookups$: Observable<{ [key: string]: {[key:string|number]:string} }>;
+  lookups$: Observable<{ [key: string]: any }>;
   constructor(http:HttpClient, private metadata: MetadataService, private dap: OpendapService) {
-    this.lookups$ = http.get(environment.attributeTranslations).pipe(shareReplay()) as Observable<{ [key: string]: {[key:string|number]:string} }>;
+    this.lookups$ = http.get(environment.attributeTranslations).pipe(shareReplay()) as Observable<{ [key: string]: any }>;
   }
 
   getFeatures(layer: FeatureDataConfig,filter?:{[key:string]:any}): Observable<FeatureCollection<Point>> {
