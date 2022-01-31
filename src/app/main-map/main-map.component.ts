@@ -236,11 +236,16 @@ export class MainMapComponent implements OnInit {
     // if(this.mapRelativeMode){
     //   palette = this.layer.relativeOptions[this.mapRelativeMode]?.palette || palette;
     // }
+    const date = this.date;
 
     forkJoin([
       this.pointData.getValues(this.layerSettingsFlat,{},this.date,null,null/*this.mapRelativeMode*/),
       this.palettes.getPalette(palette.name,palette.reverse,palette.count)
     ]).subscribe(([features,palette]) => {
+      if(this.date!==date){
+        return;
+      }
+
       this.pointLayerFeatures = features;
       this.configurePointLegend(palette);
     });
