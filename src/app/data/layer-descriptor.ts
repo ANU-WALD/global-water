@@ -45,6 +45,7 @@ export interface LayerDescriptor extends MetadataConfig, LayerDescriptorCommon {
   // relativeOptions?:{[key:string]:RelativeOption};
   palette?:PaletteDescriptor;
   variants?:LayerVariant[];
+  chartLabel?:string;
 }
 
 export interface FlattenedLayerDescriptor extends LayerDescriptor, LayerVariant { }

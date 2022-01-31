@@ -161,11 +161,13 @@
     ],
     "meta":[
       "Riv_Qmean",
-      "Riv_Qmax"
+      "Riv_Qmax",
+      "name"
     ],
     "variables":[
       "river_discharge"
     ],
+    "chartLabel":"Gauge on {{name}}",
     "time":"time",
     "timeFirst":false,
     "timePeriod":{

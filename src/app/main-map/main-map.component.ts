@@ -399,7 +399,11 @@ export class MainMapComponent implements OnInit {
         };
       }).filter(row=>(row.value!==null)&&!isNaN(row.value));
       this.setupChart(layer.label,chartData);
-      this.chartPolygonLabel=null;
+      if(this.layer.chartLabel){
+        this.chartPolygonLabel = InterpolationService.interpolate(this.layer.chartLabel,geoJSON.properties);
+      } else {
+        this.chartPolygonLabel=null;
+      }
     });
   }
 
