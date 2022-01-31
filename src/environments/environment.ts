@@ -4,6 +4,7 @@
 
 export const environment = {
   production: false,
+  trackActions: false,
   layerConfig:'assets/config/layers.json',
   basemapConfig:'assets/config/basemaps.json',
   vectorConfig:'assets/config/foci.json',
