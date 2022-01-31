@@ -115,10 +115,15 @@
       }
     ],
     "meta":[
+      "name",
+      "admin_country",
+      "admin_province"
     ],
     "variables":[
       "storage"
     ],
+    "chartLabel":"{{name}}",
+    "chartLabelX":"{{name}} ({{admin_country}},{{admin_province}})",
     "time":"time",
     "timeFirst":true,
     "timePeriod":{
@@ -162,12 +167,15 @@
     "meta":[
       "Riv_Qmean",
       "Riv_Qmax",
-      "name"
+      "name",
+      "admin_country",
+      "admin_province"
     ],
     "variables":[
       "river_discharge"
     ],
     "chartLabel":"Gauge on {{name}}",
+    "chartLabelX":"Gauge on {{name}} ({{admin_country}},{{admin_province}})",
     "time":"time",
     "timeFirst":false,
     "timePeriod":{
