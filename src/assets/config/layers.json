@@ -117,13 +117,13 @@
     "meta":[
       "name",
       "admin_country",
-      "admin_province"
+      "admin_province",
+      "type"
     ],
     "variables":[
       "storage"
     ],
-    "chartLabel":"{{name}}",
-    "chartLabelX":"{{name}} ({{admin_country}},{{admin_province}})",
+    "chartLabel":"{{name}} ({{admin_country}},{{admin_province}})",
     "time":"time",
     "timeFirst":true,
     "timePeriod":{
@@ -174,8 +174,7 @@
     "variables":[
       "river_discharge"
     ],
-    "chartLabel":"Gauge on {{name}}",
-    "chartLabelX":"Gauge on {{name}} ({{admin_country}},{{admin_province}})",
+    "chartLabel":"Gauge on {{name}} ({{admin_country}},{{admin_province}})",
     "time":"time",
     "timeFirst":false,
     "timePeriod":{

@@ -6,6 +6,7 @@ import { map, shareReplay, switchAll } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LayerDescriptor, MetadataConfig } from './data';
 import { DapData, DapDAS } from 'dap-query-js/dist/dap-query';
+import { HttpClient } from '@angular/common/http';
 
 const DEFAULT_ID_COLUMN = 'ID';
 
@@ -20,8 +21,9 @@ export interface FeatureDataConfig extends LayerDescriptor {
 export class FeatureDataService {
   private layerCache: { [key: string]: Observable<FeatureCollection<Point>> } = {};
   private dapCache: { [key: string]: Observable<DapData> } = {};
-
-  constructor(private metadata: MetadataService, private dap: OpendapService) {
+  lookups$: Observable<{ [key: string]: {[key:string|number]:string} }>;
+  constructor(http:HttpClient, private metadata: MetadataService, private dap: OpendapService) {
+    this.lookups$ = http.get(environment.attributeTranslations).pipe(shareReplay()) as Observable<{ [key: string]: {[key:string|number]:string} }>;
   }
 
   getFeatures(layer: FeatureDataConfig,filter?:{[key:string]:any}): Observable<FeatureCollection<Point>> {
@@ -217,11 +219,19 @@ export class FeatureDataService {
     let allMeta = [coreMeta];
     allMeta = allMeta.concat(lyr.relatedFiles||[]);
 
-    let res$ = forkJoin(allMeta.map(m=>this._metaFromFiles(m,idCol)));
+    let meta$ = forkJoin(allMeta.map(m=>this._metaFromFiles(m,idCol))).pipe(
+      map(allMeta=>Object.assign({},...allMeta)));
 
-    return res$.pipe(
-      map(allMeta=>Object.assign({},...allMeta)),
-      map(data => {
+    return forkJoin([meta$,this.lookups$]).pipe(
+      map(metaAndLookups=>{
+        return {
+          meta:metaAndLookups[0],
+          lookups:metaAndLookups[1]
+        };
+      }),
+      map(metaAndLookups => {
+        const data = metaAndLookups.meta;
+        const lookups = metaAndLookups.lookups;
         const result: FeatureCollection<Point> = {
           type: 'FeatureCollection',
           features: []
@@ -241,7 +251,11 @@ export class FeatureDataService {
           }
 
           Object.keys(data).filter(v=>(v!=='latitude')&&(v!=='longitude')).forEach(v=>{
-            f.properties[v] = data[v][i];
+            let val = data[v][i];
+            if(lookups[v]&&lookups[v][val]){
+              val = lookups[v][val];
+            }
+            f.properties[v] = val;
           });
           return f;
         });

@@ -11,6 +11,7 @@ export const environment = {
   tds:'http://dapds00.nci.org.au/thredds',
   pointConfig:'assets/config/points.json',
   geojsons: 'assets/selection_layers/',
+  attributeTranslations:'assets/lookups.json',
   tiles:'https://storage.googleapis.com/wald-vector/{{filename}}/{z}/{x}/{y}.pbf',
   splitGeoJSONS:'http://localhost:15107/062_ANU/split_polygons/{{filename}}/{{id}}.json'
   // splitGeoJSONS:'https://storage.googleapis.com/wald-vector/split_polygons/{{filename}}/{{id}}.json'
