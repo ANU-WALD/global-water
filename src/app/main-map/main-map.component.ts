@@ -265,8 +265,13 @@ export class MainMapComponent implements OnInit {
 
   configurePointLegend(palette:ColourPalette): void {
     palette = palette.map(c=>c.replace(')',',0.5)').replace('rgb','rgba'));
-    const max = Math.max(...(this.pointLayerFeatures.features).map(f=>f.properties.value));
-    const breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
+    let breaks: number[];
+    if(this.layerSettingsFlat.breaks){
+      breaks = this.layerSettingsFlat.breaks;
+    } else {
+      const max = Math.max(...(this.pointLayerFeatures.features).map(f=>f.properties.value));
+      breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
+    }
     this.siteStyles.fill = new RangeStyle('value',palette,breaks);
     // this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
     this.siteStyles.size = new RangeStyle('value',[5,5,5,5,5,5,5],breaks);

@@ -181,13 +181,30 @@
       "format":"%B %d, %Y"
     },
     "palette": {
+      "name": "YlGnBu",
+      "count": 6,
+      "reverse": false
+    },
+    "paletteX":{
       "name": "PuBu",
       "count": 6,
       "reverse": false
     },
     "variants":[
       {
-        "variantLabel":"Current"
+        "variantLabel":"Current",
+        "breaks":[
+          0,
+          100,
+          500,
+          1000,
+          5000,
+          10000
+        ]
+      },
+      {
+        "variantLabel":"Hmmm",
+        "bin":"decile"
       },
       {
         "variantLabel":"Median",

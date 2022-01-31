@@ -21,6 +21,7 @@ export interface RelativeOption {
 export interface LayerDescriptorCommon {
   label:string;
   legendLabels?:string[];
+  breaks?:number[];
 }
 
 export interface LayerVariant extends LayerDescriptorCommon {
