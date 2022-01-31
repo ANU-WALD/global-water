@@ -133,10 +133,18 @@
       {
         "variantLabel":"Storage",
         "palette": {
-          "name": "PuBu",
+          "name": "YlGnBu",
           "count": 6,
           "reverse": false
-        }
+        },
+        "breaks":[
+          0,
+          5,
+          50,
+          500,
+          5000,
+          50000
+        ]
       },
       {
         "variantLabel":"Median",
