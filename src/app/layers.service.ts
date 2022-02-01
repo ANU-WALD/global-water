@@ -33,12 +33,7 @@ export class LayersService {
 
         if(constants){
           layers.forEach(l=>{
-            Object.keys(l).forEach(k=>{
-              const val = l[k];
-              if((typeof(val)==='string') && val.startsWith('$') && val.endsWith('$')){
-                l[k] = constants[val.slice(1,-1)];
-              }
-            });
+            this.substituteConstants(l, constants);
           });
         }
 
@@ -65,6 +60,17 @@ export class LayersService {
       switchAll(),
       publishReplay(),
       refCount()) as Observable<LayerDescriptor[]>;
+  }
+
+  private substituteConstants(l: LayerDescriptor, constants: any) {
+    Object.keys(l).forEach(k => {
+      const val = l[k];
+      if ((typeof (val) === 'string') && val.startsWith('$') && val.endsWith('$')) {
+        l[k] = constants[val.slice(1, -1)];
+      } else if (typeof (val) === 'object') {
+        this.substituteConstants(val, constants);
+      }
+    });
   }
 
   matchingLayers(params?: any): Observable<LayerDescriptor[]>{
