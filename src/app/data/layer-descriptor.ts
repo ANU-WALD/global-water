@@ -26,7 +26,8 @@ export interface LayerDescriptorCommon {
 
 export interface LayerVariant extends LayerDescriptorCommon {
   variantLabel:string;
-  relative:RelativeOption;
+  relative?:RelativeOption;
+  bin?:string;
 }
 
 export interface LayerDescriptor extends MetadataConfig, LayerDescriptorCommon {

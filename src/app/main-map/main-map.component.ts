@@ -16,6 +16,7 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CacheService } from '../cache.service';
 import { LegendUtils } from '../legend-utils';
+import * as R from 'ramda';
 
 declare var gtag: (a: string,b: string,c?: any) => void;
 
@@ -239,7 +240,7 @@ export class MainMapComponent implements OnInit {
     const date = this.date;
 
     forkJoin([
-      this.pointData.getValues(this.layerSettingsFlat,{},this.date,null,null/*this.mapRelativeMode*/),
+      this.pointData.getValues(this.layerSettingsFlat,{},this.date,null),
       this.palettes.getPalette(palette.name,palette.reverse,palette.count)
     ]).subscribe(([features,palette]) => {
       if(this.date!==date){
@@ -247,6 +248,8 @@ export class MainMapComponent implements OnInit {
       }
 
       this.pointLayerFeatures = features;
+      this.pointLayerFeatures.features = this.pointLayerFeatures.features.filter(f=>!isNaN(f.properties.value));
+
       this.configurePointLegend(palette);
     });
   }
@@ -274,13 +277,17 @@ export class MainMapComponent implements OnInit {
     if(this.layerSettingsFlat.breaks){
       breaks = this.layerSettingsFlat.breaks;
     } else {
-      const max = Math.max(...(this.pointLayerFeatures.features).map(f=>f.properties.value));
-      breaks = [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
+      const max = Math.max(
+        ...(this.pointLayerFeatures.features).map(f=>f.properties.value)
+                                             .filter(v=>!isNaN(v)));
+      const count = palette.length;
+      breaks = R.range(0,count).map(v=>0.5*max*v/(count-1));
+      [0, max/10, 2*max/10, 3*max/10, 4*max/10, 5*max/10];
     }
     this.siteStyles.fill = new RangeStyle('value',palette,breaks);
     // this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
     this.siteStyles.size = new RangeStyle('value',[5,5,5,5,5,5,5],breaks);
-    this.legend = LegendUtils.makePointLegend(palette,this.siteStyles.fill);
+    this.legend = LegendUtils.makePointLegend(palette,this.siteStyles.fill,this.layerSettingsFlat.legendLabels);
   }
 
   configureWMSLegend(): void {

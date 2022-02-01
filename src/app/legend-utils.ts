@@ -62,10 +62,10 @@ export class LegendUtils {
     return result;
   }
 
-  static makePointLegend(palette: string[], fill: RangeStyle<string>): LegendConfig {
+  static makePointLegend(palette: string[], fill: RangeStyle<string>, labels?: string[]): LegendConfig {
     return {
       colours: palette.slice().reverse(),
-      labels: LegendUtils.getLabels(fill).reverse(),// Should be significant digits
+      labels: labels || LegendUtils.getLabels(fill).reverse(),// Should be significant digits
       shape: ['circle']
     };
   }

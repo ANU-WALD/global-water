@@ -61,18 +61,30 @@ export class PointDataService {
     }
 
     let comp = properties[prop];   
-    if(mode.includes('[')){
+    if(comp&&mode.includes('[')){
       const idx = +(mode.split('[')[1].split(']')[0]);
       comp = comp[idx];
     }
     return val - comp;
   }
 
+  _bin(val:number,bin:number[]):number{
+    if(!bin?.findIndex){
+      return NaN;
+    }
+
+    const idx = bin.findIndex(b=>val<=b);
+    if(idx>=0){
+      return idx;
+    } else {
+      return bin.length;
+    }
+  }
+
   getValues(layer:FlattenedLayerDescriptor, 
             filter:{[key:string]:any},
             timestep: UTCDate,
-            variable?: string,
-            relativeMode?: string): Observable<FeatureCollection<Point>>{
+            variable?: string): Observable<FeatureCollection<Point>>{
     return this._layerConfig(layer.label).pipe(
       map(lyr=>forkJoin([of(lyr),this.featureData.getValues(lyr,filter,timestep,variable,true)])),
       switchAll(),
@@ -83,12 +95,18 @@ export class PointDataService {
         };
       }),
       tap(data=>{
-        if(!relativeMode||!data.coverage){
+        if(!data.coverage){
           return;
         }
-        data.coverage.features.forEach(f=>{
-          f.properties.value = this._computeRelative(f.properties.value,f.properties,layer.relative?.variable);
-        })
+        if(layer.relative){
+          data.coverage.features.forEach(f=>{
+            f.properties.value = this._computeRelative(f.properties.value,f.properties,layer.relative?.variable);
+          });
+        } else if(layer.bin){
+          data.coverage.features.forEach(f=>{
+            f.properties.value = this._bin(f.properties.value,f.properties[layer.bin]);
+          });
+        }
       }),
       map(data=>data.coverage));
   }
