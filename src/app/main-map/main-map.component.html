@@ -1,6 +1,7 @@
 <!--
 <div id="main-map" class="main-map">
  -->
+
 <div>
   <leaflet-map class="main-map"
                [baseMap]="basemap"
@@ -61,16 +62,8 @@
       <div *ngIf="showWindows" class="map-controls">
         <div class="logo-block">
           <div class="title-block">
-            <h1>Global Water Monitor</h1>>
+            <h1>Global Water Monitor</h1>
           </div>
-          <!-- <span class="float-right">
-            <a class="logo" href="http://wald.anu.edu.au/" target="_blank">
-              <img  class="logo"
-                    alt="Centre for Water and Landscape Dynamics"
-                    src="assets/anuwald_round_large_tr.png"
-                    height="50">
-            </a>
-          </span> -->
           <div class="theme-bar float-left">
             <div class="btn-group" role="group">
               <button *ngFor="let lyr of layers" type="button" class="btn btn-primary"
@@ -136,6 +129,9 @@
             {{chartPrompt[polygonMode]}}
           </div>
         </div>
+        <div *ngIf="showWindows" class="logo-block">
+          <app-logo-block></app-logo-block>
+        </div>
       </div>
     </map-control>
 
@@ -153,7 +149,7 @@
         <span>
             Data by <a [href]="layer.attributionURL" target="_blank">{{layer.attribution}}</a>
         </span>
-        <app-logo-block></app-logo-block>
+        <!-- <app-logo-block></app-logo-block> -->
 
       </div>
     </map-control>
@@ -206,9 +202,15 @@
       </div>
     </map-control>
 
+    <!-- <map-control [position]="'BOTTOM_CENTER'">
+      <div *ngIf="showWindows" class="logo-block-standalone map-controls">
+        <app-logo-block></app-logo-block>
+      </div>
+    </map-control> -->
   </leaflet-map>
 </div>
 
 <one-time-splash #splash application="tree-change" klass="about" label="">
   <app-about></app-about>
 </one-time-splash>
+
