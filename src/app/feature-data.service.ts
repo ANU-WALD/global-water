@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core';
 import { Point, Feature, FeatureCollection } from 'geojson';
 import { Observable, forkJoin, of } from 'rxjs';
 import { TimeSeries, MetadataService, OpendapService, UTCDate } from 'map-wald';
-import { map, shareReplay, switchAll } from 'rxjs/operators';
+import { map, shareReplay, switchAll, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LayerDescriptor, MetadataConfig } from './data';
 import { DapData, DapDAS } from 'dap-query-js/dist/dap-query';
 import { HttpClient } from '@angular/common/http';
+import { transpose } from 'ramda';
 
 const DEFAULT_ID_COLUMN = 'ID';
 
@@ -192,10 +193,18 @@ export class FeatureDataService {
 
     let res$ = forkJoin([this.metadata.dasForUrl(url),this.metadata.ddxForUrl(url)]).pipe(
       map(([das,ddx]) => {
-        const size = +ddx.variables[idCol].dimensions[0].size;
-        const rangeQuery = this.dap.dapRangeQuery(0,size-1);
         return forkJoin(variables.map(v => {
-          return this.getDAP(`${url}.ascii?${v}`, das);
+          const retrieval$ = this.getDAP(`${url}.ascii?${v}`, das);
+
+          if(ddx.variables[v].dimensions[0].name===idCol){
+            return retrieval$;
+          }
+          return retrieval$.pipe(
+            map(data => {
+              const result = Object.assign({},data);
+              result[v] = transpose(data[v] as number[][]);
+              return result;
+            }));
         }));
       }),
       switchAll(),
