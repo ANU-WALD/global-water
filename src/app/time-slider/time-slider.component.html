@@ -6,10 +6,25 @@
        [min]="min"
        [max]="max">
 
-<span>{{currentDate}}</span>
+<span>
+  <a [ngbPopover]="popContent"
+     [popoverTitle]="popTitle"
+     placement="bottom"
+     class="some-a">{{currentDate}}</a></span>
 
 
 <!-- 
 <date-selection></date-selection>
 -->
 
+<ng-template #popContent>
+  <ngb-datepicker [minDate]="firstDate"
+                  [maxDate]="lastDate"
+                  [markDisabled]="markDisabled"
+                  [(ngModel)]="ngbDate"
+                  (ngModelChange)="ngbDateChanged($event)"
+                  >
+  </ngb-datepicker>
+
+</ng-template>
+<ng-template #popTitle>Select date</ng-template>
