@@ -221,7 +221,7 @@ export class MainMapComponent implements OnInit {
 
     this.gaEvent('layer','wms', `${this.layer.label}:${(this.date as Date).toUTCString()}`); // + ${this.relative?event.relativeVariable:'-'}
 
-    this.layerSettingsFlat = Object.assign({},this.layer,this.selectedVariant);
+    this.flattenLayer();
     this.wmsParams = null;
 
     if(this.layerSettingsFlat.type==='grid'){
@@ -230,6 +230,10 @@ export class MainMapComponent implements OnInit {
     } else {
       this.setupPointLayer();
     }
+  }
+
+  private flattenLayer() {
+    this.layerSettingsFlat = Object.assign({}, this.layer, this.selectedVariant);
   }
 
   private setupPointLayer(): void {
@@ -293,14 +297,10 @@ export class MainMapComponent implements OnInit {
   configureWMSLegend(): void {
     this.legend = LegendUtils.resetLegend();
 
-    if(!this.layerSettingsFlat?.metadata){
-      return;
-    }
-
-    const url = InterpolationService.interpolate(
-      this.layerSettingsFlat.metadata,this.layerSettingsFlat);
-
-    this.http.get(url).subscribe((metadata: LegendResponse)=>{
+    this.layersService.getLayerMetadata(this.layerSettingsFlat).subscribe(metadata=>{
+      if(!metadata){
+        return;
+      }
       this.legend = LegendUtils.makeLegend(metadata,this.layerSettingsFlat.legendLabels);
     });
   }
@@ -342,6 +342,7 @@ export class MainMapComponent implements OnInit {
     this.selectedVariant = this.layerVariants[0];
 
     if(this.layer){
+      this.flattenLayer();
       this.initLayerDates();
     }
 
@@ -363,7 +364,7 @@ export class MainMapComponent implements OnInit {
 
   initLayerDates() {
     this.date = this.layersService.constrainDate(this.date,this.layer); // Necessary?
-    this.layersService.availableDates(this.layer).subscribe(dates=>{
+    this.layersService.availableDates(this.layerSettingsFlat).subscribe(dates=>{
       this.layerDates = dates;
 
       if(this.layer.timePeriod?.format){

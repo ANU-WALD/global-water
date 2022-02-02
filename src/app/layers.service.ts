@@ -1,11 +1,11 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map, publishReplay, refCount, switchAll, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { LayerDescriptor } from './data';
-import { DateRange, UTCDate } from 'map-wald';
+import { DateRange, InterpolationService, UTCDate } from 'map-wald';
 import { FeatureDataService } from './feature-data.service';
+import { CacheService } from './cache.service';
 
 const DEFAULT_ATTRIBUTION_TEXT='ANU Centre for Water and Landscape Dynamics';
 const DEFAULT_ATTRIBUTION_URL='http://wald.anu.edu.au/';
@@ -20,7 +20,7 @@ const DEFAULT_LAYER_SETTINGS={
 export class LayersService {
   layerConfig$: Observable<LayerDescriptor[]>;
 
-  constructor(private http: HttpClient,
+  constructor(private http: CacheService,
               private featureData: FeatureDataService) {
     const url = `${environment.layerConfig}?_=${(new Date()).getTime()}`;
     this.layerConfig$ = this.http.get(url).pipe(
@@ -107,11 +107,21 @@ export class LayersService {
   }
 
   availableDates(lyr:LayerDescriptor): Observable<UTCDate[]>{
-    if(!lyr.timePeriod){
+    if(!lyr?.timePeriod){
       return of([]);
     }
 
     if(lyr.type==='grid'){
+      if(lyr.metadata){
+        return this.getLayerMetadata(lyr).pipe(
+          map(metadata=>{
+            const dates = ((metadata.dates_iso8601||[]) as string[]).map(d=>new Date(d));
+            return dates;
+          })
+        );
+      }
+
+
       const interval = lyr.timePeriod.interval || {days:1};
       let d = lyr.timePeriod.start;
       const result:UTCDate[] = [];
@@ -133,5 +143,16 @@ export class LayersService {
     }
 
     return this.featureData.getTimes(lyr);
+  }
+
+  getLayerMetadata(flatLayer:LayerDescriptor): Observable<any>{
+    if(!flatLayer?.metadata){
+      return of(null);
+    }
+
+    const url = InterpolationService.interpolate(
+      flatLayer.metadata,flatLayer);
+
+    return this.http.get(url);
   }
 }
