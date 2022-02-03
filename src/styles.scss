@@ -37,12 +37,19 @@ $navbar-height: 0px;
   // background: white;
   // background: transparent;
 
-  padding: 10px;
-  width: 750px;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  width: 625px;
 
   h5 {
     color: $primary;
   }
+}
+
+.variant-selection {
+  width:200px;
 }
 
 .chart-control, .map-controls, .display-settings, .map-legend {
@@ -117,7 +124,7 @@ label {
   float: right;
   display: inline-block;
 
-  padding-left:30px;
+  // padding-left:30px;
   padding-top:8px;
 }
 

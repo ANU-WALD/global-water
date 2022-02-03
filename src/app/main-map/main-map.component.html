@@ -64,23 +64,26 @@
           <div class="title-block">
             <h1>Global Water Monitor</h1>
           </div>
-          <div class="theme-bar float-left">
-            <div class="btn-group" role="group">
-              <button *ngFor="let lyr of layers" type="button" class="btn btn-primary"
-                      [ngClass]="{'active':lyr===layer}"
-                      [ngbTooltip]="lyr.label"
-                      (click)="setLayer(lyr)">
-                <span *ngIf="!lyr.icon">{{lyr.label}}</span>
-                <i *ngIf="lyr.icon" class="fa" [ngClass]="lyr.icon"></i>
-              </button>
-            </div>
-            <div *ngIf="layerVariants?.length" class='float-right'>
-              <select class="form-control" 
-                      [(ngModel)]="selectedVariant"
-                      (ngModelChange)="variantChanged($event)"
-                      [ngbTooltip]="'Variant'">
-                <option *ngFor="let variant of layerVariants" [ngValue]="variant">{{variant.variantLabel}}</option>
-              </select>
+          <div class="row">
+            <div class="theme-bar float-left">
+              <div class="btn-group" role="group">
+                <button *ngFor="let lyr of layers" type="button" class="btn btn-primary"
+                        [ngClass]="{'active':lyr===layer}"
+                        [ngbTooltip]="lyr.label"
+                        (click)="setLayer(lyr)">
+                  <span *ngIf="!lyr.icon">{{lyr.label}}</span>
+                  <i *ngIf="lyr.icon" class="fa" [ngClass]="lyr.icon"></i>
+                </button>
+              </div>
+              <div class='float-right'>
+                  <select class="form-control variant-selection" 
+                        [(ngModel)]="selectedVariant"
+                        [disabled]="!layerVariants?.length"
+                        (ngModelChange)="variantChanged($event)"
+                        [ngbTooltip]="'Variant'">
+                  <option *ngFor="let variant of layerVariants" [ngValue]="variant">{{variant.variantLabel}}</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
