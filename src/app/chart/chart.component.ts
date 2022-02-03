@@ -90,7 +90,7 @@ export class ChartComponent implements OnInit, OnChanges {
         // range: yRange
       },
       height: 200,
-      width: 370, //600,
+      width: 520, //600,
       title: this.title,
       showlegend: false
     },

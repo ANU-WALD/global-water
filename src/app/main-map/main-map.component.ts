@@ -108,7 +108,7 @@ export class MainMapComponent implements OnInit {
   chartPolygonLabel: string;
   legend = LegendUtils.resetLegend();
 
-  polygonMode: 'point' | 'predefined' | 'draw' = 'predefined';
+  polygonMode: 'point' | 'predefined' | 'draw' = 'point';
   chartPrompt = CHART_PROMPTS;
 
   layerVariants:LayerVariant[] = [];
