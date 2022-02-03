@@ -1,3 +1,11 @@
+<span class="float-left">Select date</span>
+<span class="float-right">
+  <a [ngbPopover]="popContent"
+     [popoverTitle]="popTitle"
+     [autoClose]="'outside'"
+     placement="bottom"
+     class="some-a">{{currentDate}}</a></span>
+
 <input type="range"
        class="time-slider"
        [(ngModel)]="currentStep"
@@ -5,12 +13,6 @@
        [min]="min"
        [max]="max">
 
- <span>
-  <a [ngbPopover]="popContent"
-     [popoverTitle]="popTitle"
-     [autoClose]="'outside'"
-     placement="bottom"
-     class="some-a">{{currentDate}}</a></span>
 
 <ng-template #popContent>
   <ngb-datepicker [minDate]="firstDate"
