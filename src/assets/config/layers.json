@@ -34,19 +34,8 @@
       "name": "RdYlBu",
       "count": 11,
       "reverse": false
-    }
-  },
-  {
-    "type":"grid",
-    "source":"custom",
-    "label":"Precipitation",
-    "icon":"",
-    "metadata":"$mswx_meta$",
-    "url":"$mswx_url$",
-    "variable":"MSWX_precipitation_GWM",
-    "polygonDrill":"$mswx_drill$",
-    "mapParams":"$mswx_params$",
-    "legendLabels":[
+    },
+    "preciptation_labels":[
       "> 1000 mm/mo",
       "750 - 1000 mm/mo",
       "500 - 750 mm/mo",
@@ -58,18 +47,7 @@
       "5 - 25 mm/mo",
       "< 5mm/mo"
     ],
-    "timePeriod":"$mswx_time$"
-  },
-  {
-    "type":"grid",
-    "source":"custom",
-    "label":"Temperature",
-    "icon":"",
-    "metadata":"$mswx_meta$",
-    "url":"$mswx_url$",
-    "polygonDrill":"$mswx_drill$",
-    "mapParams":"$mswx_params$",
-    "legendLabels":[
+    "temp_labels":[
       ">35",
       "30 - 35",
       "25 - 30",
@@ -81,7 +59,66 @@
       "-10 - 0",
       "-20 - -10",
       "<-20"
-    ],
+    ]
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Climate",
+    "icon":"",
+    "metadata":"$mswx_meta$",
+    "url":"$mswx_url$",
+    "timePeriod":"$mswx_time$",
+    "variants":[
+      {
+        "variantLabel":"Precipitation",
+        "variable":"MSWX_precipitation_GWM",
+        "legendLabels":"$preciptation_labels$"
+      },
+      {
+        "variantLabel":"Average temperature",
+        "variable":"MSWX_air_temperature_GWM",
+        "legendLabels":"$temp_labels$"
+      },
+      {
+        "variantLabel":"Minimum temperature",
+        "variable":"MSWX_tmin_air_temperature_GWM",
+        "legendLabels":"$temp_labels$"
+      },
+      {
+        "variantLabel":"Maximum temperature",
+        "variable":"MSWX_tmax_air_temperature_GWM",
+        "legendLabels":"$temp_labels$"
+      },
+      {
+        "variantLabel":"Humidity",
+        "variable":"MSWX_relative_humidity"
+      }
+    ]
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Precipitation",
+    "icon":"",
+    "metadata":"$mswx_meta$",
+    "url":"$mswx_url$",
+    "variable":"MSWX_precipitation_GWM",
+    "polygonDrill":"$mswx_drill$",
+    "mapParams":"$mswx_params$",
+    "legendLabels":"$preciptation_labels$",
+    "timePeriod":"$mswx_time$"
+  },
+  {
+    "type":"grid",
+    "source":"custom",
+    "label":"Temperature",
+    "icon":"",
+    "metadata":"$mswx_meta$",
+    "url":"$mswx_url$",
+    "polygonDrill":"$mswx_drill$",
+    "mapParams":"$mswx_params$",
+    "legendLabels":"$temp_labels$",
     "timePeriod":"$mswx_time$",
     "variants":[
       {
@@ -189,7 +226,7 @@
   },
   {
     "type":"point",
-    "label":"Streamflow",
+    "label":"Rivers",
     "icon":"",
     "filename":"ub8/global/GRALM/Global_River_Discharge_GSGR (2000-present).nc",
     "relatedFiles":[
@@ -287,7 +324,7 @@
   {
     "type":"grid",
     "source":"custom",
-    "label":"Soil Moisture",
+    "label":"Soil water",
     "icon":"",
     "metadata":"https://c3s-sm-mtmenipwta-ts.a.run.app/config?layer={{variable}}",
     "url":"https://c3s-sm-mtmenipwta-ts.a.run.app/wms",
