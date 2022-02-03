@@ -69,6 +69,8 @@
     "metadata":"$mswx_meta$",
     "url":"$mswx_url$",
     "timePeriod":"$mswx_time$",
+    "polygonDrill":"$mswx_drill$",
+    "mapParams":"$mswx_params$",
     "variants":[
       {
         "variantLabel":"Precipitation",
