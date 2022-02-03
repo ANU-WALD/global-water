@@ -9,11 +9,18 @@ const TICK_FREQUENCY = 5; // years
 
 const SLIDER_STYLE = `input[type="range"].time-slider::-moz-range-track {
   background: {{gradient}}
+  height:5px !important;
 }
 
 
-input[type="range"]::-webkit-slider-runnable-track {
+input[type="range"].time-slider::-webkit-slider-runnable-track {
+  height:5px !important;
   background: {{gradient}}
+}
+
+input[type=range].time-slider::-webkit-slider-thumb {
+	position: relative;
+  top: -5px;
 }
 `;
 const GRADIENT = 'linear-gradient(to right, ';
