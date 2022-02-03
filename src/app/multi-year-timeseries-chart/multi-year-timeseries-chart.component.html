@@ -12,7 +12,7 @@
       <button class="float-right btn btn-sm btn-primary btn-download" (click)="downloadClick()">Download</button>
     </div>
   </div>
-  <p *ngIf="chartLabel">{{chartLabel}}</p>
+  <p *ngIf="chartLabel" class="chart-title"><strong>{{chartLabel}}</strong></p>
   <app-chart [series]="effectiveChartSeries"
              axisLabel=""
              x="date"
