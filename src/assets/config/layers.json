@@ -97,68 +97,6 @@
     ]
   },
   {
-    "type":"grid",
-    "source":"custom",
-    "label":"Precipitation",
-    "icon":"",
-    "metadata":"$mswx_meta$",
-    "url":"$mswx_url$",
-    "variable":"MSWX_precipitation_GWM",
-    "polygonDrill":"$mswx_drill$",
-    "mapParams":"$mswx_params$",
-    "legendLabels":"$preciptation_labels$",
-    "timePeriod":"$mswx_time$"
-  },
-  {
-    "type":"grid",
-    "source":"custom",
-    "label":"Temperature",
-    "icon":"",
-    "metadata":"$mswx_meta$",
-    "url":"$mswx_url$",
-    "polygonDrill":"$mswx_drill$",
-    "mapParams":"$mswx_params$",
-    "legendLabels":"$temp_labels$",
-    "timePeriod":"$mswx_time$",
-    "variants":[
-      {
-        "variantLabel":"Average (binned)",
-        "variable":"MSWX_air_temperature_GWM"
-      },
-      {
-        "variantLabel":"Average (continuous)",
-        "variable":"MSWX_air_temperature"
-      },
-      {
-        "variantLabel":"Minimum (binned)",
-        "variable":"MSWX_tmin_air_temperature_GWM"
-      },
-      {
-        "variantLabel":"Minimum (continuous)",
-        "variable":"MSWX_tmin_air_temperature"
-      },
-      {
-        "variantLabel":"Maximum (binned)",
-        "variable":"MSWX_tmax_air_temperature_GWM"
-      },
-      {
-        "variantLabel":"Maximum (continuous)",
-        "variable":"MSWX_tmax_air_temperature"
-      }
-    ]
-  },
-  {
-    "type":"grid",
-    "source":"custom",
-    "label":"Humidity",
-    "icon":"",
-    "url":"$mswx_url$",
-    "variable":"MSWX_relative_humidity",
-    "polygonDrill":"$mswx_drill$",
-    "mapParams":"$mswx_params$",
-    "timePeriod":"$mswx_time$"
-  },
-  {
     "type":"point",
     "label":"Waterbodies",
     "icon":"",
