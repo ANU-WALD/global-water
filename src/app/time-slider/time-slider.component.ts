@@ -1,6 +1,22 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { UTCDate } from 'map-wald';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { InterpolationService, UTCDate } from 'map-wald';
 import * as d3 from 'd3';
+
+const TICK_COLOUR='#000';
+const BACKGROUND_COLOUR='#58723C';
+const TICK_SIZE=0.2;//%
+const TICK_FREQUENCY = 5; // years
+
+const SLIDER_STYLE = `input[type="range"].time-slider::-moz-range-track {
+  background: {{gradient}}
+}
+
+
+input[type="range"]::-webkit-slider-runnable-track {
+  background: {{gradient}}
+}
+`;
+const GRADIENT = 'linear-gradient(to right, ';
 
 @Component({
   selector: 'app-time-slider',
@@ -25,8 +41,9 @@ export class TimeSliderComponent implements OnChanges {
   min = 0;
   max = 1;
   markDisabled: (d:any)=>boolean;
+  styleElement: HTMLStyleElement;
 
-  constructor() {
+  constructor(private el: ElementRef) {
 
     this.markDisabled = (d:any) => {
       return this.isDisabled(d);
@@ -57,6 +74,43 @@ export class TimeSliderComponent implements OnChanges {
     this.firstDate = this.fromDate(this.dates[0]);
     this.lastDate = this.fromDate(this.dates[this.max]);
     this.stepChanged(false);
+    this.createSliderStyles();
+  }
+
+  createSliderStyles(): void {
+    let newElement = false;
+    if(!this.styleElement){
+      this.styleElement = document.createElement('style');
+      newElement = true;
+    } else {
+      this.styleElement.firstChild?.remove();
+    }
+
+    const styleText = InterpolationService.interpolate(SLIDER_STYLE, {gradient: this.makeGradient()});
+    this.styleElement.appendChild(document.createTextNode(styleText));
+
+    if(newElement){
+      this.el.nativeElement.appendChild(this.styleElement);
+    }
+  }
+
+  makeGradient(): string {
+    const years = this.dates.map((d=>d.getUTCFullYear()));
+    const changeOfYearIndices = years.map((y,i)=>i?(years[i]===years[i-1]?-1:i):-1).filter(i=>i>=0);
+    let changeOfYearPercentages = changeOfYearIndices.map(i=>+(100*i/this.dates.length).toFixed(2));
+
+    changeOfYearPercentages = changeOfYearPercentages.filter((_,i)=>(i%TICK_FREQUENCY)==0)
+    const gradient = changeOfYearPercentages.map(p=>{
+      return `${BACKGROUND_COLOUR} ${(p-TICK_SIZE)}%,
+      ${TICK_COLOUR} ${(p-TICK_SIZE)}%,
+      ${TICK_COLOUR} ${(p+TICK_SIZE)}%,
+      ${BACKGROUND_COLOUR} ${(p+TICK_SIZE)}%`;
+    }).join(', \n');
+    const style = `${GRADIENT}
+      ${BACKGROUND_COLOUR},
+      ${gradient},
+      ${BACKGROUND_COLOUR} 100%);`;
+    return style;
   }
 
   stepChanged(userSet: boolean) {
@@ -106,7 +160,6 @@ export class TimeSliderComponent implements OnChanges {
 
   ngbDateChanged(d:any) {
     const date = this.toDate(d);
-    console.log(d,date);
     this.currentStep = this.dates.findIndex(d=>{
       return d.getUTCFullYear()===date.getUTCFullYear() &&
              d.getUTCMonth()===date.getUTCMonth() &&
