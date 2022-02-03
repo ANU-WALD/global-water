@@ -97,6 +97,35 @@
     ]
   },
   {
+    "type":"grid",
+    "source":"custom",
+    "label":"Soil water",
+    "icon":"",
+    "metadata":"https://c3s-sm-mtmenipwta-ts.a.run.app/config?layer={{variable}}",
+    "url":"https://c3s-sm-mtmenipwta-ts.a.run.app/wms",
+    "variable":"C3S-SoilMoisture",
+    "X":"https://c3s-sm-mtmenipwta-ts.a.run.app/wms?service=WMS&request=GetMap&layers=C3S-SoilMoisture&styles=&format=image%2Fpng&transparent=true&version=1.1.1&height=256&width=256&srs=EPSG%3A3857&time=2020-12-01T00%3A00%3A00.000Z&bbox=7514065.628545968,2504688.542848655,10018754.171394622,5009377.085697314",
+    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/c3s-sm-tx",
+    "mapParams":"$mswx_params$",
+    "timePeriod":{
+      "start":2000,
+      "end":2020,
+      "interval":{
+        "months":1
+      }
+    },
+    "legendLabels":[
+      "0.35-0.40",
+      "0.30-0.35",
+      "0.25-0.30",
+      "0.20-0.25",
+      "0.15-0.20",
+      "0.10-0.15",
+      "0.05-0.10",
+      "0.00-0.05"
+    ]
+  },
+  {
     "type":"point",
     "label":"Waterbodies",
     "icon":"",
@@ -257,35 +286,6 @@
           "reverse": false
         }
       }
-    ]
-  },
-  {
-    "type":"grid",
-    "source":"custom",
-    "label":"Soil water",
-    "icon":"",
-    "metadata":"https://c3s-sm-mtmenipwta-ts.a.run.app/config?layer={{variable}}",
-    "url":"https://c3s-sm-mtmenipwta-ts.a.run.app/wms",
-    "variable":"C3S-SoilMoisture",
-    "X":"https://c3s-sm-mtmenipwta-ts.a.run.app/wms?service=WMS&request=GetMap&layers=C3S-SoilMoisture&styles=&format=image%2Fpng&transparent=true&version=1.1.1&height=256&width=256&srs=EPSG%3A3857&time=2020-12-01T00%3A00%3A00.000Z&bbox=7514065.628545968,2504688.542848655,10018754.171394622,5009377.085697314",
-    "polygonDrill":"https://australia-southeast1-wald-1526877012527.cloudfunctions.net/c3s-sm-tx",
-    "mapParams":"$mswx_params$",
-    "timePeriod":{
-      "start":2000,
-      "end":2020,
-      "interval":{
-        "months":1
-      }
-    },
-    "legendLabels":[
-      "0.35-0.40",
-      "0.30-0.35",
-      "0.25-0.30",
-      "0.20-0.25",
-      "0.15-0.20",
-      "0.10-0.15",
-      "0.05-0.10",
-      "0.00-0.05"
     ]
   }
 ]
