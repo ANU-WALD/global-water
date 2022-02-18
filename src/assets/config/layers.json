@@ -159,6 +159,7 @@
     "variants":[
       {
         "variantLabel":"Storage",
+        "units": "GL",
         "palette": {
           "name": "YlGnBu",
           "count": 6,
@@ -235,6 +236,7 @@
     "variants":[
       {
         "variantLabel":"Current",
+        "units": "m&sup3;/s",
         "breaks":[
           0,
           100,

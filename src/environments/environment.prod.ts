@@ -4,7 +4,7 @@ export const environment = {
   layerConfig:'assets/config/layers.json',
   basemapConfig:'assets/config/basemaps.json',
   vectorConfig:'assets/config/foci.json',
-  tds:'http://dapds00.nci.org.au/thredds',
+  tds:'https://dapds00.nci.org.au/thredds',
   pointConfig:'assets/config/points.json',
   geojsons: 'assets/selection_layers/',
   attributeTranslations:'assets/lookups.json',

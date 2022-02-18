@@ -1,5 +1,5 @@
 import { RangeStyle } from "map-wald";
-import { LegendResponse } from "./data";
+import { FlattenedLayerDescriptor, LegendResponse } from "./data";
 import * as R from 'ramda';
 import { makeColour } from "map-wald-leaflet";
 
@@ -62,10 +62,17 @@ export class LegendUtils {
     return result;
   }
 
-  static makePointLegend(palette: string[], fill: RangeStyle<string>, labels?: string[]): LegendConfig {
+  static makePointLegend(palette: string[], fill: RangeStyle<string>, layer?: FlattenedLayerDescriptor): LegendConfig {
+    let labels = layer?.legendLabels;
+    if(!labels){
+      labels = LegendUtils.getLabels(fill).reverse();
+      if(layer.units){
+        labels = labels.map(l => `${l} ${layer.units}`);
+      }
+    } 
     return {
       colours: palette.slice().reverse(),
-      labels: labels || LegendUtils.getLabels(fill).reverse(),// Should be significant digits
+      labels: labels,// Should be significant digits
       shape: ['circle']
     };
   }

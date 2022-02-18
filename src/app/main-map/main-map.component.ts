@@ -291,7 +291,7 @@ export class MainMapComponent implements OnInit {
     this.siteStyles.fill = new RangeStyle('value',palette,breaks);
     // this.siteSize = new RangeStyle('value',[1,2,3,5,8,13,21],breaks);
     this.siteStyles.size = new RangeStyle('value',[5,5,5,5,5,5,5],breaks);
-    this.legend = LegendUtils.makePointLegend(palette,this.siteStyles.fill,this.layerSettingsFlat.legendLabels);
+    this.legend = LegendUtils.makePointLegend(palette,this.siteStyles.fill,this.layerSettingsFlat);
   }
 
   configureWMSLegend(): void {
