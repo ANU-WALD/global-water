@@ -36,7 +36,7 @@ const FULL_EXTENT: Bounds = {
 };
 const DATA_COLUMNS=['date','value'];
 const DEFAULT_DELTA_OFFSET=-50;
-const INITIAL_OPACITY=75;//%
+const INITIAL_OPACITY=50;//%
 const DEFAULT_PALETTE:PaletteDescriptor = {
   name:'YlOrBr',
   count:6,
