@@ -74,26 +74,31 @@
     "variants":[
       {
         "variantLabel":"Precipitation",
+        "units": "mm/mo",
         "variable":"MSWX_precipitation_GWM",
         "legendLabels":"$preciptation_labels$"
       },
       {
         "variantLabel":"Average temperature",
+        "units": "&deg;C",
         "variable":"MSWX_air_temperature_GWM",
         "legendLabels":"$temp_labels$"
       },
       {
         "variantLabel":"Minimum temperature",
+        "units": "&deg;C",
         "variable":"MSWX_tmin_air_temperature_GWM",
         "legendLabels":"$temp_labels$"
       },
       {
         "variantLabel":"Maximum temperature",
+        "units": "&deg;C",
         "variable":"MSWX_tmax_air_temperature_GWM",
         "legendLabels":"$temp_labels$"
       },
       {
         "variantLabel":"Humidity",
+        "units": "%",
         "variable":"MSWX_relative_humidity"
       }
     ]
@@ -125,7 +130,8 @@
       "0.10-0.15",
       "0.05-0.10",
       "0.00-0.05"
-    ]
+    ],
+    "units":"?"
   },
   {
     "type":"point",

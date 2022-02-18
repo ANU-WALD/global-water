@@ -52,6 +52,7 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
         this.effectiveChartSeries = [
           {
             title: this.chartSeries.title,
+            units: this.chartSeries.units,
             data: convertToMonthlyVariance(this.chartSeries.data)
           }
         ];
@@ -65,6 +66,7 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
         this.effectiveChartSeries = years.map((yr,i)=>{
           const result:ChartSeries = {
             title: `${this.chartSeries.title}: ${yr}`,
+            units: this.chartSeries.units,
             data: groups[yr.toString()].map(r=>{
               const d = new Date(r.date as Date);
               d.setUTCFullYear(maxYear);
@@ -87,6 +89,7 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
           const seriesLen = 12;
           const result = {
             title: lbl,
+            units: this.chartSeries.units,
             data: R.range(0,seriesLen).map(i=>{
               const d = new Date(Date.UTC(maxYear,i,15));
               const seriesSummary = this.effectiveChartSeries.map(s=>{

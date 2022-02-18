@@ -309,15 +309,16 @@ export class MainMapComponent implements OnInit {
     this.setupChart(null,null);
   }
 
-  setupChart(title: string, chartData: ChartEntry[]): void{
-    if(!chartData) {
+  setupChart(layer: LayerDescriptor, chartData: ChartEntry[]): void{
+    if(!layer||!chartData) {
       this.chartPolygonLabel=null;
       this.rawChartData = null;
       return;
     }
 
     this.rawChartData = {
-      title,
+      title:layer.label,
+      units: layer.units,
       data:chartData
     };
   }
@@ -416,7 +417,7 @@ export class MainMapComponent implements OnInit {
           value:timeseries.values[i]
         };
       }).filter(row=>(row.value!==null)&&!isNaN(row.value));
-      this.setupChart(layer.label,chartData);
+      this.setupChart(this.layerSettingsFlat,chartData);
       if(this.layer.chartLabel){
         this.chartPolygonLabel = InterpolationService.interpolate(this.layer.chartLabel,geoJSON.properties);
       } else {
@@ -461,7 +462,7 @@ export class MainMapComponent implements OnInit {
   }
 
   private chartPolygonTimeSeries() {
-    const layer = this.layer;
+    const layer = this.layerSettingsFlat;
     if (!layer.polygonDrill||!this.selectedPolygonFeature) {
       return;
     }
@@ -471,7 +472,7 @@ export class MainMapComponent implements OnInit {
         return;
       }
 
-      if(layer!==this.layer){
+      if(layer!==this.layerSettingsFlat){
         return;
       }
 
@@ -494,7 +495,7 @@ export class MainMapComponent implements OnInit {
       if ((this.selectedPolygonFeature.properties.source!==CUSTOM_POLYGON)&&this.vectorLayer.label) {
         this.chartPolygonLabel = InterpolationService.interpolate(this.vectorLayer.label, this.selectedPolygonFeature.properties);
       }
-      this.setupChart(layer.label, data as ChartEntry[]);
+      this.setupChart(this.layerSettingsFlat, data as ChartEntry[]);
     });
   }
 

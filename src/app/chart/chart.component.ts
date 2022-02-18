@@ -11,6 +11,7 @@ export interface ChartEntry {
 export interface ChartSeries {
   title: string;
   data: ChartEntry[];
+  units: string;
   colour?: string;
   mode?:string;
   markerSize?:number;
@@ -76,16 +77,17 @@ export class ChartComponent implements OnInit, OnChanges {
       };
     }).reverse();
 
+    const axisTitle = this.axisLabel || this.series[0].units || '';
     Plotly.plot(node, series, {
       margin: {
-        t: 30,
-        l: this.axisLabel ? 35 : 20,
+        t: 40,
+        l: axisTitle ? 50 : 30,
         r: 10,
-        b: 20
+        b: 30
       },
       yaxis: {
         hoverformat: '.2f',
-        title: this.axisLabel || '',
+        title: axisTitle,
         fixedrange: true,
         // range: yRange
       },
