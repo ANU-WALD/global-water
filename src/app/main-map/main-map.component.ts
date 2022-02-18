@@ -66,6 +66,7 @@ export class MainMapComponent implements OnInit {
 
   layerDates: UTCDate[] = [];
   dateFormat = '%B/%Y';
+  focusYear = -1;
 
   mapConfig = {
     latLngSelection: false,
@@ -145,7 +146,7 @@ export class MainMapComponent implements OnInit {
     this.layersService.layerConfig$.subscribe(layers=>{
       this.layers = layers;
       const initialLayer = this.layers[0];
-      this.date = initialLayer.timePeriod?.end;
+      this.setDate(initialLayer.timePeriod?.end);
       this.setLayer(initialLayer);
     });
   }
@@ -181,6 +182,7 @@ export class MainMapComponent implements OnInit {
   }
 
   dateChange(): void {
+    this.setDate(this.date);
     this.setupDataOverlayLayer();
   }
 
@@ -364,7 +366,7 @@ export class MainMapComponent implements OnInit {
   }
 
   initLayerDates() {
-    this.date = this.layersService.constrainDate(this.date,this.layer); // Necessary?
+    this.setDate(this.layersService.constrainDate(this.date,this.layer)); // Necessary?
     this.layersService.availableDates(this.layerSettingsFlat).subscribe(dates=>{
       this.layerDates = dates;
 
@@ -381,6 +383,11 @@ export class MainMapComponent implements OnInit {
         }
       }
     });
+  }
+
+  setDate(newDate: UTCDate) {
+    this.date = newDate; // Necessary?
+    this.focusYear = this.date.getUTCFullYear();
   }
 
   displayOptionsChanged(event: DisplaySettings): void {

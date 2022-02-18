@@ -18,6 +18,7 @@ const CM_YR_ON_YR_CUMUL='Year on year (cumulative)';
 export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
   @Input() chartSeries: ChartSeries;
   @Input() chartLabel = '';
+  @Input() focusYear = -1;
 
   chartModes = [CM_NORMAL,CM_DEVIATION,CM_YR_ON_YR,CM_YR_ON_YR_CUMUL];
   chartMode = CM_YR_ON_YR;
@@ -28,8 +29,8 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
   constructor() { }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if(changes.chartSeries){
-      this.configureChartMode()      
+    if(changes.chartSeries||changes.focusYear){
+      this.configureChartMode();
     }
   }
 
@@ -84,6 +85,13 @@ export class MultiYearTimeseriesChartComponent implements OnInit, OnChanges {
 
           return result;
         });
+        if(this.focusYear>0){
+          const idx = years.indexOf(this.focusYear);
+          if(idx>0){
+            const focusYear = this.effectiveChartSeries.splice(idx,1)[0];
+            this.effectiveChartSeries.splice(0,0,focusYear);
+          }
+        }
 
         const makeExtremity = (lbl:string,fn:((...arr:number[])=>number),pos:string) => {
           const seriesLen = 12;
