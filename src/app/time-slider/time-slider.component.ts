@@ -45,6 +45,8 @@ export class TimeSliderComponent implements OnChanges {
   oldStep = -1;
   currentDate = ''
   currentStep = 0;
+  tooltipDate = '';
+  tooltipPos = '0px';
   min = 0;
   max = 1;
   markDisabled: (d:any)=>boolean;
@@ -128,10 +130,14 @@ export class TimeSliderComponent implements OnChanges {
     }
 
     this.date = this.dates[this.currentStep];
-    this.currentDate = d3.time.format(this.format)(this.date);
+    this.currentDate = this.txtDate(this.date);
     this.dateChange.emit(this.date);
     this.ngbDate = this.fromDate(this.date);
     this.oldStep = this.currentStep;
+  }
+
+  txtDate(d:UTCDate):string{
+    return d3.time.format(this.format)(d);
   }
 
   fromDate(d:UTCDate):any {
@@ -173,5 +179,15 @@ export class TimeSliderComponent implements OnChanges {
              d.getUTCDate()===date.getUTCDate();
     });
     this.stepChanged(true);
+  }
+
+  mousemove(event:MouseEvent){
+    const target = event.target as HTMLElement;
+    const pos = Math.round(this.dates.length * (event.offsetX)/ target.clientWidth);
+    const date = this.txtDate(this.dates[pos]);
+    setTimeout(()=>{
+      this.tooltipDate = date;
+      this.tooltipPos = event.offsetX +'px';
+    });
   }
 }
