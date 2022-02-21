@@ -45,8 +45,11 @@ export class TimeSliderComponent implements OnChanges {
   oldStep = -1;
   currentDate = ''
   currentStep = 0;
+
+  tooltipStep = 0;
   tooltipDate = '';
   tooltipPos = '0px';
+
   min = 0;
   max = 1;
   markDisabled: (d:any)=>boolean;
@@ -183,11 +186,16 @@ export class TimeSliderComponent implements OnChanges {
 
   mousemove(event:MouseEvent){
     const target = event.target as HTMLElement;
-    const pos = Math.round(this.dates.length * (event.offsetX)/ target.clientWidth);
-    const date = this.txtDate(this.dates[pos]);
+    this.tooltipStep = Math.round(this.dates.length * (event.offsetX)/ target.clientWidth);
+    const date = this.txtDate(this.dates[this.tooltipStep]);
     setTimeout(()=>{
       this.tooltipDate = date;
       this.tooltipPos = event.offsetX +'px';
     });
+  }
+
+  selectTooltipDate(): void {
+    this.currentStep = this.tooltipStep;
+    this.stepChanged(true);
   }
 }

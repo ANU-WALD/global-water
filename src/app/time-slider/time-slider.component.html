@@ -19,7 +19,8 @@
        (mousemove)="mousemove($event)">
 <div *ngIf="tooltipDate"
      class="slider-tooltip"
-     [ngStyle]="{left:tooltipPos}">
+     [ngStyle]="{left:tooltipPos}"
+     (click)="selectTooltipDate()">
   <p>{{tooltipDate}}</p>
 </div>
 </div>
