@@ -6,6 +6,7 @@ const TICK_COLOUR='#000';
 const BACKGROUND_COLOUR='#58723C';
 const TICK_SIZE=0.2;//%
 const TICK_FREQUENCY = 5; // years
+const MOUSE_LEAVE_DEBOUNCE=1500; // ms
 
 const SLIDER_STYLE = `input[type="range"].time-slider::-moz-range-track {
   background: {{gradient}}
@@ -46,6 +47,7 @@ export class TimeSliderComponent implements OnChanges {
   currentDate = ''
   currentStep = 0;
 
+  mouseHere = false;
   tooltipStep = 0;
   tooltipDate = '';
   tooltipPos = '0px';
@@ -185,6 +187,7 @@ export class TimeSliderComponent implements OnChanges {
   }
 
   mousemove(event:MouseEvent){
+    this.mouseHere = true;
     const target = event.target as HTMLElement;
     this.tooltipStep = Math.round(this.dates.length * (event.offsetX)/ target.clientWidth);
     const date = this.txtDate(this.dates[this.tooltipStep]);
@@ -192,6 +195,18 @@ export class TimeSliderComponent implements OnChanges {
       this.tooltipDate = date;
       this.tooltipPos = event.offsetX +'px';
     });
+  }
+
+  mouseleave(): void {
+    this.mouseHere = false;
+    setTimeout(()=>{
+      if(this.mouseHere){
+        return;
+      }
+      this.tooltipStep = -1;
+      this.tooltipDate = '';
+      this.tooltipPos = '';
+    }, MOUSE_LEAVE_DEBOUNCE);
   }
 
   selectTooltipDate(): void {

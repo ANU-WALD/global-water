@@ -16,11 +16,14 @@
        (ngModelChange)="stepChanged(true)"
        [min]="min"
        [max]="max"
-       (mousemove)="mousemove($event)">
+       (mousemove)="mousemove($event)"
+       (mouseleave)="mouseleave()">
 <div *ngIf="tooltipDate"
      class="slider-tooltip"
      [ngStyle]="{left:tooltipPos}"
-     (click)="selectTooltipDate()">
+     (click)="selectTooltipDate()"
+     (mouseleave)="mouseleave()"
+     (mousemove)="mouseHere=true">
   <p>{{tooltipDate}}</p>
 </div>
 </div>
