@@ -7,6 +7,7 @@ import { VectorLayerDescriptor } from 'map-wald-leaflet';
   styleUrls: ['./vector-layer-selection.component.scss']
 })
 export class VectorLayerSelectionComponent implements OnInit, OnChanges {
+  @Input() vectorLayer: VectorLayerDescriptor = null;
   @Input() vectorLayers: VectorLayerDescriptor[] = [];
   @Input() currentZoom: number;
   @Input() enabled = true;
@@ -23,6 +24,9 @@ export class VectorLayerSelectionComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if(changes.vectorLayers&&this.vectorLayers) {
       this.selectedLayer = this.vectorLayers[0];
+    }
+    if(changes.vectorLayer){
+      this.selectedLayer = this.vectorLayers?.find(l=>l===this.vectorLayer);
     }
   }
 

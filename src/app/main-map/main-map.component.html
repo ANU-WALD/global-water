@@ -32,13 +32,16 @@
       [style]="{weight:1,fillOpacity:1,color:'#00000099'}">
     </geojson-layer>
 
-    <geojson-layer *ngIf="mapConfig.showVectors&&vectorLayer?.source"
+    <geojson-layer *ngIf="mapConfig.showVectors&&mapConfig.allowPolygonSelection&&vectorLayer?.source"
                    [url]="vectorLayer.source"
                    (featureSelected)="polygonFeatureSelected($event)">
-
     </geojson-layer>
 
-    <vector-tile-layer *ngIf="mapConfig.showVectors&&vectorLayer?.tileLayers"
+    <geojson-layer *ngIf="mapConfig.showVectors&&!mapConfig.allowPolygonSelection&&vectorLayer?.source"
+                   [url]="vectorLayer.source">
+    </geojson-layer>
+
+    <vector-tile-layer *ngIf="mapConfig.showVectors&&mapConfig.allowPolygonSelection&&vectorLayer?.tileLayers"
                        [url]="vectorLayer.tiles"
                        [styles]="vectorStyles"
                        [sublayers]="vectorLayer.tileLayers"
@@ -46,6 +49,12 @@
                        [maxNativeZoom]="vectorLayer.availableZooms[1]"
                        (featureSelected)="polygonFeatureSelected($event)"></vector-tile-layer>
 
+    <vector-tile-layer *ngIf="mapConfig.showVectors&&!mapConfig.allowPolygonSelection&&vectorLayer?.tileLayers"
+                       [url]="vectorLayer.tiles"
+                       [styles]="vectorStyles"
+                       [sublayers]="vectorLayer.tileLayers"
+                       [minNativeZoom]="vectorLayer.availableZooms[0]"
+                       [maxNativeZoom]="vectorLayer.availableZooms[1]"></vector-tile-layer>
 
     <map-control [position]="'TOP_LEFT'">
       <app-map-buttons [basemaps]="basemaps"
@@ -196,6 +205,7 @@
               <div class="col-12">
                 <vector-layer-selection [vectorLayers]="vectorLayers"
                                         [currentZoom]="zoom"
+                                        [vectorLayer]="vectorLayer"
                                         [enabled]="mapConfig.showVectors"
                                         (vectorLayerSelected)="vectorLayerChanged($event)">
                 </vector-layer-selection>

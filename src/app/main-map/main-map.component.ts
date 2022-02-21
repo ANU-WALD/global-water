@@ -71,7 +71,8 @@ export class MainMapComponent implements OnInit {
   mapConfig = {
     latLngSelection: false,
     enableDrawing: false,
-    showVectors: false
+    showVectors: false,
+    allowPolygonSelection: false
   };
 
   pointMode = PointMode;
@@ -167,7 +168,8 @@ export class MainMapComponent implements OnInit {
     const pd = this.layer?.polygonDrill;
     cfg.latLngSelection = pd && (this.polygonMode==='point');
     cfg.enableDrawing =   pd && (this.polygonMode==='draw');
-    cfg.showVectors =     pd && (this.polygonMode==='predefined');
+    cfg.allowPolygonSelection = pd && (this.polygonMode==='predefined');
+    cfg.showVectors =     true;//pd && (this.polygonMode==='predefined');
   }
 
   interpolationSubstitutions(): any {
@@ -575,6 +577,15 @@ export class MainMapComponent implements OnInit {
   }
 
   vectorLayerChanged(vl: VectorLayerDescriptor): void {
+    if((this.polygonMode==='predefined')&&
+    !vl?.source&&
+    !vl?.tileLayers) {
+      setTimeout(()=>{
+        this.polygonMode='point';
+        this.updateMapConfig();
+      })
+    }
+
     this.configureVectorLayer(vl);
   }
 
@@ -583,6 +594,15 @@ export class MainMapComponent implements OnInit {
   }
 
   featureSelectionModeChanged(): void {
+    if((this.polygonMode==='predefined')&&
+       !this.vectorLayer?.source&&
+       !this.vectorLayer?.tileLayers&&
+       this.vectorLayers?.length){
+          setTimeout(()=>{
+            const newLayer = this.vectorLayers.find((l)=>l.source||l.tileLayers);
+            this.configureVectorLayer(newLayer);
+          });
+       }
     this.updateMapConfig();
   }
 

@@ -58,5 +58,8 @@
     "availableZooms":[0,10],
     "displayZooms":[0,999],
     "label":""
+  },
+  {
+    "name": "None"
   }
 ]
